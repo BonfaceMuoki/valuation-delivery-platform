@@ -1,0 +1,59 @@
+version: '3.9'
+services:
+ backend:
+  container_name: backend
+  restart: unless-stopped
+  build:
+   context: ./backend
+   dockerfile: Dockerfile
+  tty: true 
+  networks:
+   - app
+  volumes:
+   - ./backend:/app/backend
+  depends_on:
+   - db
+  ports:
+   - 8000:8000
+ frontend:
+  container_name: frontend
+  build:
+   context: ./frontend
+   dockerfile: Dockerfile
+  tty: true 
+  ports:
+   - 3000:3000
+  volumes:
+   - ./frontend:/app/frontend
+  networks:
+   - app
+ db:
+  image: mysql
+  restart: unless-stopped
+  environment:
+   MYSQL_DATABASE: ${DB_DATABASE}
+   MYSQL_USER: ${DB_USERNAME}
+   MYSQL_PASSWORD: ${DB_PASSWORD}
+   MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+  ports:
+   - 3306:3306
+  networks:
+   - app
+ phpmyadmin:
+  image: phpmyadmin/phpmyadmin
+  restart: unless-stopped
+  tty: true
+  depends_on:
+   - db
+  ports:
+   - 8088:80
+  environment:
+    PMA_HOST: ${DB_HOST}
+    MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+    UPLOAD_LIMIT: 300M
+  networks:
+   - app
+networks:
+ app:
+  driver: bridge
+ 
