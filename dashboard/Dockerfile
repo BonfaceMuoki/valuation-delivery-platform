@@ -5,6 +5,6 @@ COPY . .
 
 RUN npm install
 
-EXPOSE 3000
+RUN npm install nodemon --save-dev
 
-CMD npm start
+EXPOSE 3000

@@ -1,24 +1,32 @@
-import React, { useState } from "react";
-import { Box, useMediaQuery } from "@mui/material";
-import { Outlet } from "react-router-dom";
-import { useSelector,useDispatch } from "react-redux";
-import Navbar from "components/Navbar";
-import Sidebar from "components/Sidebar";
-import { setMode,setLightMode } from "state";
+import React from 'react'
+import {
+  Grid,
+  useTheme,
+  useMediaQuery,
+} from '@mui/material'
+import "../../assets/scss/auth.css"
+import Image from 'mui-image';
+import profileImage from "assets/profile.jpg";
+import { Outlet } from 'react-router-dom';
+const AuthLayout = () => {
+  const isNonMobile = useMediaQuery("(min-width: 600px)");
+  const theme = useTheme();
+  return (
+    <Grid container spacing={2} >
+      <Grid
+        container item md={6}
+        direction="column"
+        display={isNonMobile ? "block" : "none"}
+        height={isNonMobile ? "100vh" : "0px"}
+        backgroundColor={theme.palette.grey[200]}
+      >
+      </Grid>
+      <Grid container item xs={12} md={6} direction="column" gap={5} alignContent={'center'} height={'100vh'} sx={{ justifyContent: 'center' }} >
+        <Outlet />
+      </Grid>
 
-
-const Layout = () => {
-    const isNonMobile = useMediaQuery("(min-width: 600px)");
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-    const dispatch = useDispatch();
-    dispatch(setLightMode("light"));
-
-    return (
-        <Box display={isNonMobile ? "flex" : "block"} width="100%" height="100%">
-                        <Outlet />
-
-        </Box>
-    );
+    </Grid>
+  );
 };
 
-export default Layout;
+export default AuthLayout;

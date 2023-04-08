@@ -19,10 +19,10 @@ function App() {
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <Routes>
-            <Route element={<AuthLayout/>}>
+          <Route element={<AuthLayout />}>
               <Route path="/login" element={<Login/>} />
               <Route path="/signup" element={<Signup/>} />
-            </Route>
+        </Route>
             <Route element={<Layout />}>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
