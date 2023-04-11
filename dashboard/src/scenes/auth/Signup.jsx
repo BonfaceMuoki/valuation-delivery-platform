@@ -53,32 +53,32 @@ function Signup() {
 
           <Typography variant='p' sx={{ mb: 4 }} align='center' >Creating A company Account</Typography>
           <Typography sx={{ ml: 1 }}>Your Full Names</Typography>
-          <TextField placeholder='Full Names' sx={{ m: 1 }} id="outlined-basic" />
+          <TextField placeholder='Full Names' sx={{ m: 1 }} id="outlined-basic" fullWidth />
           <Typography sx={{ ml: 1 }}>Account Login Email</Typography>
-          <TextField placeholder='Account Login Email' sx={{ m: 1 }} id="outlined-basic" />
+          <TextField placeholder='Account Login Email' sx={{ m: 1 }} id="outlined-basic" fullWidth />
           <Typography sx={{ ml: 1 }}>Company Name</Typography>
-          <TextField placeholder='Company Name' sx={{ m: 1 }} id="outlined-basic" />
+          <TextField placeholder='Company Name' sx={{ m: 1 }} id="outlined-basic" fullWidth />
           <Grid container direction={isNonMobile ? 'row' : 'column'} >
-            <Grid md={6} sm={12}>
+            <Grid md={6} sm={12} sx={{mb:1}}>
             <Typography sx={{ ml: 1 }}>Directors VRB Number</Typography>
-          <TextField placeholder='Directors VRB Number' sx={{ m: 1 }} id="outlined-basic" />
+          <TextField placeholder='Directors VRB Number'  sx={{ pl:1 }} fullWidth id="outlined-basic" />
             </Grid>
-            <Grid md={6} sm={12}>
+            <Grid md={6} sm={12} sx={{mb:1}}>
             <Typography sx={{ ml: 1 }}>ISK Number</Typography>
-          <TextField placeholder='ISK Number' sx={{ m: 1 }} id="outlined-basic" />
+          <TextField placeholder='ISK Number'  sx={{ pl:1 }} fullWidth id="outlined-basic" />
             </Grid>
           </Grid>
           <Typography sx={{ ml: 1 }}>Contact Phone Number</Typography>
-          <TextField placeholder='Contact Phone Number' sx={{ m: 1 }} id="outlined-basic" />
+          <TextField placeholder='Contact Phone Number'  sx={{ pl:1, mb:1 }} id="outlined-basic"  fullWidth/>
           
           <Grid container direction={isNonMobile ? 'row' : 'column'}  >
-            <Grid md={6}  sm={12} >
+            <Grid md={6}  sm={12} sx={{mb:1}}>
             <Typography sx={{ ml: 1 }} >Password</Typography>
-          <TextField type='password' placeholder='Password' sx={{ m: 1 }} id="outlined-basic" />
+          <TextField type='password' placeholder='Password'  sx={{ pl: 1}} fullWidth id="outlined-basic" />
             </Grid>
-            <Grid md={6} sm={12}>
+            <Grid md={6} sm={12} sx={{mb:1}}>
             <Typography sx={{ ml: 1 }} >Confirm Password</Typography>
-          <TextField type='password' placeholder='Confirm Password' sx={{ m: 1 }} id="outlined-basic" />
+          <TextField type='password' placeholder='Confirm Password' sx={{pl:1 }} fullWidth id="outlined-basic" />
             </Grid>
           </Grid>
 

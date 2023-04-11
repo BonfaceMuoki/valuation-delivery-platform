@@ -28,6 +28,7 @@ services:
   networks:
    - app
  db:
+  container_name: db
   image: mysql
   restart: unless-stopped
   environment:
@@ -40,6 +41,7 @@ services:
   networks:
    - app
  phpmyadmin:
+  container_name: phpmyadmin
   image: phpmyadmin/phpmyadmin
   restart: unless-stopped
   tty: true
