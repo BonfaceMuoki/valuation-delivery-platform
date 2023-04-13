@@ -18,8 +18,8 @@ return new class extends Migration
         $table->unsignedBigInteger('user_id');
         $table->unsignedBigInteger('organization_id');
         //FOREIGN KEY
-        $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-        $table->foreign('organization_id')->references('id')->on('report_consumers')->onDelete('cascade');
+        $table->foreign('user_id')->references('id')->on('users');
+        $table->foreign('organization_id')->references('id')->on('report_consumers');
         //PRIMARY KEYS
         $table->primary(['user_id', 'organization_id']);
     });

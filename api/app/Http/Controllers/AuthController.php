@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Role;
 use Mockery\Exception;
 use App\Models\Property;
+use App\Models\Organization;
 use Validator;
 use DB;
 use Mail;
@@ -55,12 +56,13 @@ class AuthController extends Controller
     public function register(Request $request)
         {
         $validator = Validator::make($request->all(), [
-            'register_as' => 'required|in:Tenant,Owner',
+            'register_as' => 'required|in:Super Admin,Report Uploader,Uploaders Accesser',
             'full_name' => 'required|string|between:2,100',
-            'last_name' => 'required|string|between:2,100',
-            'phone_number' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:users',
-            'nin_number' => 'required|string|unique:users',
-            'email' => 'required|string|email|max:100|unique:users',
+            'company_name' => 'required|string|between:2,100',
+            'email' => 'required|string|between:2,100',
+            'organization_phone' => 'regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:organizations',
+            'directors_vrb' => 'required|string|unique:organizations',
+            'isk_number' => 'required|string|max:100|unique:organizations',
             'password' => ['required', Password::min(6)->letters()->mixedCase()->numbers()->symbols()->uncompromised()],
             'password_confirmation' => 'required|same:password'
         ]);
@@ -71,24 +73,33 @@ class AuthController extends Controller
         try {
             DB::beginTransaction();
             $user = User::create(
-                array_merge(
-                    $validator->validated(),
-                    ['password' => bcrypt($request->password)]
-                )
+                [
+                    'full_name' => $request->full_name,
+                    'email' => $request->email,
+                    'password' => bcrypt($request->password)
+                ]
             );
-            if (strtolower($request->post('register_as')) == 'admin') {
-                $admin_role = Role::where('slug', 'admin')->first();
-                $user->roles()->attach($admin_role);
-                } else if (strtolower($request->post('register_as')) == 'owner') {
-                $owner_role = Role::where('slug', 'owner')->first();
-                $user->roles()->attach($owner_role);
-                } else if (strtolower($request->post('register_as')) == 'tenant') {
-                $tenant_role = Role::where('slug', 'tenant')->first();
-                $user->roles()->attach($tenant_role);
+            //crete a company
+            $company['organization_name']=$request->post('company_name');
+            $company['organization_phone']=$request->post('organization_phone');
+            $company['organization_email']=$request->post('company_email');
+            $company['directors_vrb']=$request->post('directors_vrb');
+            $company['isk_number']=$request->post('isk_number');
+            $company['created_by']=$user->id;
+            $organization = Organization::create($company);
+            //crete a company
+            if (strtolower($request->post('register_as')) == 'report uploader admin') {
+                $uploaderadmin_role = Role::where('slug', 'report uploader admin')->first();
+                $user->roles()->attach($uploaderadmin_role);
                 }
+                //link org and user
+                $organization->users()->attach($user);
+                //link org and user
             DB::commit();
             return response()->json([
                 'message' => 'Account has been created successfully',
+                'organization_d' => $organization,
+                'organization_users' => $organization->with("users")->get(),
                 'user' => $user
             ], 201);
 
@@ -97,8 +108,8 @@ class AuthController extends Controller
         catch (\Exception $exp) {
             DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
             return response()->json([
-                'message' => 'Account has been created successfully',
-                'user' => $user
+                'message' => 'Account has mot been created successfully',
+                'error' => $exp
             ], 400);
 
             }

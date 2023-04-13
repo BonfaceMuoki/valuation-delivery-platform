@@ -23,8 +23,9 @@ return new class extends Migration
             $table->string("organization_logo")->nullable();
             $table->string("idemnity_amount")->nullable();
             $table->string("idemnity_expiry")->nullable();
-            $table->string("created_by");
+            $table->unsignedBigInteger("created_by");
             $table->timestamps();
+            $table->foreign("created_by")->references('id')->on("users")->onDelete("cascade");
         });
     }
 
