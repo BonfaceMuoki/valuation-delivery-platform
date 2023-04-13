@@ -27,6 +27,7 @@ return array(
     'App\\Mail\\SendTenantEmail' => $baseDir . '/app/Mail/SendTenantEmail.php',
     'App\\Models\\Organization' => $baseDir . '/app/Models/Organization.php',
     'App\\Models\\Permission' => $baseDir . '/app/Models/Permission.php',
+    'App\\Models\\ReportConsumers' => $baseDir . '/app/Models/ReportConsumers.php',
     'App\\Models\\Role' => $baseDir . '/app/Models/Role.php',
     'App\\Models\\User' => $baseDir . '/app/Models/User.php',
     'App\\Permissions\\HasPermissionsTrait' => $baseDir . '/app/Permissions/HasPermissionsTrait.php',

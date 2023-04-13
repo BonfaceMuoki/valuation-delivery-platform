@@ -56,7 +56,7 @@ class AuthController extends Controller
         {
         $validator = Validator::make($request->all(), [
             'register_as' => 'required|in:Tenant,Owner',
-            'first_name' => 'required|string|between:2,100',
+            'full_name' => 'required|string|between:2,100',
             'last_name' => 'required|string|between:2,100',
             'phone_number' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:users',
             'nin_number' => 'required|string|unique:users',

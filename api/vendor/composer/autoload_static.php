@@ -555,6 +555,7 @@ class ComposerStaticInit34b0b8700393955396f3f7858c11f867
         'App\\Mail\\SendTenantEmail' => __DIR__ . '/../..' . '/app/Mail/SendTenantEmail.php',
         'App\\Models\\Organization' => __DIR__ . '/../..' . '/app/Models/Organization.php',
         'App\\Models\\Permission' => __DIR__ . '/../..' . '/app/Models/Permission.php',
+        'App\\Models\\ReportConsumers' => __DIR__ . '/../..' . '/app/Models/ReportConsumers.php',
         'App\\Models\\Role' => __DIR__ . '/../..' . '/app/Models/Role.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
         'App\\Permissions\\HasPermissionsTrait' => __DIR__ . '/../..' . '/app/Permissions/HasPermissionsTrait.php',
