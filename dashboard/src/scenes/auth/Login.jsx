@@ -18,6 +18,10 @@ import { useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { alert, defaultModules } from '@pnotify/core';
+import '@pnotify/core/dist/PNotify.css';
+import * as PNotifyMobile from '@pnotify/mobile';
+import '@pnotify/mobile/dist/PNotifyMobile.css';
 
 // 👇 Styled React Route Dom Link Component
 export const LinkItem = styled(Link)`
@@ -28,6 +32,7 @@ export const LinkItem = styled(Link)`
     color: #5ea1b6;
   }
 `;
+defaultModules.set(PNotifyMobile, {});
 
 
 function Login() {
@@ -46,7 +51,9 @@ function Login() {
     resolver: yupResolver(schema),
 });
   const submitLoginForm = ()=>{
-    alert("submit?");
+    alert({
+      text: 'Notice me, senpai!',
+    });
   }
 
   return (
@@ -54,28 +61,17 @@ function Login() {
         <Box display={'flex'} flexDirection={'column'}
           width={isNonMobile ? "50%" : "80%"}
           sx={{
-
             justifyContent: 'center',
-            marginRight: '10%',
-            marginLeft: '20%',
             borderColor: theme.palette.primary,
-            borderRadius: '10px'
           }}  >
 <form className='form' name="loginform" onSubmit={handleSubmit(submitLoginForm)}>
-
-
           <Typography variant='h2' sx={{ mb: 2, fontWeight: 'bold' }} align='center'  >LOGIN</Typography>
-
-          {/* <Typography variant='p' sx={{ mb: 2 }} align='center'  fullWidth>Please Login to continue</Typography> */}
           <Typography sx={{ ml: 2 }}>Username</Typography>
           <Typography sx={{ ml: 2 }} className="errorp">{errors.email?.message}</Typography>
-          <TextField placeholder='Username' sx={{ m: 2 }} id="outlined-basic" fullWidth {...register("email")} />
-     
+          <TextField placeholder='Username' sx={{ m: 2 }} id="outlined-basic" fullWidth {...register("email")} />     
           <Typography sx={{ ml: 2 }} >Password</Typography>
           <Typography sx={{ ml: 2 }} className="errorp">{errors.password?.message}</Typography>
           <TextField type='password' placeholder='Password' sx={{ m: 2 }} id="outlined-basic" fullWidth {...register("password")} />
-
-          <br/>
           <Button
             type="submit"
             variant='contained'

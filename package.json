@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@sweetalert2/theme-material-ui": "^5.0.15",
+    "sweetalert2": "^11.7.3"
+  },
+  "devDependencies": {
+    "pnotify": "^5.2.0"
+  }
+}
