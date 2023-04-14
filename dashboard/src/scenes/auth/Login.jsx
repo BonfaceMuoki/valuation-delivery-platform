@@ -39,8 +39,8 @@ function Login() {
   const {data}= useGetUsersQuery();
   console.log("data "+data+ " userid"+userId);
   const schema = yup.object().shape({
-    email:yup.string().required(),
-    password: yup.string().required()
+    email:yup.string().required("Please provide your Username/Email"),
+    password: yup.string().required("Please provide your Password.")
   });
   const {register,handleSubmit,formState : {errors} } = useForm({
     resolver: yupResolver(schema),
@@ -68,11 +68,13 @@ function Login() {
 
           {/* <Typography variant='p' sx={{ mb: 2 }} align='center'  fullWidth>Please Login to continue</Typography> */}
           <Typography sx={{ ml: 2 }}>Username</Typography>
+          <Typography sx={{ ml: 2 }} className="errorp">{errors.email?.message}</Typography>
           <TextField placeholder='Username' sx={{ m: 2 }} id="outlined-basic" fullWidth {...register("email")} />
-          <p className="errorp">{errors.email?.message}</p><br/>
+     
           <Typography sx={{ ml: 2 }} >Password</Typography>
+          <Typography sx={{ ml: 2 }} className="errorp">{errors.password?.message}</Typography>
           <TextField type='password' placeholder='Password' sx={{ m: 2 }} id="outlined-basic" fullWidth {...register("password")} />
-          <p className="errorp">{errors.password?.message}</p><br/>
+
           <br/>
           <Button
             type="submit"
