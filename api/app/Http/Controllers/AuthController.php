@@ -27,7 +27,7 @@ class AuthController extends Controller
      */
     public function __construct()
         {
-        $this->middleware('auth:api', ['except' => ['registertenant', 'login', 'register']]);
+        $this->middleware('auth:api', ['except' => ['registertenant', 'login', 'register','allUsers']]);
         }
     /**
      * Get a JWT via given credentials.
@@ -56,7 +56,7 @@ class AuthController extends Controller
     public function register(Request $request)
         {
         $validator = Validator::make($request->all(), [
-            'register_as' => 'required|in:Super Admin,Report Uploader,Uploaders Accesser',
+            'register_as' => 'required|in:Super Admin,Report Uploader,Uploaders Accesser,report uploader admin',
             'full_name' => 'required|string|between:2,100',
             'company_name' => 'required|string|between:2,100',
             'email' => 'required|string|between:2,100',
@@ -245,5 +245,8 @@ class AuthController extends Controller
             'token' => $token,
             'created_at' => Carbon::now()
         ]);
+        }
+        public function allUsers(){
+            return response()->json(["users"=>User::all()]);
         }
     }

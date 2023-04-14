@@ -20,6 +20,8 @@ import Image from 'mui-image';
 import profileImage from "assets/profile.jpg";
 import { Link } from 'react-router-dom';
 import styled from '@emotion/styled';
+import { useGetUsersQuery } from 'features/authapi';
+import { useSelector } from "react-redux";
 
 // 👇 Styled React Route Dom Link Component
 export const LinkItem = styled(Link)`
@@ -36,6 +38,11 @@ function Login() {
   const [checked, setChecked] = useState(true);
   const theme = useTheme();
   const isNonMobile = useMediaQuery("(min-width: 600px)");
+
+  const userId = useSelector((state)=>state.global.userId);
+  const {data}= useGetUsersQuery();
+  console.log("data "+data+ " userid"+userId);
+
   return (
 
         <Box display={'flex'} flexDirection={'column'}
