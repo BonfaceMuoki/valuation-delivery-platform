@@ -7,3 +7,6 @@ body,
   width:100%;
   font-family: "inter", sans-serif;
 }
+.errorp{
+  color:red;
+}

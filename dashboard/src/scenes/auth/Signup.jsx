@@ -59,11 +59,11 @@ function Signup() {
           <Typography sx={{ ml: 1 }}>Company Name</Typography>
           <TextField placeholder='Company Name' sx={{ m: 1 }} id="outlined-basic" fullWidth />
           <Grid container direction={isNonMobile ? 'row' : 'column'} >
-            <Grid md={6} sm={12} sx={{mb:1}}>
+            <Grid item md={6} sm={12} sx={{mb:1}}>
             <Typography sx={{ ml: 1 }}>Directors VRB Number</Typography>
           <TextField placeholder='Directors VRB Number'  sx={{ pl:1 }} fullWidth id="outlined-basic" />
             </Grid>
-            <Grid md={6} sm={12} sx={{mb:1}}>
+            <Grid item md={6} sm={12} sx={{mb:1}}>
             <Typography sx={{ ml: 1 }}>ISK Number</Typography>
           <TextField placeholder='ISK Number'  sx={{ pl:1 }} fullWidth id="outlined-basic" />
             </Grid>
@@ -72,11 +72,11 @@ function Signup() {
           <TextField placeholder='Contact Phone Number'  sx={{ pl:1, mb:1 }} id="outlined-basic"  fullWidth/>
           
           <Grid container direction={isNonMobile ? 'row' : 'column'}  >
-            <Grid md={6}  sm={12} sx={{mb:1}}>
+            <Grid item md={6}  sm={12} sx={{mb:1}}>
             <Typography sx={{ ml: 1 }} >Password</Typography>
           <TextField type='password' placeholder='Password'  sx={{ pl: 1}} fullWidth id="outlined-basic" />
             </Grid>
-            <Grid md={6} sm={12} sx={{mb:1}}>
+            <Grid item md={6} sm={12} sx={{mb:1}}>
             <Typography sx={{ ml: 1 }} >Confirm Password</Typography>
           <TextField type='password' placeholder='Confirm Password' sx={{pl:1 }} fullWidth id="outlined-basic" />
             </Grid>
@@ -88,10 +88,10 @@ function Signup() {
             sx={{ m: 2, backgroundColor: theme.palette.primary[800] }}
             size='large' >Login</Button>
           <Grid container direction={isNonMobile ? 'row' : 'column'} sx={{ m: 2 }} >
-            <Grid md={6} sm={12}>
+            <Grid item md={6} sm={12}>
               <Link to={'/login'} >Have an Account?  Login</Link>
             </Grid>
-            <Grid md={6} sm={12}>
+            <Grid item md={6} sm={12}>
               <Link to={'/forgot-password'}>Forgot password</Link>
             </Grid>
           </Grid>
