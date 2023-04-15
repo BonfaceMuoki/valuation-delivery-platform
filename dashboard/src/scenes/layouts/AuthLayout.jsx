@@ -12,6 +12,7 @@ const AuthLayout = () => {
   const isNonMobile = useMediaQuery("(min-width: 600px)");
   const theme = useTheme();
   return (
+    
     <Grid container spacing={2} >
       <Grid
         container item md={6}

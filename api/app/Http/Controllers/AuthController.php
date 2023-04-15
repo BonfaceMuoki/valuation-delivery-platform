@@ -35,7 +35,10 @@ class AuthController extends Controller
      * @return \Illuminate\Http\JsonResponse
      */
     public function login(Request $request)
-        {
+        {   $image=$request->file('image');
+            
+            return response()->json(['error' => 'Unauthorized','data'=>$image->getClientOriginalName()], 401);
+
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required|string|min:6',
