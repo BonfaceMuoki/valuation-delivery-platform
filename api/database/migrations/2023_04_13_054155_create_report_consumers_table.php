@@ -32,6 +32,8 @@ return new class extends Migration
      */
     public function down()
     {
+        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('report_consumers');
+        Schema::enableForeignKeyConstraints();
     }
 };

@@ -16,12 +16,12 @@ return new class extends Migration
         Schema::create('report_consumer_users', function (Blueprint $table)
         {//
         $table->unsignedBigInteger('user_id');
-        $table->unsignedBigInteger('organization_id');
+        $table->unsignedBigInteger('report_consumer_id');
         //FOREIGN KEY
-        $table->foreign('user_id')->references('id')->on('users');
-        $table->foreign('organization_id')->references('id')->on('report_consumers');
+        $table->foreign('user_id')->references('id')->on('users')->onDelete("cascade");
+        $table->foreign('report_consumer_id')->references('id')->on('report_consumers')->onDelete("cascade");
         //PRIMARY KEYS
-        $table->primary(['user_id', 'organization_id']);
+        $table->primary(['user_id', 'report_consumer_id']);
     });
     }
 
@@ -32,6 +32,8 @@ return new class extends Migration
      */
     public function down()
     {
-        //
+        Schema::disableForeignKeyConstraints();
+    Schema::drop('report_consumer_users');
+    Schema::enableForeignKeyConstraints();
     }
 };

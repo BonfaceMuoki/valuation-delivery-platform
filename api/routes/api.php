@@ -29,6 +29,8 @@ Route::group([
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/all-users', [AuthController::class, 'allUsers']);
     Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/register-accesor', [AuthController::class, 'registerAccesor']);
+    
     Route::post('/invite-tenant', [AuthController::class, 'inviteTenant']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/refresh', [AuthController::class, 'refresh']);

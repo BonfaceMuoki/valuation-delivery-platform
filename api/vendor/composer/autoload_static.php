@@ -558,6 +558,7 @@ class ComposerStaticInit34b0b8700393955396f3f7858c11f867
         'App\\Models\\ReportConsumers' => __DIR__ . '/../..' . '/app/Models/ReportConsumers.php',
         'App\\Models\\Role' => __DIR__ . '/../..' . '/app/Models/Role.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
+        'App\\Models\\ValuationReport' => __DIR__ . '/../..' . '/app/Models/ValuationReport.php',
         'App\\Permissions\\HasPermissionsTrait' => __DIR__ . '/../..' . '/app/Permissions/HasPermissionsTrait.php',
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
         'App\\Providers\\AuthServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AuthServiceProvider.php',

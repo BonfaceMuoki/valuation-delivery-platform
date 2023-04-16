@@ -10,10 +10,9 @@ import {
 } from '@mui/material'
 import { useState } from 'react';
 import "../../assets/scss/auth.css"
-import { Link } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
-import { useGetUsersQuery,useLoginUserMutation } from 'features/authapi';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -26,6 +25,8 @@ import '@pnotify/mobile/dist/PNotifyMobile.css';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import { ToastContainer, toast } from 'react-toastify';
+import { useLoginMutation } from './authApiSlice';
+import { setCredentials } from './authSlice'; 
 
 // 👇 Styled React Route Dom Link Component
 export const LinkItem = styled(Link)`
@@ -40,11 +41,11 @@ defaultModules.set(PNotifyMobile, {});
 
 
 function Login() {
+  const dispatch = useDispatch();
   const [checked, setChecked] = useState(true);
   const theme = useTheme();
   const isNonMobile = useMediaQuery("(min-width: 600px)");
-  const userId = useSelector((state) => state.global.userId);
-  const { data } = useGetUsersQuery();
+  // const { data } = useGetUsersQuery();
   const schema = yup.object().shape({
     email: yup.string().required("Please provide your Username/Email"),
     password: yup.string().required("Please provide your Password.")
@@ -52,27 +53,26 @@ function Login() {
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
   });
-  const [addNewPost, response] = useLoginUserMutation();
   const [open, setOpen] = React.useState(false);
-  const submitLoginForm = (data) => {
+
+  const [login, { isLoading }] = useLoginMutation();
+  const navigate = useNavigate();
+
+  const  submitLoginForm = async (data) => {
     // setOpen(true);
     // setOpen(false);
     let formData= new FormData();
     formData.append("image",image);
     formData.append("email",data.email);
     formData.append("password",data.password);
-
-    addNewPost(formData)
-      .unwrap()
-      .then((response) => {
-        console.log(response);
-      })
-      .then((error) => {
-        console.log(error)
-      })
-    toast.success('Success Notification !', {
-      position: toast.POSITION.TOP_RIGHT
-    });
+    let email=data.email;
+    let password = data.password;
+    const userData = await login({ email, password }).unwrap()
+    dispatch(setCredentials({ ...userData, email }));
+    console.log(userData);
+    navigate('/')
+    
+ 
   }
   //upload image
   const [image,setImage]=useState();

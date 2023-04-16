@@ -30,6 +30,7 @@ return array(
     'App\\Models\\ReportConsumers' => $baseDir . '/app/Models/ReportConsumers.php',
     'App\\Models\\Role' => $baseDir . '/app/Models/Role.php',
     'App\\Models\\User' => $baseDir . '/app/Models/User.php',
+    'App\\Models\\ValuationReport' => $baseDir . '/app/Models/ValuationReport.php',
     'App\\Permissions\\HasPermissionsTrait' => $baseDir . '/app/Permissions/HasPermissionsTrait.php',
     'App\\Providers\\AppServiceProvider' => $baseDir . '/app/Providers/AppServiceProvider.php',
     'App\\Providers\\AuthServiceProvider' => $baseDir . '/app/Providers/AuthServiceProvider.php',

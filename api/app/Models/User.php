@@ -55,14 +55,13 @@ class User extends Authenticatable implements JWTSubject
         {
         return [];
         }
-    public function properties()
-        {
-        return $this->hasMany(Property::class, "user_id")->with("units");
 
-        }
-    public function myunits()
-        {
-        return $this->belongsToMany(Unit::class, 'property_tenants')->withPivot('is_active');
-        }
+ 
+    public function UploaderOrganization(){
+      return $this->belongsToMany(Organization::class,"organization_users","user_id","organization_id");
+    }
+    public function AccessorOrganization(){
+        return $this->belongsToMany(ReportConsumer::class,"report_consumer_users","user_id","report_consumer_id");
+    }
 
     }

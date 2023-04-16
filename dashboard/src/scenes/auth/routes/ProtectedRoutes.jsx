@@ -1,14 +1,15 @@
-import React, { useState } from 'react'
-import { Navigate, Outlet } from 'react-router-dom'
-function ProtectedRoutes() {
-    const [isLogged, setIsLogged] = useState(false);
-    if (isLogged) {
-        return <Outlet/>
-    } else {
-        return <Navigate to="/login" replace />;
-    }
+import { useLocation, Navigate, Outlet } from "react-router-dom"
+import { useSelector } from "react-redux"
+import { selectCurrentToken } from "../authSlice"
 
+const RequireAuth = () => {
+    const token = useSelector(selectCurrentToken)
+    const location = useLocation()
 
+    return (
+        token
+            ? <Outlet />
+            : <Navigate to="/login" state={{ from: location }} replace />
+    )
 }
-
-export default ProtectedRoutes
+export default RequireAuth

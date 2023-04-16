@@ -12,7 +12,7 @@ import Login from "./scenes/auth/Login";
 import Signup from "./scenes/auth/Signup";
 import ProtectedRoutes from "scenes/auth/routes/ProtectedRoutes";
 function App() {
-  const mode = useSelector((state) => state.global.mode);
+  const mode = useSelector((state) => state.auth.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
   return (
     <div className="App">
@@ -24,12 +24,12 @@ function App() {
               <Route path="/login" element={<Login/>} />
               <Route path="/signup" element={<Signup/>} />
         </Route>
-  
-            <Route element={<ProtectedRoutes><Layout /></ProtectedRoutes>}>
+        <Route element={<ProtectedRoutes />}>
+            <Route element={<Layout/>}>
               <Route path="/" element={<Navigate to="/dashboard" replace />} />
               <Route path="/dashboard" element={<Dashboard />} />
             </Route>
-            
+            </Route>
           </Routes>
         </ThemeProvider>
       </BrowserRouter>
