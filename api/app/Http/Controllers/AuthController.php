@@ -125,6 +125,8 @@ class AuthController extends Controller
                         'password' => bcrypt($request->password)
                     ]
                 );
+                $uploader_role = Role::where('slug', 'report uploader')->first();
+                $user->roles()->attach($uploader_role);
                 //
                 $loggeduser=auth()->user();
                 $organizations=$loggeduser->UploaderOrganization()->get();
@@ -136,14 +138,22 @@ class AuthController extends Controller
             }
             else if(strtolower($request->post('register_as')) == 'valuation firm director'){
 
+            }else if(strtolower($request->post('register_as')) == 'super admin'){
+                $user = User::create(
+                    [
+                        'full_name' => $request->full_name,
+                        'email' => $request->email,
+                        'password' => bcrypt($request->password)
+                    ]
+                );
+                $superadmin_role = Role::where('slug', 'super admin')->first();
+                $user->roles()->attach($superadmin_role);
             }
             DB::commit();
             return response()->json([
                 'message' => 'Account has been created successfully',
-                'org' =>$organizations,
-                'organization_d_u' => $user->UploaderOrganization()->get(),
-                'organization_d_a' => $user->AccessorOrganization()->get(),
-                'user' => $user
+                'user' => $user,
+                'roles' => $user->roles()->get()
             ], 201);
 
 
@@ -160,7 +170,7 @@ class AuthController extends Controller
 public function registerAccesor(Request $request){
 
     $validator = Validator::make($request->all(), [
-        'register_as' => 'required|in:Report Uploader,Report Accessor Admin',
+        'register_as' => 'required|in:Report Accessor,Report Accessor Admin',
         'full_name' => 'required|string|between:2,100',
         'email' => 'required|string|between:2,100',
         'password' => ['required', Password::min(6)->letters()->mixedCase()->numbers()->symbols()->uncompromised()],
@@ -204,7 +214,7 @@ public function registerAccesor(Request $request){
                 $organization = ReportConsumer::create($company);
 
                 $organization->users()->attach($user);
-                
+
 
             }else{
                 $organization->users()->attach($user);
@@ -240,7 +250,6 @@ public function registerAccesor(Request $request){
         DB::commit();
         return response()->json([
             'message' => 'Account has been created successfully',
-            'org' =>$organizations,
             'organization_d_u' => $user->UploaderOrganization()->get(),
             'organization_d_a' => $user->AccessorOrganization()->get(),
             'user' => $user

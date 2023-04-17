@@ -1,7 +1,5 @@
 <?php
-use App\Http\Controllers\OwnerController;
-use App\Http\Controllers\PropertyController;
-use App\Http\Controllers\TenantController;
+use App\Http\Controllers\CommonController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -37,6 +35,17 @@ Route::group([
     Route::get('/user-profile', [AuthController::class, 'userProfile']);
     Route::get('/owner-details', [AuthController::class, 'userDetails']);
     });
+    Route::group([
+        'middleware' => 'api',
+        'prefix' => 'commons'
+    ], function ($router)
+        {
+        Route::get('/get-accesors-list', [CommonController::class, 'getAccesorsList']);
+        Route::get('/get-accesors-users-list/{accesor}', [CommonController::class, 'getAccesorsUsersList']);
+        Route::get('/get-uploaders-list', [CommonController::class, 'getUploadersList']);
+        Route::get('/get-uploaders-users-list/{uploader}', [CommonController::class, 'getUploadersUsersList']);
+        });
+    
 Route::post('/reset-password-request', [PasswordResetRequestController::class, 'sendPasswordResetEmail']);
 Route::post('/change-password', [ChangePasswordController::class, 'passwordResetProcess']);
 

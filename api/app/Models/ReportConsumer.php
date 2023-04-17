@@ -18,6 +18,6 @@ class ReportConsumer extends Model
     ];
       public function users()
       {
-        return $this->belongsToMany(User::class, 'report_consumer_users');
+        return $this->belongsToMany(User::class, 'report_consumer_users')->with("roles");
       }
 }
