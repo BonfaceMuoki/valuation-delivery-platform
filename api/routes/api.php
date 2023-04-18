@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CommonController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -6,6 +7,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PasswordResetRequestController;
 
 use App\Http\Controllers\ChangePasswordController;
+use App\Http\Controllers\ValuerController;
+
 
 ;
 
@@ -45,6 +48,30 @@ Route::group([
         Route::get('/get-uploaders-list', [CommonController::class, 'getUploadersList']);
         Route::get('/get-uploaders-users-list/{uploader}', [CommonController::class, 'getUploadersUsersList']);
         });
+        Route::group([
+            'middleware' => 'api',
+            'prefix' => 'admin'
+        ], function ($router)
+            {
+            Route::post('/add-role', [AdminController::class, 'addRoles']);
+            Route::get('/get-all-roles', [AdminController::class, 'getAllRoles']);
+            Route::get('/get-all-permissions', [AdminController::class, 'getAllPermissions']);
+            Route::post('/add-permissions', [AdminController::class, 'addPermissions']);
+            Route::post('/assign-role-permissions', [AdminController::class, 'assignRolePermissions']);
+            Route::get('/get-role-permissions', [AdminController::class, 'getRolePermissions']);
+            
+
+            
+            });
+            Route::group([
+                'middleware' => 'api',
+                'prefix' => 'uploader'
+            ], function ($router)
+                {
+                Route::post('/upload-report', [ValuerController::class, 'uploadReport']);
+                });
+
+            
     
 Route::post('/reset-password-request', [PasswordResetRequestController::class, 'sendPasswordResetEmail']);
 Route::post('/change-password', [ChangePasswordController::class, 'passwordResetProcess']);

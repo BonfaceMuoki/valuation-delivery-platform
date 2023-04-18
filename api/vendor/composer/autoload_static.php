@@ -162,6 +162,7 @@ class ComposerStaticInit34b0b8700393955396f3f7858c11f867
         'C' => 
         array (
             'Cron\\' => 5,
+            'Codedge\\Fpdf\\' => 13,
             'Carbon\\' => 7,
         ),
         'B' => 
@@ -508,6 +509,10 @@ class ComposerStaticInit34b0b8700393955396f3f7858c11f867
         array (
             0 => __DIR__ . '/..' . '/dragonmantank/cron-expression/src/Cron',
         ),
+        'Codedge\\Fpdf\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/codedge/laravel-fpdf/src',
+        ),
         'Carbon\\' => 
         array (
             0 => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon',
@@ -536,11 +541,15 @@ class ComposerStaticInit34b0b8700393955396f3f7858c11f867
     public static $classMap = array (
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Exceptions\\Handler' => __DIR__ . '/../..' . '/app/Exceptions/Handler.php',
+        'App\\Http\\Controllers\\AdminController' => __DIR__ . '/../..' . '/app/Http/Controllers/AdminController.php',
         'App\\Http\\Controllers\\AuthController' => __DIR__ . '/../..' . '/app/Http/Controllers/AuthController.php',
+        'App\\Http\\Controllers\\CommonController' => __DIR__ . '/../..' . '/app/Http/Controllers/CommonController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
         'App\\Http\\Controllers\\HomeController' => __DIR__ . '/../..' . '/app/Http/Controllers/HomeController.php',
         'App\\Http\\Controllers\\PasswordResetRequestController' => __DIR__ . '/../..' . '/app/Http/Controllers/PasswordResetRequestController.php',
+        'App\\Http\\Controllers\\ValuerController' => __DIR__ . '/../..' . '/app/Http/Controllers/ValuerController.php',
         'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
+        'App\\Http\\Middleware\\Admin' => __DIR__ . '/../..' . '/app/Http/Middleware/Admin.php',
         'App\\Http\\Middleware\\Authenticate' => __DIR__ . '/../..' . '/app/Http/Middleware/Authenticate.php',
         'App\\Http\\Middleware\\EncryptCookies' => __DIR__ . '/../..' . '/app/Http/Middleware/EncryptCookies.php',
         'App\\Http\\Middleware\\PreventRequestsDuringMaintenance' => __DIR__ . '/../..' . '/app/Http/Middleware/PreventRequestsDuringMaintenance.php',
@@ -555,7 +564,7 @@ class ComposerStaticInit34b0b8700393955396f3f7858c11f867
         'App\\Mail\\SendTenantEmail' => __DIR__ . '/../..' . '/app/Mail/SendTenantEmail.php',
         'App\\Models\\Organization' => __DIR__ . '/../..' . '/app/Models/Organization.php',
         'App\\Models\\Permission' => __DIR__ . '/../..' . '/app/Models/Permission.php',
-        'App\\Models\\ReportConsumers' => __DIR__ . '/../..' . '/app/Models/ReportConsumers.php',
+        'App\\Models\\ReportConsumer' => __DIR__ . '/../..' . '/app/Models/ReportConsumer.php',
         'App\\Models\\Role' => __DIR__ . '/../..' . '/app/Models/Role.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
         'App\\Models\\ValuationReport' => __DIR__ . '/../..' . '/app/Models/ValuationReport.php',
@@ -564,6 +573,7 @@ class ComposerStaticInit34b0b8700393955396f3f7858c11f867
         'App\\Providers\\AuthServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AuthServiceProvider.php',
         'App\\Providers\\BroadcastServiceProvider' => __DIR__ . '/../..' . '/app/Providers/BroadcastServiceProvider.php',
         'App\\Providers\\EventServiceProvider' => __DIR__ . '/../..' . '/app/Providers/EventServiceProvider.php',
+        'App\\Providers\\PermissionsServiceProvider' => __DIR__ . '/../..' . '/app/Providers/PermissionsServiceProvider.php',
         'App\\Providers\\RouteServiceProvider' => __DIR__ . '/../..' . '/app/Providers/RouteServiceProvider.php',
         'Attribute' => __DIR__ . '/..' . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
         'Brick\\Math\\BigDecimal' => __DIR__ . '/..' . '/brick/math/src/BigDecimal.php',
@@ -664,6 +674,9 @@ class ComposerStaticInit34b0b8700393955396f3f7858c11f867
         'Carbon\\Translator' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/Translator.php',
         'Carbon\\TranslatorImmutable' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/TranslatorImmutable.php',
         'Carbon\\TranslatorStrongTypeInterface' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/TranslatorStrongTypeInterface.php',
+        'Codedge\\Fpdf\\Facades\\Fpdf' => __DIR__ . '/..' . '/codedge/laravel-fpdf/src/Facades/Fpdf.php',
+        'Codedge\\Fpdf\\FpdfServiceProvider' => __DIR__ . '/..' . '/codedge/laravel-fpdf/src/FpdfServiceProvider.php',
+        'Codedge\\Fpdf\\Fpdf\\Fpdf' => __DIR__ . '/..' . '/codedge/laravel-fpdf/src/Fpdf/Fpdf.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Cron\\AbstractField' => __DIR__ . '/..' . '/dragonmantank/cron-expression/src/Cron/AbstractField.php',
         'Cron\\CronExpression' => __DIR__ . '/..' . '/dragonmantank/cron-expression/src/Cron/CronExpression.php',

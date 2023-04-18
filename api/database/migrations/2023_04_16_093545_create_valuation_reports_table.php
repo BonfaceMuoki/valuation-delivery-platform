@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('valuation_reports', function (Blueprint $table) {
             $table->id();
             $table->string("report_description")->nullable();
-            $table->unsignedBigInteger("report_uploading_form");
             $table->unsignedBigInteger("report_uploading_user");
             $table->double("market_value")->nullable();
             $table->double("forced_market_value")->nullable();

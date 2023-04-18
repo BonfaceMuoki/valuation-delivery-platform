@@ -19,6 +19,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'codedge/laravel-fpdf' => array(
+            'pretty_version' => '1.11.0',
+            'version' => '1.11.0.0',
+            'reference' => '426993f1b2d5b0f113984e9dcac0dc58c2ef05b2',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../codedge/laravel-fpdf',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'cordoval/hamcrest-php' => array(
             'dev_requirement' => true,
             'replaced' => array(
