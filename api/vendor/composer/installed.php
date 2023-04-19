@@ -10,6 +10,15 @@
         'dev' => true,
     ),
     'versions' => array(
+        'bacon/bacon-qr-code' => array(
+            'pretty_version' => '2.0.8',
+            'version' => '2.0.8.0',
+            'reference' => '8674e51bb65af933a5ffaf1c308a660387c35c22',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../bacon/bacon-qr-code',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'brick/math' => array(
             'pretty_version' => '0.11.0',
             'version' => '0.11.0.0',
@@ -33,6 +42,15 @@
             'replaced' => array(
                 0 => '*',
             ),
+        ),
+        'dasprid/enum' => array(
+            'pretty_version' => '1.0.4',
+            'version' => '1.0.4.0',
+            'reference' => '8e6b6ea76eabbf19ea2bf5b67b98e1860474012f',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../dasprid/enum',
+            'aliases' => array(),
+            'dev_requirement' => false,
         ),
         'davedevelopment/hamcrest-php' => array(
             'dev_requirement' => true,
@@ -91,6 +109,15 @@
             'reference' => '3a85486b709bc384dae8eb78fb2eec649bdb64ff',
             'type' => 'library',
             'install_path' => __DIR__ . '/../egulias/email-validator',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'endroid/qr-code' => array(
+            'pretty_version' => '4.8.2',
+            'version' => '4.8.2.0',
+            'reference' => '2436c2333a3931c95e2b96eb82f16f53143d6bba',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../endroid/qr-code',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
@@ -973,6 +1000,24 @@
             'install_path' => __DIR__ . '/../sebastian/version',
             'aliases' => array(),
             'dev_requirement' => true,
+        ),
+        'setasign/fpdf' => array(
+            'pretty_version' => '1.8.5',
+            'version' => '1.8.5.0',
+            'reference' => 'f4104a04c9a3f95c4c26a0a0531abebcc980987a',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../setasign/fpdf',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'setasign/fpdi' => array(
+            'pretty_version' => 'v2.3.7',
+            'version' => '2.3.7.0',
+            'reference' => 'bccc892d5fa1f48c43f8ba7db5ed4ba6f30c8c05',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../setasign/fpdi',
+            'aliases' => array(),
+            'dev_requirement' => false,
         ),
         'spatie/backtrace' => array(
             'pretty_version' => '1.2.1',

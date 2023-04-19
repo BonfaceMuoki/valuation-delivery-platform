@@ -69,6 +69,7 @@ Route::group([
             ], function ($router)
                 {
                 Route::post('/upload-report', [ValuerController::class, 'uploadReport']);
+                Route::get('/addimage', [ValuerController::class, 'writeToPDF']);
                 });
 
             
