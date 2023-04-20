@@ -69,7 +69,12 @@ Route::group([
             ], function ($router)
                 {
                 Route::post('/upload-report', [ValuerController::class, 'uploadReport']);
+<<<<<<< HEAD
                 Route::get('/addimage', [ValuerController::class, 'writeToPDF']);
+=======
+                Route::get('/generate-qr-report', [ValuerController::class, 'generateQRCode']);
+                
+>>>>>>> dbb06ff417231b5db9273caa6e22b519d626a8bc
                 });
 
             
