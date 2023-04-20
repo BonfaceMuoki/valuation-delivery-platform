@@ -8,10 +8,16 @@ RUN apt-get update && apt-get install -y git curl libpng-dev libonig-dev libxml2
 RUN apt-get install -y \
     libzip-dev \
     zip \
+    libwebp-dev \
+    libjpeg62-turbo-dev \
+    libpng-dev libxpm-dev \
+    libfreetype6-dev \
     zlib1g-dev\
     && docker-php-ext-install zip \
     && docker-php-ext-install gd
 # Clear Cache
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+    
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions

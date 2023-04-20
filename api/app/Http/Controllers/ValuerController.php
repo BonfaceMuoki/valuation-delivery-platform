@@ -5,12 +5,22 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Permission;
 use Validator;
+use Endroid\QrCode\Color\Color;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelLow;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Label\Label;
+use Endroid\QrCode\Logo\Logo;
+use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Writer\ValidationException;
 
 class ValuerController extends Controller
 {
     //
     public function __construct()
     {
+        $this->middleware('auth:api', ['except' => ['generateQRCode']]);
 
     }
     public function uploadReport(Request $request)
@@ -37,6 +47,9 @@ class ValuerController extends Controller
                 $file = $request->file("report_pdf");
                 $fileName = time() . rand(1, 99) . '.' . $file->extension();
                 $file->move(public_path('reports'), $fileName);
+                //generate qr code
+
+                //generate qr code
                 
 
             } else {
@@ -45,5 +58,54 @@ class ValuerController extends Controller
         } else {
             return response()->json(['message' => 'Please login'], 401);
         }
+    }
+    public function addQRToreport(){
+        $filePath = public_path("sample.pdf");
+        $outputFilePath = public_path("sample_output.pdf");
+        $this->fillPDFFile($filePath, $outputFilePath);
+    }
+    public function fillPDFFile($file, $outputFilePath)
+    {
+        $fpdi = new FPDI;          
+        $count = $fpdi->setSourceFile($file);  
+        for ($i=1; $i<=$count; $i++) {  
+            $template = $fpdi->importPage($i);
+            $size = $fpdi->getTemplateSize($template);
+            $fpdi->AddPage($size['orientation'], array($size['width'], $size['height']));
+            $fpdi->useTemplate($template);              
+            $fpdi->SetFont("helvetica", "", 15);
+            $fpdi->SetTextColor(153,0,153);  
+            $left = 0;
+            $top = 0;
+            $text = "valuation_report_code";
+            $fpdi->Text($left,$top,$text);  
+            $fpdi->Image("https://www.itsolutionstuff.com/assets/images/footer-logo.png", 40, 90);
+        }
+  
+        return $fpdi->Output($outputFilePath, 'F');
+    }
+    public function generateQRCode(){
+        $writer = new PngWriter();
+        // Create QR code
+        $qrCode = QrCode::create('
+        Name  :   Bonface Kyalo
+        Phone :  0701717592
+        email :  bonny.moki@gmail.com')
+            ->setEncoding(new Encoding('UTF-8'))
+            ->setErrorCorrectionLevel(new ErrorCorrectionLevelLow())
+            ->setSize(300)
+            ->setMargin(10)
+            ->setRoundBlockSizeMode(new RoundBlockSizeModeMargin())
+            ->setForegroundColor(new Color(0, 0, 0))
+            ->setBackgroundColor(new Color(255, 255, 255));  
+    //         $logo = Logo::create(public_path('reportqr_codes'),'symfony.png')
+    // ->setResizeToWidth(50);      
+        // Create generic label
+        $label = Label::create('Label')
+            ->setTextColor(new Color(255, 0, 0));        
+        $result = $writer->write($qrCode,null, $label);        
+        // Validate the result
+        // $writer->validateResult($result, 'Life is too short to be generating QR codes');
+        $result->saveToFile(public_path('reportqr_codes/qrcode.png'));
     }
 }
