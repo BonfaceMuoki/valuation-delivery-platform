@@ -16,4 +16,6 @@ use App\Http\Controllers\HomeController;
 |
 */
 Route::get('/', [HomeController::class, 'home']);
+
+
 Route::get('/reset-password', [PasswordResetRequestController::class, 'resetPasswordForm']);
