@@ -45,10 +45,16 @@ class AdminController extends Controller
             DB::beginTransaction();
             $permissions = json_decode(stripslashes($request->post('permission_name')), true);
             foreach ($permissions as $perm) {
-                $permission['name'] = $perm['permission_name'];
-                $permission['slug'] = strtolower($perm['permission_name']);
-                $permission['status'] = 1;
-                Permission::create($permission);
+                //check if exists
+                $found=Permission::where("name",$perm['permission_name'])->get();
+                if(sizeof($found)==0){
+                    $permission['name'] = $perm['permission_name'];
+                    $permission['slug'] = strtolower($perm['permission_name']);
+                    $permission['status'] = 1;
+                    Permission::create($permission);
+                }
+                //check if exists
+
             }
             DB::commit();
             return response()->json([
