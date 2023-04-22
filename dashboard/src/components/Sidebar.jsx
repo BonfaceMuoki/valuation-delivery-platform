@@ -39,57 +39,33 @@ const navItems = [
     icon: <HomeOutlined />,
   },
   {
-    text: "Client Facing",
+    text: "Valuation Reports",
     icon: null,
   },
   {
-    text: "Products",
+    text: "Uploaded",
     icon: <ShoppingCartOutlined />,
   },
   {
-    text: "Customers",
+    text: "Upload",
     icon: <Groups2Outlined />,
   },
   {
-    text: "Transactions",
-    icon: <ReceiptLongOutlined />,
-  },
-  {
-    text: "Geography",
-    icon: <PublicOutlined />,
-  },
-  {
-    text: "Sales",
+    text: "User Mnager",
     icon: null,
   },
   {
-    text: "Overview",
+    text: "My Uploaders",
     icon: <PointOfSaleOutlined />,
   },
   {
-    text: "Daily",
+    text: "Accesors List",
     icon: <TodayOutlined />,
   },
   {
-    text: "Monthly",
+    text: "My Accesors",
     icon: <CalendarMonthOutlined />,
-  },
-  {
-    text: "Breakdown",
-    icon: <PieChartOutlined />,
-  },
-  {
-    text: "Management",
-    icon: null,
-  },
-  {
-    text: "Admin",
-    icon: <AdminPanelSettingsOutlined />,
-  },
-  {
-    text: "Performance",
-    icon: <TrendingUpOutlined />,
-  },
+  }
 ];
 
 const Sidebar = ({
@@ -132,7 +108,7 @@ const Sidebar = ({
               <FlexBetween color={theme.palette.secondary.main}>
                 <Box display="flex" alignItems="center" gap="0.5rem">
                   <Typography variant="h4" fontWeight="bold">
-                    ECOMVISION
+                    Valuation Track
                   </Typography>
                 </Box>
                 {!isNonMobile && (

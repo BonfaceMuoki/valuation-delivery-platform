@@ -16,11 +16,14 @@ const authSlice = createSlice({
         logOut: (state, action) => {
             state.user = null
             state.token = null
+        },
+        setMode: (state,action)=>{
+            state.mode = state.mode === "light" ? "dark" : "light";
         }
     },
 })
 
-export const { setCredentials, logOut } = authSlice.actions
+export const { setCredentials, logOut,setMode } = authSlice.actions
 
 export default authSlice.reducer
 

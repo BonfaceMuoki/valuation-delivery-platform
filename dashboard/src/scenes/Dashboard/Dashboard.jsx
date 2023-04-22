@@ -18,7 +18,7 @@ function Dashboard() {
     isSuccess,
     isError,
     error
-} = useGetValuationReportsQuery(2);
+} = useGetValuationReportsQuery(1);
   console.log(reports?.reports.data);
 
   return (
@@ -53,10 +53,10 @@ function Dashboard() {
       >
         {/* row 1 */}
         <StatBox
-          title="Total Customers"
+          title="Total Rperts"
           value="10"
           increase="+14%"
-          description="Since last month"
+          description="Since First Day"
           icon={
             <Email
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
@@ -64,10 +64,10 @@ function Dashboard() {
           }
         />
         <StatBox
-          title="Total Customers"
+          title="Total Reports"
           value="10"
           increase="+14%"
-          description="Since last month"
+          description="This Month"
           icon={
             <Email
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
@@ -75,7 +75,7 @@ function Dashboard() {
           }
         />
         <StatBox
-          title="Total Customers"
+          title="Accesors served"
           value="10"
           increase="+14%"
           description="Since last month"
