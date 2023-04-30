@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  LogoutOutlined,
   LightModeOutlined,
   DarkModeOutlined,
   Menu as MenuIcon,
@@ -9,7 +10,7 @@ import {
 } from "@mui/icons-material";
 import FlexBetween from "components/FlexBetween";
 import { useDispatch } from "react-redux";
-import {setMode} from '../scenes/auth/authSlice'; 
+import { setMode } from '../scenes/auth/authSlice';
 import profileImage from "assets/profile.jpg";
 import {
   AppBar,
@@ -69,9 +70,7 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
               <LightModeOutlined sx={{ fontSize: "25px" }} />
             )}
           </IconButton>
-          <IconButton>
-            <SettingsOutlined sx={{ fontSize: "25px" }} />
-          </IconButton>
+
 
           <FlexBetween>
             <Button
@@ -99,13 +98,13 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
                   fontSize="0.85rem"
                   sx={{ color: theme.palette.secondary[100] }}
                 >
-               
+
                 </Typography>
                 <Typography
                   fontSize="0.75rem"
                   sx={{ color: theme.palette.secondary[200] }}
                 >
-     
+
                 </Typography>
               </Box>
               <ArrowDropDownOutlined
@@ -118,7 +117,10 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
               onClose={handleClose}
               anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
             >
-              <MenuItem onClick={handleClose}>Log Out</MenuItem>
+              <MenuItem onClick={handleClose}><IconButton><LogoutOutlined sx={{ fontSize: "25px" }} /></IconButton>Log Out</MenuItem>
+              <MenuItem>     <IconButton>
+                <SettingsOutlined sx={{ fontSize: "25px" }} />
+              </IconButton>Settings</MenuItem>
             </Menu>
           </FlexBetween>
         </FlexBetween>
