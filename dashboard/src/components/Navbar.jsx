@@ -10,7 +10,7 @@ import {
 } from "@mui/icons-material";
 import FlexBetween from "components/FlexBetween";
 import { useDispatch } from "react-redux";
-import { setMode } from '../scenes/auth/authSlice';
+import { setMode,logOut } from '../scenes/auth/authSlice';
 import profileImage from "assets/profile.jpg";
 import {
   AppBar,
@@ -117,7 +117,7 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
               onClose={handleClose}
               anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
             >
-              <MenuItem onClick={handleClose}><IconButton><LogoutOutlined sx={{ fontSize: "25px" }} /></IconButton>Log Out</MenuItem>
+              <MenuItem onClick={() => dispatch(logOut())}><IconButton><LogoutOutlined sx={{ fontSize: "25px" }} /></IconButton>Log Out</MenuItem>
               <MenuItem>     <IconButton>
                 <SettingsOutlined sx={{ fontSize: "25px" }} />
               </IconButton>Settings</MenuItem>

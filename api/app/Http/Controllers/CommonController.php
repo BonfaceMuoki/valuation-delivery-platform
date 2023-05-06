@@ -44,6 +44,9 @@ class CommonController extends Controller
     public function getReportsList()
     {
         $user = auth()->user();
+        if($user==null){
+            return response()->json(['message'=>'Unautheticated'],403);
+        }
         $reports_query = ValuationReport::query();
         $reports = array();
         if ($user->hasPermissionTo(Permission::where("name", 'view valuation firm reports only')->first())) {
