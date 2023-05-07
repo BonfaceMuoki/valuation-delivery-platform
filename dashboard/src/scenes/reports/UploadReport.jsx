@@ -12,8 +12,8 @@ import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import "../../assets/scss/uploadreport.css";
 import { DatePicker } from '@mui/x-date-pickers';
-import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider'
-import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 const style = {
     position: 'absolute',
@@ -33,14 +33,14 @@ const style = {
 function UploadReport() {
 
     const schema = yup.object().shape({
-         market_value: yup
-        .number().typeError('Invalid Market Value: not a number')
-        .positive("Market Value must be a positive number")
-        .required("Market Value is required"),
+        market_value: yup
+            .number().typeError('Invalid Market Value: not a number')
+            .positive("Market Value must be a positive number")
+            .required("Market Value is required"),
         forced_market_value: yup
-        .number().typeError('Invalid Forced Market Value: not a number')
-        .positive("Forced Market Value must be a positive number")
-        .required("Forced Market Value is required"),
+            .number().typeError('Invalid Forced Market Value: not a number')
+            .positive("Forced Market Value must be a positive number")
+            .required("Forced Market Value is required"),
         property_lr: yup.string().required("Property LR is required"),
         encuberence_details: yup.string().required("Encuberence Details is required"),
         report_description: yup.string().required("Report description are required"),
@@ -49,7 +49,26 @@ function UploadReport() {
             value: yup.string(),
             label: yup.string()
         })
-        ).min(1, "Recipient required").max(1, "Only one recipient is required.")
+        ).min(1, "Recipient required").max(1, "Only one recipient is required."),
+        file: yup
+            .mixed()
+            .required('Please upload a file')
+            .nullable()
+            .test('fileSize', 'File size is too large', (value) => {
+                if (value[0]) {
+                    return value[0].size <= 1024 * 1024 * 2;
+                }
+                return true;
+
+            })
+            .test('fileType', 'Only PDF files are allowed', (value) => {
+                if (value[0]) {
+                    return ['application/pdf', 'pdf'].includes(value[0].type);
+                }
+                return true;
+
+            })
+
     });
 
     const { register, handleSubmit, formState: { errors }, control } = useForm({
@@ -64,10 +83,11 @@ function UploadReport() {
     const [image, setImage] = useState();
     const [uploadedFile, setUploadedFile] = useState();
     const handleImage = (e) => {
-        
-        setUploadedFile(e.target.files[0].name);
-        console.log(e.target.files[0]);
+
         setImage(e.target.files[0]);
+        if (e.target.files[0]) {
+            setUploadedFile(e.target.files[0].name);
+        }
     }
     //upload image
     const [options, setOptions] = useState([]);
@@ -115,6 +135,7 @@ function UploadReport() {
                                             multiple
                                             getOptionDisabled={(option) => option.disabled}
                                             getOptionLabel={(option) => option.label}
+                                            isOptionEqualToValue={(option, value) => option.value === value.value}
                                             id="days-autocomplete"
                                             onChange={(event, value) => field.onChange(value)}
                                             options={options}
@@ -126,12 +147,12 @@ function UploadReport() {
                                                     inputRef={ref}
                                                     {...params}
                                                 />
-                                                
+
                                             )}
                                         />
-                                       
+
                                     )}
-                                    
+
                                 />
                                 <span className='errorSpan' >{errors.recipient?.message}</span>
                             </Col>
@@ -198,7 +219,7 @@ function UploadReport() {
                                         </div>
                                     )}
                                 />
-                                
+
                             </Col>
                         </Row>
                         <Row gutter={16}>
@@ -218,48 +239,60 @@ function UploadReport() {
                                         </div>
                                     )}
                                 />
-                               
+
                             </Col>
                         </Row>
                         <Row gutter={16}>
-                            <Col span={isNonMediumScreens ? 12 : 24} justfyContent>
+                            <Col span={isNonMediumScreens ? 12 : 24} >
                                 <Typography sx={{ ml: 1, mt: 3 }}>Valuation Date</Typography>
-                                <Controller
-                                    name="valuation_date"
-                                    control={control}
-                                    render={({ field: { onChange, onBlur, value } }) => (
-                                        <LocalizationProvider dateAdapter={AdapterDayjs} fullWidth>
-                                            <DatePicker sx={{ ml: 1 }} fullWidth />
-                                        </LocalizationProvider>
-                                    )}
-                                />
 
-                                 <span className='errorSpan' ><br></br>{errors.valuation_date?.message}</span>
+                                <LocalizationProvider dateAdapter={AdapterDayjs} fullWidth>
+
+                                    <Controller
+                                        control={control}
+                                        name="valuation_date"
+                                        render={({ field: { onChange, onBlur, value } }) => (
+                                            <DatePicker
+                                                value={value}
+                                                onChange={onChange}
+                                                onBlur={onBlur}
+                                                renderInput={(params) => <TextField {...params} />}
+                                            />
+                                        )}
+                                    />
+                                </LocalizationProvider>
+
+
+                                <span className='errorSpan' ><br></br>{errors.valuation_date?.message}</span>
                             </Col>
                             <Col span={isNonMediumScreens ? 12 : 24} justify="center">
                                 <label htmlFor="upload-photo">
                                     <input
                                         style={{ display: 'none' }}
                                         id="upload-photo"
-                                        name="upload-photo"
                                         type="file"
-                                        onChange={handleImage}
+                                        {...register("file", {
+                                            onChange: handleImage
+                                        })}
+
                                     />
-                                      <Typography sx={{ ml: 1, mt: 3 }}>Report Document(Only PDF)</Typography>
-                                      
-                                    <BTNMUI variant="outlined"  sx={{ mt:0, textAlign: "left",height:70, width:200 }} color="secondary" component="span" >
-                                        <UploadOutlined sx={{fontSize:"55px"}}/>
-                                    </BTNMUI><br/>
-                                    {(uploadedFile!="") ? <span sx={{mt:3, fontSize:"25px"}} className='successSpan'>{uploadedFile}</span> : ""}
+                                    <Typography sx={{ ml: 1, mt: 3 }}>Report Document(Only PDF)</Typography>
+
+                                    <BTNMUI variant="outlined" sx={{ mt: 0, textAlign: "left", height: 70, width: 200 }} color="secondary" component="span" >
+                                        <UploadOutlined sx={{ fontSize: "55px" }} />
+                                    </BTNMUI><br />
+                                    {(uploadedFile != "") ? <span sx={{ mt: 3, fontSize: "25px" }} className='successSpan'>{uploadedFile}</span> : ""}
                                 </label>
+                                <span className='errorSpan' ><br></br>{errors.file?.message}</span>
                             </Col>
                         </Row>
                         <Row gutter={16} >
                             <Col className="gutter-row" span={isNonMediumScreens ? 12 : 12} justify="center">
-                          
+
                             </Col>
                             <Col className="gutter-row" span={isNonMediumScreens ? 24 : 24} justify="center">
-                                <BTNMUI type="submit" variant="contained" sx={{ mt: 3,height:50,backgroundColor:"blue", color:"white" }} fullWidth>Send</BTNMUI>
+                                <BTNMUI type="submit" variant="contained" sx={{ mt: 3, height: 50, backgroundColor: "blue", color: "white" }} fullWidth>Send</BTNMUI>
+
                             </Col>
                         </Row>
                     </form>

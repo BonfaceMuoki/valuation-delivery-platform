@@ -1,6 +1,7 @@
 import React from 'react'
 import { Table, Popconfirm, Button } from 'antd'
 import { useGetValuationReportsQuery } from './ValuationReportsSlice'
+import { useSelector } from 'react-redux';
 
 
 function ReportsTable() {
@@ -50,7 +51,7 @@ function ReportsTable() {
         isError,
         error
     } = useGetValuationReportsQuery();
-    console.log(reports?.reports);
+    console.log(useSelector());
     return (
         <div>
             <Table

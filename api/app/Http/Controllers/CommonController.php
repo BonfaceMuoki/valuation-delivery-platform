@@ -13,7 +13,7 @@ class CommonController extends Controller
     //
     public function getAccesorsList()
     {
-        $all = ReportConsumer::asll();
+        $all = ReportConsumer::all();
         return response()->json(['code' => 1, 'accesors' => $all], 201);
     }
     public function getAccesorsUsersList($accesor)
