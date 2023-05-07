@@ -14,6 +14,8 @@ import "../../assets/scss/uploadreport.css";
 import { DatePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { useGetAccesorsListQuery } from 'features/accessorsListSlice';
+import { useUploadValuationReportMutation } from 'features/valuationReportUploadSlice';
 
 const style = {
     position: 'absolute',
@@ -31,6 +33,16 @@ const style = {
 };
 
 function UploadReport() {
+    const [uploadReport, { isLoading: isUploading }] = useUploadValuationReportMutation();
+    const {
+        data: accesorslist,
+        isLoading,
+        isSuccess,
+        isError,
+        error
+    } = useGetAccesorsListQuery();
+
+    console.log(accesorslist);
 
     const schema = yup.object().shape({
         market_value: yup
@@ -91,24 +103,40 @@ function UploadReport() {
     }
     //upload image
     const [options, setOptions] = useState([]);
-    useEffect(() => {
-        // make API call or update state to fetch options with IDs
-        setOptions([
-            { value: "Monday", label: "Monday" },
-            { value: "Tuesday", label: "Tuesday" },
-            { value: "Wednesday", label: "Wednesday" },
-            { value: "Thursday", label: "Thursday" },
-            { value: "Friday", label: "Friday" },
-            { value: "Saturday", label: "Saturday" },
-            { value: "Sunday", label: "Sunday" }
-        ]);
-    }, []);
+    // useEffect(() => {
+    //     // make API call or update state to fetch options with IDs
+    //     setOptions(accesorslist?.accesors);
+    // }, []);
     const onSubmit = (data) => {
-        console.log(data);
-    };
+    console.log(data);
+    const formData= new FormData();
+    formData.append("report_description",data.report_description);
+    formData.append("market_value",data.market_value);
+    formData.append("forced_market_value",data.forced_market_value);
+    formData.append("property_lr",data.property_lr);
+    formData.append("valuation_date",data.valuation_date);
+    formData.append("encumberrence_details",data.encuberence_details);
+    formData.append("receiving_company_id",data.recipient[0].id);
+    formData.append("report_pdf",data.file[0]);
+    const response=uploadReport(formData);
+    console.log(response);
+    // const report_description=data.report_description;
+    // const market_value=data.market_value;
+    // const forced_market_value=data.forced_market_value;
+    // const property_lr=data.property_lr;
+    // const valuation_date=data.valuation_date;
+    // const encumberrence_details=data.encuberence_details;
+    // const receiving_company_id=data.recipient[0].id;
+    // const report_pdf=data.file[0];
+
+    // const response=uploadReport({report_description,market_value,forced_market_value,property_lr,valuation_date,encumberrence_details,receiving_company_id,report_pdf});
+     
+ };
 
     return (
+        
         <Box>
+            { accesorslist?.accesors &&<>
             <Button icon={<UploadOutlined />} onClick={handleOpen}>Upload New Report</Button>
             <Modal
                 open={open}
@@ -132,13 +160,14 @@ function UploadReport() {
                                             disableClearable
                                             disablePortal
                                             filterSelectedOptions
+                                            options={accesorslist?.accesors}
                                             multiple
                                             getOptionDisabled={(option) => option.disabled}
-                                            getOptionLabel={(option) => option.label}
-                                            isOptionEqualToValue={(option, value) => option.value === value.value}
+                                            getOptionLabel={(option) => option.organization_name}
+                                            isOptionEqualToValue={(option, value) => option.id === value.id}
                                             id="days-autocomplete"
                                             onChange={(event, value) => field.onChange(value)}
-                                            options={options}
+                                            
                                             renderInput={(params) => (
                                                 <TextField
                                                     id="receipient"
@@ -164,7 +193,7 @@ function UploadReport() {
                                     defaultValue=""
                                     render={({ field }) => (
                                         <div>
-                                            <TextField  {...field} fullWidth />
+                                            <TextField  {...field} autoComplete="off" fullWidth />
                                             <span className='errorSpan' >{errors.property_lr?.message}</span>
                                         </div>
                                     )}
@@ -181,7 +210,7 @@ function UploadReport() {
                                     defaultValue=""
                                     render={({ field }) => (
                                         <div>
-                                            <TextField  {...field} fullWidth />
+                                            <TextField  {...field} autoComplete="off"  fullWidth />
                                             <span className='errorSpan' >{errors.market_value?.message}</span>
                                         </div>
                                     )}
@@ -195,7 +224,7 @@ function UploadReport() {
                                     defaultValue=""
                                     render={({ field }) => (
                                         <div>
-                                            <TextField  {...field} fullWidth />
+                                            <TextField  {...field} autoComplete="off"  fullWidth />
                                             <span className='errorSpan' >{errors.forced_market_value?.message}</span>
                                         </div>
                                     )}
@@ -298,7 +327,7 @@ function UploadReport() {
                     </form>
                 </Box>
             </Modal>
-
+            </>   }
         </Box>
 
     )

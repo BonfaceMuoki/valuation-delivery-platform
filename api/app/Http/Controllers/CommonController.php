@@ -7,6 +7,7 @@ use App\Models\ReportConsumer;
 use App\Models\ValuationReport;
 use Illuminate\Http\Request;
 use App\Models\Permission;
+use DB;
 
 class CommonController extends Controller
 {
@@ -50,15 +51,16 @@ class CommonController extends Controller
         $reports_query = ValuationReport::query();
         $reports = array();
         if ($user->hasPermissionTo(Permission::where("name", 'view valuation firm reports only')->first())) {
+            $url=url("/");
             $org = $user->UploaderOrganization()->first();
             $reports_query->join("report_consumers", "report_consumers.id", "=", "valuation_reports.receiving_company_id");
             $reports_query->where("report_uploading_from", $org->id);
-            $reports_query->select('valuation_reports.*', 'report_consumers.organization_name');
+            $reports_query->select("valuation_reports.*", "report_consumers.organization_name",DB::raw("CONCAT('".$url."','/',valuation_reports.upload_link) as report_url"));
             $reports = $reports_query->get();
         } else if ($user->hasPermissionTo((Permission::where("name", 'view accesors reports only')->first()))) {
             $org = $user->AccessorOrganization()->first();
             $reports_query->join("organizations", "organizations.id", "=", "valuation_reports.report_uploading_from");
-            $reports_query->where("report_uploading_from", $org->id);
+            // $reports_query->where("report_uploading_from", $org->id);
             $reports_query->select('valuation_reports.*', 'organizations.organization_name');
             $reports = $reports_query->get();
         } else if ($user->hasPermissionTo((Permission::where("name", 'view all reports')->first()))) {

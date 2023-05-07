@@ -29,6 +29,14 @@ class ValuerController extends Controller
 
 
     }
+    public function uploadValuationReport(Request $request){
+        
+        $file = $request->file("report_pdf");
+        $fileName = time() . rand(1, 99) . '.' . $file->extension();
+        $file->move(public_path('reports'), $fileName);
+
+        return response()->json(['file_name'=>$fileName], 200);
+    }
     public function uploadReport(Request $request)
     {
 
@@ -38,7 +46,6 @@ class ValuerController extends Controller
             if ($user->hasPermissionTo(Permission::where("slug", "upload report")->first())) {
                 $validator = Validator::make($request->all(), [
                     'report_description' => 'required|string',
-                    'report_uploading_user' => 'required|string',
                     'market_value' => 'required|integer',
                     'forced_market_value' => 'required|integer',
                     'property_lr' => 'required|string',
@@ -51,11 +58,13 @@ class ValuerController extends Controller
                     return response()->json($validator->errors()->toJson(), 400);
                 }
                 $orgdetails = $user->UploaderOrganization()->first();
-                $datatosave=$request->except(['report_pdf']);
+                $datatosave=$request->except(['report_pdf','valuation_data']);
                 $file = $request->file("report_pdf");
                 $fileName = time() . rand(1, 99) . '.' . $file->extension();
                 $file->move(public_path('reports'), $fileName);
+               
                 $datatosave['report_uploading_user']=$user->id;
+                $datatosave['valuation_date']= date('Y-m-d', strtotime($request->valuation_date));
                 $datatosave['upload_link']=$fileName;
                 $datatosave['report_uploading_from']=$orgdetails->id;
                 $datatosave['approving_director']=0;

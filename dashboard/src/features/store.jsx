@@ -10,33 +10,27 @@ import { persistReducer, persistStore,
     REGISTER } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 
-const apiPersistConfig = {
-    timeout: 500,
-    key: 'api',
-    storage,
-  };
-  
   const authPersistConfig = {
     timeout: 500,
     key: 'auth',
     storage,
   };
 
-const apiPersistReducer = persistReducer(apiPersistConfig, apiSlice.reducer);
+// const apiPersistReducer = persistReducer(apiPersistConfig, apiSlice.reducer);
 const authPersistReducer = persistReducer(authPersistConfig, authReducer);
 
 
 export const store = configureStore({
     reducer: {
-        [apiSlice.reducerPath]: apiPersistReducer,
+        [apiSlice.reducerPath]: apiSlice.reducer,
         auth: authPersistReducer
     },
     middleware: getDefaultMiddleware =>
         getDefaultMiddleware({
             serializableCheck: {
-              ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER]
+              ignoredActions: [FLUSH, PAUSE, PERSIST, PURGE, REGISTER]
             }
           }).concat(apiSlice.middleware),
-    devTools: true
+    devTools: false
 })
 export const persistor = persistStore(store);

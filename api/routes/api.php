@@ -70,6 +70,7 @@ Route::group([
             ], function ($router)
                 {
                 Route::post('/upload-report', [ValuerController::class, 'uploadReport']);
+                Route::post('/upload-valuation-report', [ValuerController::class, 'uploadReport']);
                 Route::get('/addimage', [ValuerController::class, 'writeToPDF']);
                 Route::get('/generate-qr-report', [ValuerController::class, 'generateQRCode']);
                 });
