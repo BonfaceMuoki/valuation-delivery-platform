@@ -16,7 +16,9 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { useGetAccesorsListQuery } from 'features/accessorsListSlice';
 import { useUploadValuationReportMutation } from 'features/valuationReportUploadSlice';
-
+import { useDispatch } from 'react-redux';
+import { setfetchvaluationreports } from 'scenes/auth/authSlice';
+import { useGetValuationReportsQuery } from 'scenes/Dashboard/ValuationReportsSlice';
 const style = {
     position: 'absolute',
     top: '5%',
@@ -33,7 +35,9 @@ const style = {
 };
 
 function UploadReport() {
+    const {refetch} =  useGetValuationReportsQuery();
     const [uploadReport, { isLoading: isUploading }] = useUploadValuationReportMutation();
+    const dispatch = useDispatch();
     const {
         data: accesorslist,
         isLoading,
@@ -41,9 +45,6 @@ function UploadReport() {
         isError,
         error
     } = useGetAccesorsListQuery();
-
-    console.log(accesorslist);
-
     const schema = yup.object().shape({
         market_value: yup
             .number().typeError('Invalid Market Value: not a number')
@@ -120,17 +121,12 @@ function UploadReport() {
     formData.append("report_pdf",data.file[0]);
     const response=uploadReport(formData);
     console.log(response);
-    // const report_description=data.report_description;
-    // const market_value=data.market_value;
-    // const forced_market_value=data.forced_market_value;
-    // const property_lr=data.property_lr;
-    // const valuation_date=data.valuation_date;
-    // const encumberrence_details=data.encuberence_details;
-    // const receiving_company_id=data.recipient[0].id;
-    // const report_pdf=data.file[0];
+    if(response.data.originalStatus==200){
+        setTimeout(()=>{
+            window.location.reload(false);
+        }, 500);
+    }
 
-    // const response=uploadReport({report_description,market_value,forced_market_value,property_lr,valuation_date,encumberrence_details,receiving_company_id,report_pdf});
-     
  };
 
     return (

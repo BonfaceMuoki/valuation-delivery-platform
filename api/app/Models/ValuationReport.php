@@ -15,6 +15,7 @@ class ValuationReport extends Model
     'report_uploading_user',
     'report_uploading_from',
     'market_value',
+    'forced_market_value',
     'property_lr',
     'valuation_date',
     'approving_director',

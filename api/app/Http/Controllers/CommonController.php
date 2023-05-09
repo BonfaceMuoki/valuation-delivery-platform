@@ -55,7 +55,7 @@ class CommonController extends Controller
             $org = $user->UploaderOrganization()->first();
             $reports_query->join("report_consumers", "report_consumers.id", "=", "valuation_reports.receiving_company_id");
             $reports_query->where("report_uploading_from", $org->id);
-            $reports_query->select("valuation_reports.*", "report_consumers.organization_name",DB::raw("CONCAT('".$url."','/',valuation_reports.upload_link) as report_url"));
+            $reports_query->select("valuation_reports.*", "report_consumers.organization_name",DB::raw("CONCAT('".$url."','/reports/',valuation_reports.upload_link) as report_url"));
             $reports = $reports_query->get();
         } else if ($user->hasPermissionTo((Permission::where("name", 'view accesors reports only')->first()))) {
             $org = $user->AccessorOrganization()->first();
@@ -69,6 +69,34 @@ class CommonController extends Controller
             return response()->json(['message' => 'You do not have the permission to view this resource'], 401);
         }
         return response()->json($reports);
+    }
+    public function downloadValuationReport($id, $signed = 0)
+    {
+
+   
+        
+        $foundfile = ValuationReport::where("id", $id)->first();
+
+        if (file_exists(public_path('/reports/') . $foundfile['upload_link'])) {
+            $headers = [
+                'Content-Type' => 'application/pdf'
+            ];
+            $pdffile = "";
+            $exploded = explode(".", $foundfile['upload_link']);
+            if ($signed == 1) {
+                if (file_exists(public_path('/reports/') . $exploded[0] . ".pdf_signed.pdf")) {
+                    $pdffile = public_path('/reports/') . $exploded[0] . ".pdf_signed.pdf";
+                    return response()->download($pdffile, 'Test File', $headers, 'inline');
+                } else {
+                    abort(404, 'File not found!');
+                }
+
+            }
+            $pdffile = public_path('/reports/') . $foundfile['upload_link'];
+            return response()->download($pdffile,$foundfile['upload_link'], $headers, 'inline');
+        } else {
+            abort(404, 'File not found!');
+        }
     }
     
 }

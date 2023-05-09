@@ -1,12 +1,17 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useSelector } from 'react-redux';
 import { DataGrid } from '@mui/x-data-grid'
 import { useGetValuationReportsQuery } from './ValuationReportsSlice'
+import { istofetchvaluationreports } from 'scenes/auth/authSlice';
+
+import Valuationreportactions from 'scenes/reports/Valuationreportactions';
+import { DownloadDoneOutlined, UpcomingOutlined } from '@mui/icons-material';
 
 
-function ReportsTable() {
- 
+function ReportsTable  () {
+
     const columns = [
-       {
+        {
             headerName: "LR Number",
             field: "property_lr",
             flex: 1,
@@ -26,26 +31,33 @@ function ReportsTable() {
             headerName: "Forced Market value",
             field: "forced_market_value",
             flex: 1
+        },
+        {
+            field: 'actions',
+            headerName: <DownloadDoneOutlined>Report</DownloadDoneOutlined>,
+            type: 'actions',
+            width: 400,
+            renderCell: (params) => <Valuationreportactions {...{ params }} />,
         }
     ];
     const {
         data: reports,
+        isFetching,
         isLoading,
+        refetch: refetchValuations,
         isSuccess,
         isError,
         error
-    } = useGetValuationReportsQuery();
-
-    console.log(reports);
+    } =  useGetValuationReportsQuery();     
     return (
-        <div style={{ height: 400, width: '100%' }}>
+        <div style={{ height: 475, width: '100%' }}>
+            {isFetching&& <span>Is refetching</span>}
+            {/* {isLoading&& <span>Is refetching</span>} */}
             <DataGrid
-loading={isLoading || !reports}
-getRowId={(row) => row.id}
-rows={reports || []}
-columns={columns}
-
-
+                loading={isLoading || !reports}
+                getRowId={(row) => row.id}
+                rows={reports || []}
+                columns={columns}
             />
         </div>
     )

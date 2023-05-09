@@ -6,7 +6,10 @@ export const valuationReportUploadSlice = apiSlice.injectEndpoints({
             query: (formData) => ({
                 url: '/api/uploader/upload-valuation-report',
                 method: 'POST',
-                body: formData            
+                body: formData,
+                headers: {
+                    'Accept': 'Application/json'
+                  }          
             })
         }),
     })

@@ -47,7 +47,8 @@ Route::group([
         Route::get('/get-accesors-users-list/{accesor}', [CommonController::class, 'getAccesorsUsersList']);
         Route::get('/get-uploaders-list', [CommonController::class, 'getUploadersList']);
         Route::get('/get-uploaders-users-list/{uploader}', [CommonController::class, 'getUploadersUsersList']);
-        Route::get('/get-reports-list', [CommonController::class, 'getReportsList']);        
+        Route::get('/get-reports-list', [CommonController::class, 'getReportsList']);  
+        Route::get('/downloadvaluationreport/{id}/{signed}', [CommonController::class, 'downloadValuationReport']);        
         });
         Route::group([
             'middleware' => 'api',

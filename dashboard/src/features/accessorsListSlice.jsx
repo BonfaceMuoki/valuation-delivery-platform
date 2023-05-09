@@ -5,7 +5,9 @@ export const accessorsListSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
         getAccesorsList: builder.query({
             query: () => `/api/commons/get-accesors-list`,
-            skipCache: true
+            skipCache: true,
+            keepUnusedDataFor:5,
+            refetchOnFocus: true,
         })
     })
 })

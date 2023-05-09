@@ -8,11 +8,9 @@ import Layout from "./scenes/layouts/Layout";
 import AuthLayout from "./scenes/layouts/AuthLayout";
 import Dashboard from "./scenes/Dashboard/Dashboard";
 import Unauthorized from "scenes/auth/Unauthorized";
-
 import Login from "./scenes/auth/Login";
 import Signup from "./scenes/auth/Signup";
 import ProtectedRoutes from "scenes/auth/routes/ProtectedRoutes";
-import AuthorizeRoute from "scenes/auth/routes/AuthorizeRoute";
 function App() {
   const mode = useSelector((state) => state.auth.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
@@ -25,20 +23,18 @@ function App() {
             <Route element={<AuthLayout />}>
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
-              
             </Route>
-            <Route element={<ProtectedRoutes />}>
+            <Route element={<ProtectedRoutes  checkrole="Report uploader" />}>
               <Route element={<Layout />}>
-              <Route path="/unauthorized" element={<Unauthorized />} />
-                <Route element={<AuthorizeRoute checkrole="Report Uploader" />}>
-                  <Route
-                    path="/"
-                    element={<Navigate to="/dashboard" replace />}
-                  />
-                </Route>
-                <Route element={<AuthorizeRoute checkrole="Report Uploader" />}>
-                  <Route path="/dashboard" element={<Dashboard />} />
-                </Route>
+                <Route
+                  path="/"
+                  element={<Navigate to="/dashboard" replace />}
+                />
+              </Route>
+            </Route>
+            <Route element={<ProtectedRoutes/>}>
+              <Route element={<Layout />}>
+                <Route path="/unauthorized" element={<Unauthorized />} />
               </Route>
             </Route>
           </Routes>
