@@ -26,10 +26,12 @@ function Valuationreportactions({ params }) {
                 toast.warning('File not found !', {
                     position: toast.POSITION.TOP_RIGHT
                 });
+                return;
             } else if (response.status === 401 && response.status == 403) {
                 toast.warning('Forbidden acces !', {
                     position: toast.POSITION.TOP_RIGHT
                 });
+                return;
             }
             return response.blob();
         })
