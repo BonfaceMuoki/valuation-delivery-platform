@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux';
 import { DataGrid } from '@mui/x-data-grid'
-import { useGetValuationReportsQuery } from './ValuationReportsSlice'
+import { useGetValuationReportsQuery } from '../../features/ValuationReportsSlice'
 import { istofetchvaluationreports } from 'scenes/auth/authSlice';
 
 import Valuationreportactions from 'scenes/reports/Valuationreportactions';
@@ -9,6 +9,7 @@ import { DownloadDoneOutlined, UpcomingOutlined } from '@mui/icons-material';
 
 
 function ReportsTable  () {
+    
 
     const columns = [
         {
@@ -34,7 +35,7 @@ function ReportsTable  () {
         },
         {
             field: 'actions',
-            headerName: <DownloadDoneOutlined>Report</DownloadDoneOutlined>,
+            headerName: <DownloadDoneOutlined></DownloadDoneOutlined>,
             type: 'actions',
             width: 400,
             renderCell: (params) => <Valuationreportactions {...{ params }} />,

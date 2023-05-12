@@ -5,13 +5,13 @@ import { Button as BTNMUI, Box, useTheme, useMediaQuery, TextField, Typography, 
 import Header from 'components/Header';
 import StatBox from 'components/StatBox';
 import { Email } from '@mui/icons-material';
-import ReportsTable from './ReportsTable';
+import ReportsTable from '../reports/ReportsTable';
 import UploadReport from 'scenes/reports/UploadReport';
 
 
 
 
-function Dashboard() {
+function AdminDashboard() {
   
   const theme = useTheme();
 
@@ -88,4 +88,4 @@ function Dashboard() {
   )
 }
 
-export default Dashboard;
+export default AdminDashboard;

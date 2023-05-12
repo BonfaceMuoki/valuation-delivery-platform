@@ -6,7 +6,7 @@ import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import { themeSettings } from "theme";
 import Layout from "./scenes/layouts/Layout";
 import AuthLayout from "./scenes/layouts/AuthLayout";
-import Dashboard from "./scenes/Dashboard/Dashboard";
+import ValuerDashboard from "./scenes/Dashboard/ValuerDashboard";
 import Unauthorized from "scenes/auth/Unauthorized";
 
 import Login from "./scenes/auth/Login";
@@ -37,7 +37,7 @@ function App() {
                   />
                 </Route>
                 <Route element={<AuthorizeRoute checkrole="Report Uploader" />}>
-                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/dashboard" element={<ValuerDashboard />} />
                 </Route>
               </Route>
             </Route>

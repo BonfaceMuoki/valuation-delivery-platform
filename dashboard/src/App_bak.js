@@ -6,7 +6,7 @@ import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
 import { themeSettings } from "theme";
 import Layout from "./scenes/layouts/Layout";
 import AuthLayout from "./scenes/layouts/AuthLayout";
-import Dashboard from "./scenes/Dashboard/Dashboard";
+import Dashboard from "./scenes/Dashboard/ValuerDashboard";
 import Unauthorized from "scenes/auth/Unauthorized";
 import Login from "./scenes/auth/Login";
 import Signup from "./scenes/auth/Signup";

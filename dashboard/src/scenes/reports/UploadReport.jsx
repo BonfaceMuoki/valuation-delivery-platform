@@ -18,7 +18,7 @@ import { useGetAccesorsListQuery } from 'features/accessorsListSlice';
 import { useUploadValuationReportMutation } from 'features/valuationReportUploadSlice';
 import { useDispatch } from 'react-redux';
 import { setfetchvaluationreports } from 'scenes/auth/authSlice';
-import { useGetValuationReportsQuery } from 'scenes/Dashboard/ValuationReportsSlice';
+import { useGetValuationReportsQuery } from 'features/ValuationReportsSlice';
 const style = {
     position: 'absolute',
     top: '5%',
