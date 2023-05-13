@@ -28,6 +28,7 @@ const authSlice = createSlice({
         setfetchvaluationreports: (state,action)=>{
             state.fetchvaluationreports=action.payload;
         }
+
     },
 })
 

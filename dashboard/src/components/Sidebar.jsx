@@ -20,20 +20,30 @@ import {
   ShoppingCartOutlined,
   Groups2Outlined,
   ReceiptLongOutlined,
+  DocumentScanner,
   PublicOutlined,
   PointOfSaleOutlined,
+  BuildOutlined,
   TodayOutlined,
   CalendarMonthOutlined,
   AdminPanelSettingsOutlined,
   TrendingUpOutlined,
   PieChartOutlined,
+  ApartmentOutlined,
+  VerifiedUserOutlined,
+  GradeOutlined,
+  PeopleAltOutlined,
+  CheckBoxOutlineBlankOutlined,
+  LockClockOutlined,
 } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import FlexBetween from "./FlexBetween";
 import profileImage from "assets/profile.jpg";
+import { selectCurrentRoles, selectCurrentPermissions, selectCurrentUser } from "scenes/auth/authSlice";
+import { useSelector } from "react-redux";
 
-const navItems = [
+const navItemsvaluer = [
   {
     text: "Dashboard",
     icon: <HomeOutlined />,
@@ -68,6 +78,112 @@ const navItems = [
   }
 ];
 
+const navItemsaccesor = [
+  {
+    text: "Dashboard",
+    icon: <HomeOutlined />,
+  },
+  {
+    text: "Valuation Reports",
+    icon: null,
+  },
+  {
+    text: "Uploaded",
+    icon: <ShoppingCartOutlined />,
+  },
+  {
+    text: "Upload",
+    icon: <Groups2Outlined />,
+  },
+  {
+    text: "User Mnager",
+    icon: null,
+  },
+  {
+    text: "My Uploaders",
+    icon: <PointOfSaleOutlined />,
+  },
+  {
+    text: "Accesors List",
+    icon: <TodayOutlined />,
+  },
+  {
+    text: "My Accesors",
+    icon: <CalendarMonthOutlined />,
+  }
+];
+
+const navItemsadmin = [
+  {
+    text: "Dashboard",
+    icon: <HomeOutlined />,
+    routeName: "/admin-dashboard"
+  },
+  {
+    text: "Valuation Reports",
+    icon: null,
+    
+  }, {
+    text: "All",
+    icon: <DocumentScanner />,
+    routeName: "/all-valuation-reports"
+  },
+  
+  {
+    text: "Organizations",
+    icon: null,
+  },
+  {
+    text: "Valauation Firms",
+    icon: <ApartmentOutlined />,
+    routeName: "/valuation-firms"
+  },
+  {
+    text: "Report Consumers",
+    icon: <ApartmentOutlined />,
+    routeName: "/report-consumers"
+  },
+  {
+    text: "User Manager",
+    icon: null,
+  },
+  {
+    text: "All Users",
+    icon: <GradeOutlined />,
+    routeName: "/all-system-users"
+  },
+  {
+    text: "Valuation Firm Users",
+    icon: <GradeOutlined />,
+    routeName: "/valuation-firm-users"
+  },
+  {
+    text: "Accesors List Users",
+    icon: <GradeOutlined />,
+    routeName: "/accesors-firm-users"
+  },
+  {
+    text: "Site Settings",
+    icon: null,
+  },
+  {
+    text: "Roles",
+    icon: <PeopleAltOutlined />,
+    routeName: "/roles"
+  },
+  {
+    text: "Permissions",
+    icon: <LockClockOutlined />,
+    routeName: "/permissions"
+  },
+  {
+    text: "Role Permissions",
+    icon: <CheckBoxOutlineBlankOutlined />,
+    routeName: "/role-permissions"
+  }
+];
+
+
 const Sidebar = ({
   user,
   drawerWidth,
@@ -80,6 +196,23 @@ const Sidebar = ({
   const navigate = useNavigate();
   const theme = useTheme();
 
+  const [navItems, setNavItems] = useState([]);
+  const currentuser = useSelector(selectCurrentUser);
+
+  const userrole = currentuser.role_name;
+
+  // const issuperadin=roles.find(c=>c.name=="Super Admin");
+  // const isvaluer=roles.find(c=>c.name=="Super Admin");
+  // const isaccesor=roles.find(c=>c.name=="Super Admin");
+  useEffect(() => {
+    if (userrole === "Super Admin") {
+      setNavItems(navItemsadmin);
+    } else if (userrole == "Report Uploader") {
+      setNavItems(navItemsvaluer);
+    } else if (userrole == "Report Accessor") {
+      setNavItems(navItemsaccesor);
+    }
+  }, [userrole]);
   useEffect(() => {
     setActive(pathname.substring(1));
   }, [pathname]);
@@ -119,7 +252,7 @@ const Sidebar = ({
               </FlexBetween>
             </Box>
             <List>
-              {navItems.map(({ text, icon }) => {
+              {navItems.map(({ text, icon,routeName }) => {
                 if (!icon) {
                   return (
                     <Typography key={text} sx={{ m: "2.25rem 0 1rem 3rem" }}>
@@ -127,13 +260,13 @@ const Sidebar = ({
                     </Typography>
                   );
                 }
-                const lcText = text.toLowerCase();
+                const lcText = routeName;
 
                 return (
                   <ListItem key={text} disablePadding>
                     <ListItemButton
                       onClick={() => {
-                        navigate(`/${lcText}`);
+                        navigate(lcText);
                         setActive(lcText);
                       }}
                       sx={{
@@ -169,41 +302,7 @@ const Sidebar = ({
             </List>
           </Box>
 
-          <Box position="absolute" bottom="2rem">
-            <Divider />
-            <FlexBetween textTransform="none" gap="1rem" m="1.5rem 2rem 0 3rem">
-              <Box
-                component="img"
-                alt="profile"
-                src={profileImage}
-                height="40px"
-                width="40px"
-                borderRadius="50%"
-                sx={{ objectFit: "cover" }}
-              />
-              <Box textAlign="left">
-                <Typography
-                  fontWeight="bold"
-                  fontSize="0.9rem"
-                  sx={{ color: theme.palette.secondary[100] }}
-                >
-                
-                </Typography>
-                <Typography
-                  fontSize="0.8rem"
-                  sx={{ color: theme.palette.secondary[200] }}
-                >
-                
-                </Typography>
-              </Box>
-              <SettingsOutlined
-                sx={{
-                  color: theme.palette.secondary[300],
-                  fontSize: "25px ",
-                }}
-              />
-            </FlexBetween>
-          </Box>
+       
         </Drawer>
       )}
     </Box>

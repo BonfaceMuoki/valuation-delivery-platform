@@ -14,14 +14,9 @@ import UploadReport from 'scenes/reports/UploadReport';
 function AdminDashboard() {
   
   const theme = useTheme();
-
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
-
-
-
   return (
     <Box m={isNonMediumScreens ? "1.5rem 1.5rem 0rem" : "1.5rem 1.5rem 0rem"}
-
     >
       <FlexBetween>
         <Header title="Dashbaord" subtitle="Welcome to your Dashaboard" />

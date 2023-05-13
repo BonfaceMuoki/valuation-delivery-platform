@@ -50,22 +50,31 @@ class CommonController extends Controller
         }
         $reports_query = ValuationReport::query();
         $reports = array();
-        if ($user->hasPermissionTo(Permission::where("name", 'view valuation firm reports only')->first())) {
-            $url=url("/");
+        $url=url("/");
+        if ($user->hasPermissionTo(Permission::where("slug", 'view valuation firm reports only')->first())) {
+           
             $org = $user->UploaderOrganization()->first();
             $reports_query->join("report_consumers", "report_consumers.id", "=", "valuation_reports.receiving_company_id");
             $reports_query->where("report_uploading_from", $org->id);
             $reports_query->select("valuation_reports.*", "report_consumers.organization_name",DB::raw("CONCAT('".$url."','/reports/',valuation_reports.upload_link) as report_url"));
             $reports = $reports_query->get();
-        } else if ($user->hasPermissionTo((Permission::where("name", 'view accesors reports only')->first()))) {
+        } else if ($user->hasPermissionTo((Permission::where("slug", 'view accesors reports only')->first()))) {
             $org = $user->AccessorOrganization()->first();
             $reports_query->join("organizations", "organizations.id", "=", "valuation_reports.report_uploading_from");
-            // $reports_query->where("report_uploading_from", $org->id);
+            $reports_query->where("report_uploading_from", $org->id);
             $reports_query->select('valuation_reports.*', 'organizations.organization_name');
             $reports = $reports_query->get();
-        } else if ($user->hasPermissionTo((Permission::where("name", 'view all reports')->first()))) {
+        } else if ($user->hasPermissionTo((Permission::where("slug", 'view all reports')->first()))) {
+            
+            $reports_query->join("report_consumers", "report_consumers.id", "=", "valuation_reports.receiving_company_id");
+            $reports_query->join("organizations", "organizations.id", "=", "valuation_reports.report_uploading_from");
+            $reports_query->select("valuation_reports.*", "organizations.organization_name as valuation_firm_name","report_consumers.organization_name",DB::raw("CONCAT('".$url."','/reports/',valuation_reports.upload_link) as report_url"));
             $reports = $reports_query->get();
         } else {
+            $reports_query->join("report_consumers", "report_consumers.id", "=", "valuation_reports.receiving_company_id");
+            $reports_query->join("organizations", "organizations.id", "=", "valuation_reports.report_uploading_from");
+            $reports_query->select("valuation_reports.*", "organizations.organization_name as valuation_firm_name","report_consumers.organization_name",DB::raw("CONCAT('".$url."','/reports/',valuation_reports.upload_link) as report_url"));
+            $reports = $reports_query->get();
             return response()->json(['message' => 'You do not have the permission to view this resource'], 401);
         }
         return response()->json($reports);

@@ -1,7 +1,7 @@
 import React from 'react'
-import { Button } from 'antd';
+// import { Button } from 'antd';
 import { DownloadDoneOutlined } from '@mui/icons-material';
-import { useTheme } from '@mui/material';
+import { useTheme,Button } from '@mui/material';
 import { useGetDownloadValuationReportsQuery } from 'features/downloadReportSlice';
 import { useQuery } from 'react-query';
 import { useSelector } from 'react-redux';
@@ -49,10 +49,10 @@ function Valuationreportactions({ params }) {
     return (
         <div>
             <a href="#" >
-                <Button onClick={() => handledownload(params.id, 0)}>Unsigned</Button>
-            </a>
+                <Button variant='contained' onClick={() => handledownload(params.id, 0)}>Unsigned</Button>
+            </a> &nbsp;&nbsp;&nbsp;
             <a href="#">
-                <Button onClick={() => handledownload(params.id, 1)}>Signed</Button>
+                <Button variant='contained' onClick={() => handledownload(params.id, 1)}>Signed</Button>
             </a>
         </div>
     )

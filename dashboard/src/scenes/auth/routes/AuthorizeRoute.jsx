@@ -1,13 +1,15 @@
 import { useLocation, Navigate, Outlet } from "react-router-dom"
 import { useSelector } from "react-redux"
-import { selectCurrentRoles } from '../authSlice';
+import { selectCurrentPermissions, selectCurrentRoles } from '../authSlice';
 import {toast } from 'react-toastify';
 
-function AuthorizeRoute({checkrole}) {
-    const roles = useSelector(selectCurrentRoles); 
+function AuthorizeRoute({checkpermission}) {
+    // const roles = useSelector(selectCurrentRoles); 
+    const permissions = useSelector(selectCurrentPermissions); 
     const location = useLocation();
+    // console.log(permissions.find(p => p.name ===checkpermission));
   return (
-    (roles.find(c => c.name ===checkrole))? <Outlet /> :     <Navigate to="/unauthorized" state={{ from: location }} replace />
+    (permissions.find(p => p.name ===checkpermission))? <Outlet /> :     <Navigate to="/unauthorized" state={{ from: location }} replace />
   )
 }
 

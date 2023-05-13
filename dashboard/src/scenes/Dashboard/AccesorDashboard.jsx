@@ -11,7 +11,7 @@ import UploadReport from 'scenes/reports/UploadReport';
 
 
 
-function AdminDashboard() {
+function AccesorDashboard() {
   
   const theme = useTheme();
 
@@ -88,4 +88,4 @@ function AdminDashboard() {
   )
 }
 
-export default AdminDashboard;
+export default AccesorDashboard;

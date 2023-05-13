@@ -69,8 +69,15 @@ function Login() {
     let password = data.password;
     const userData = await login({ email, password }).unwrap()
     dispatch(setCredentials({ ...userData, email }));
-    console.log(userData);
-    navigate('/')
+    console.log(userData.role.name);
+    if(userData.role.name==="Super Admin"){
+      navigate('/admin-dashboard')
+    }else if(userData.role.name==="Report Uploader"){
+      navigate('/dashbaord')
+    }else if(userData.role.name==="Report Accesor"){
+      navigate('/dashbaord')
+    }
+    
     
  
   }

@@ -328,13 +328,16 @@ public function registerAccesor(Request $request){
     }
     protected function createNewToken($token)
     {
+        $role=auth()->user()->roles()->first(["id", "name","name as role_name"]);
+        $user=auth()->user();
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60,
-            'user' => auth()->user(),
-            'roles' => auth()->user()->roles()->get(["id", "name"]),
-            'permissions' => auth()->user()->permissions()->get(["id", "name"])
+            'user' => array_merge($user->toArray(),$role->toArray()),
+            'role' => $role,
+            'roles' => $user->roles()->get(["id", "name"]),
+            'permissions' => array_merge($user->permissions()->get(["id", "slug as name"])->toArray(),$role->permissions()->get(['id','slug as name'])->toArray())
         ]);
     }
 
