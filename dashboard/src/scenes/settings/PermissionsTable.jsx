@@ -8,6 +8,7 @@ import Modal from '@mui/material/Modal';
 import FlexBetween from 'components/FlexBetween';
 import Header from 'components/Header';
 import { Add } from '@mui/icons-material';
+import { Row,Col } from 'antd';
 
 const style = {
   position: 'absolute',

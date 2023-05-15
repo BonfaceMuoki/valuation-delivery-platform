@@ -19,6 +19,8 @@ import AdminValuationReports from "scenes/reports/AdminValuationReports";
 import RolesTable from "scenes/settings/RolesTable";
 import PermissionsTable from "scenes/settings/PermissionsTable";
 import RolePermissionTable from "scenes/settings/RolePermissionTable";
+import ValuationFirms from "scenes/organizations/ValuationFirms";
+import UsersList from "scenes/users/UsersList";
 function App() {
   const mode = useSelector((state) => state.auth.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
@@ -66,20 +68,7 @@ function App() {
                 >
                   <Route path="/all-valuation-reports" element={<AdminValuationReports />} />
                 </Route>
-                <Route
-                  element={
-                    <AuthorizeRoute checkpermission="view valuation firms" />
-                  }
-                >
-                  <Route path="/valuation-firms" element={<AdminValuationReports />} />
-                </Route>
-                <Route
-                  element={
-                    <AuthorizeRoute checkpermission="view accesors" />
-                  }
-                >
-                  <Route path="/report-consumers" element={<AdminValuationReports />} />
-                </Route>
+
                 <Route
                   element={
                     <AuthorizeRoute checkpermission="view accesors" />
@@ -100,6 +89,43 @@ function App() {
                   }
                 >
                   <Route path="/role-permissions" element={<RolePermissionTable />} />
+                </Route>
+
+                <Route
+                  element={
+                    <AuthorizeRoute checkpermission="view accesors" />
+                  }
+                >
+                  <Route path="/valuation-firms" element={<ValuationFirms />} />
+                </Route>
+
+                <Route
+                  element={
+                    <AuthorizeRoute checkpermission="view accesors" />
+                  }
+                >
+                  <Route path="/report-consumers" element={<ValuationFirms />} />
+                </Route>
+                <Route
+                  element={
+                    <AuthorizeRoute checkpermission="view accesors" />
+                  }
+                >
+                  <Route path="/all-system-users" element={<UsersList />} />
+                </Route>
+                <Route
+                  element={
+                    <AuthorizeRoute checkpermission="view accesors" />
+                  }
+                >
+                  <Route path="/valuation-firm-users" element={<UsersList />} />
+                </Route>
+                <Route
+                  element={
+                    <AuthorizeRoute checkpermission="view accesors" />
+                  }
+                >
+                  <Route path="/accesors-firm-users" element={<UsersList />} />
                 </Route>
                 
               </Route>

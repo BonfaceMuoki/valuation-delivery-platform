@@ -1,12 +1,12 @@
 import React from 'react'
 import { DataGrid } from '@mui/x-data-grid'
 import { Box,Button } from '@mui/material';
-import RolesActions from './RolesActions';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import FlexBetween from 'components/FlexBetween';
 import Header from 'components/Header';
 import { Add } from '@mui/icons-material';
+import UserActions from './UserActions';
 
 const style = {
   position: 'absolute',
@@ -19,7 +19,7 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
-function RolesTable() {
+function UsersList() {
     const columns = [
         {
             headerName: "ROLE ID",
@@ -36,7 +36,7 @@ function RolesTable() {
             headerName: "Actions",
             type: 'actions',
             width: 400,
-            renderCell: (params) => <RolesActions {...{ params }} />,
+            renderCell: (params) => <UserActions {...{ params }} />,
         }
     ];
     const roles = [
@@ -56,8 +56,8 @@ function RolesTable() {
         <>
 
  <FlexBetween sx={{ml:5}}>
-        <Header sx={{ml:30}} title="Roles" subtitle="List of Roles" />
-        <Button sx={{ mt: 10, ml: 10, mr: 10}} variant='contained' onClick={handleOpen}> <Add></Add>&nbsp;&nbsp; New Role</Button>
+        <Header sx={{ml:30}} title="REport Consumers" subtitle="List of REport Consumers" />
+        <Button sx={{ mt: 10, ml: 10, mr: 10}} variant='contained' onClick={handleOpen}> <Add></Add>&nbsp;&nbsp; New User</Button>
       </FlexBetween>
       <Modal
         open={open}
@@ -87,4 +87,4 @@ function RolesTable() {
     )
 }
 
-export default RolesTable
+export default UsersList

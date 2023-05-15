@@ -10,7 +10,7 @@ import { Row, Col } from 'antd';
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
-import "../../assets/scss/uploadreport.css";
+import "../../assets/scss/validation.css";
 import { DatePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
