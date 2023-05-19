@@ -107,9 +107,11 @@ class AdminController extends Controller
     {
         $user = auth()->user();
         if ($user->hasPermissionTo(Permission::where("slug", "view roles")->first())) {
-            return response()->json(['roles' => Role::all()], 201);
+            $roles=Role::with("permissions")->get();
+            return response()->json($roles, 201);
+
         } else {
-            return response()->json(['message' => 'Permission Denie'], 401);
+            return response()->json(['message' => 'Permission Denied'], 401);
         }
     }
     public function assignRolePermissions(Request $request)

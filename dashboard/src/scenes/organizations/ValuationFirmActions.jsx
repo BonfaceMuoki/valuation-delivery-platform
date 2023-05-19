@@ -19,28 +19,8 @@ function ValuationFirmActions({ row }) {
     p: 4,
   };
   return (
-    <div>
-      <Button variant='contained' onClick={handleOpenValauationFirmModal}>Edit</Button>
-      {/* close modal edit valuation firm */}
-      <Modal
-        open={openEditValauationFirmModal}
-        onClose={handleCloseValauationFirmModal}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Typography>Edit {row.row.name}</Typography>
-          <Divider></Divider>
-          <Grid container spacing={2}  sx={{mt:1}} >
-            <Grid item xs={12} sm={6} md={4}>
-              <Typography>Valuation Firm Name</Typography>
-              <TextField fullWidth />
-            </Grid>
-          </Grid>
-        </Box>
-      </Modal>
-      {/* close modal edit valuation firm  */}
-    </div>
+    <>
+    </>
   )
 }
 

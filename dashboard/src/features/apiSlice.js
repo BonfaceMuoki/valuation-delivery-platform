@@ -1,5 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { setCredentials, logOut } from '../scenes/auth/authSlice'
+import { Navigate,useNavigate } from 'react-router-dom'
 
 const baseQuery = fetchBaseQuery({
     baseUrl: 'http://localhost:8001',
@@ -15,8 +16,8 @@ const baseQuery = fetchBaseQuery({
 
 const baseQueryWithReauth = async (args, api, extraOptions) => {
     let result = await baseQuery(args, api, extraOptions)
-    console.log(result);
-    if ((result?.error?.status === 403)||(result?.error?.status === 401)) {
+    console.log(result?.error?.status);
+    if ((result?.error?.status === 403)) {
         console.log('sending refresh token');
         // send refresh token to get new access token 
         const refreshResult = await baseQuery({
@@ -35,8 +36,11 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
         } else {
             api.dispatch(logOut())
         }
+    }else if((result?.error?.status === 401)){        
+        api.dispatch(logOut);
+        // send refresh token to get new access token 
+       
     }
-
     return result
 }
 
