@@ -16,6 +16,33 @@ class AdminController extends Controller
         $this->middleware("Admin");
 
     }
+    public function deleteRole($id){
+        $user = auth()->user();
+        if ($user->hasPermissionTo(Permission::where("slug", "add role")->first())) {
+            try {
+                DB::beginTransaction();   
+               
+                $role = Role::findOrFail($id);
+                $rolede=Role::where("id",$id)->first();
+                $rolede->permissions()->detach();
+                $role->permissions()->detach();
+                $role->delete();               
+                DB::commit();
+                return response()->json([
+                    'message' => 'Deleted successfully.'
+                ], 201);
+             
+            } catch (\Exception $exception) {
+                DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
+                return response()->json([
+                    'message' => 'Failed.'.$exception->getMessage().'.Please contact admin.',
+                    'error' => $exception,
+                ], 400);
+            }
+        } else {
+            return response()->json(['message' => 'Permission Denie'], 401);
+        }
+    }
     public function updateRole(Request $request,$id){
         $user = auth()->user();
         if ($user->hasPermissionTo(Permission::where("slug", "add role")->first())) {

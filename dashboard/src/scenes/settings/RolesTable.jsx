@@ -29,6 +29,10 @@ import { useAddRoleMutation } from 'features/addRoleSlice';
 import { apiSlice } from 'features/apiSlice';
 import { useUpdateRoleMutation } from 'features/updateRoleSlice';
 
+import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup';
+import { Toast as PrimeToast } from 'primereact/toast';
+import { useDeleteRoleMutation } from 'features/deleteRoleSlice';
+
 const style = {
   position: 'absolute',
   top: '5%',
@@ -45,21 +49,21 @@ const style = {
 };
 function RolesTable() {
 
-  const toastMessage = (message,type)=>{
-    if(type=="success"){
+  const toastMessage = (message, type) => {
+    if (type == "success") {
       toast.success(message, {
         position: toast.POSITION.TOP_RIGHT
-    });
-    }else if(type=="error"){
+      });
+    } else if (type == "error") {
       toast.error(message, {
         position: toast.POSITION.TOP_RIGHT
-    });
-    }else if(type=="warning"){
+      });
+    } else if (type == "warning") {
       toast.warning(message, {
         position: toast.POSITION.TOP_RIGHT
-    });
+      });
     }
-  } 
+  }
 
   const { data: allpermissions,
     isFetching: isFetchingpermissions,
@@ -110,7 +114,7 @@ function RolesTable() {
 
   // design forms
   //add role
-  const [sendAddRole,{isLoading: addingRole,}] = useAddRoleMutation({
+  const [sendAddRole, { isLoading: addingRole, }] = useAddRoleMutation({
     // Define onSuccess callback
     onSuccess: () => {
       alert("SUcceded")
@@ -121,27 +125,27 @@ function RolesTable() {
   const addRoleFormSchema = yup.object().shape({
     role_name: yup.string().required("The role Name is required")
   });
-  const { register: registerAddRoleForm, handleSubmit: handleSubmitAddRoleForm, formState: { errors: addRoleFormErrors }, reset : resetAddroleForm } = useForm({
+  const { register: registerAddRoleForm, handleSubmit: handleSubmitAddRoleForm, formState: { errors: addRoleFormErrors }, reset: resetAddroleForm } = useForm({
     resolver: yupResolver(addRoleFormSchema)
   });
   const submitAddRoleForm = async (data) => {
     console.log(data);
     const formData = new FormData();
-    formData.append("role_name",data.role_name);    
+    formData.append("role_name", data.role_name);
     const result = await sendAddRole(formData);
     if ('error' in result) {
-      toastMessage(result.error.data.message,"error");
+      toastMessage(result.error.data.message, "error");
 
     } else {
       resetAddroleForm();
-      toastMessage(result.data.message,"success");
+      toastMessage(result.data.message, "success");
 
     }
     refetchRoles();
   }
   // close add role
   //edit role form
-  const [submitUpdateRole, {isLoading: updatingrole, isError: errorUpdatingRole}] = useUpdateRoleMutation();
+  const [submitUpdateRole, { isLoading: updatingrole, isError: errorUpdatingRole }] = useUpdateRoleMutation();
   const [roleToEdit, setRoleToEdit] = useState();
   const [roleNameToEdit, setRoleNameToEdit] = useState();
   const editRoleFormSchema = yup.object().shape({
@@ -150,22 +154,22 @@ function RolesTable() {
   const { register: registerEditRoleForm, handleSubmit: handleSubmitEditRoleForm, setValue: setEditValue, setFocus: setEditFocus, formState: { errors: editRoleForErrors } } = useForm({
     resolver: yupResolver(editRoleFormSchema)
   });
-  const SubmitEditRoleForm = async(data) => {
-   console.log(data);
-   const role_name= data.role_name;
-   const role=data.role;
-   const updatedata ={role_name:role_name};
-   const result = await submitUpdateRole({data:updatedata,role});
-   if ('error' in result) {
-    toastMessage(result.error.data.message,"error");
+  const SubmitEditRoleForm = async (data) => {
+    console.log(data);
+    const role_name = data.role_name;
+    const role = data.role;
+    const updatedata = { role_name: role_name };
+    const result = await submitUpdateRole({ data: updatedata, role });
+    if ('error' in result) {
+      toastMessage(result.error.data.message, "error");
 
-  } else {
-    resetAddroleForm();
-    toastMessage(result.data.message,"success");
-    handleCloseEditRoleModal();
+    } else {
+      resetAddroleForm();
+      toastMessage(result.data.message, "success");
+      handleCloseEditRoleModal();
 
-  }
-   refetchRoles();
+    }
+    refetchRoles();
 
   }
   const handleRoleNameToEditChange = (event) => {
@@ -174,7 +178,7 @@ function RolesTable() {
 
   ///close edit role form
   // design view form
-  const [assignPolePermissions,{isloading: isLoadingAssignPermissions}] = useAssignRolePermissionsListMutation();
+  const [assignPolePermissions, { isloading: isLoadingAssignPermissions }] = useAssignRolePermissionsListMutation();
   const { register: registerrolepermissionsform, handleSubmit: handlerolePermissionsForm } = useForm();
   const seeRoleDetails = (row) => {
     console.log(row.permissions);
@@ -201,14 +205,14 @@ function RolesTable() {
     rolepermissionsselected.forEach((item, index) => {
       formdata.append('permissions[]', item);
     });
-    formdata.append("role", selectedRole.id);    
+    formdata.append("role", selectedRole.id);
     const result = await assignPolePermissions(formdata);
     if ('error' in result) {
-      toastMessage(result.error.data.message,"error");
+      toastMessage(result.error.data.message, "error");
 
     } else {
       resetAddroleForm();
-      toastMessage(result.data.message,"success");
+      toastMessage(result.data.message, "success");
 
     }
     refetchRoles();
@@ -254,33 +258,43 @@ function RolesTable() {
 
   }
 
-  const acceptDEletionOfRole = () => {
-    toast.current.show({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted', life: 3000 });
+  const acceptDEletionOfRole = async (data) => {
+    console.log(data);
+    const role=data.id;
+    const result =await deletRole({role})
+    if ('error' in result) {
+      toastMessage(result.error.data.message, "error");
+
+    } else {
+      resetAddroleForm();
+      toastMessage(result.data.message, "success");
+
+    }
+    refetchRoles();
   }
 
   const rejectDeletionOfRole = () => {
-    toast.current.show({ severity: 'warn', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+    toastMessage("Accepted", "success");
   }
+
+  const [deletRole, {isLoading: deleting}] = useDeleteRoleMutation();
 
   const handleOnDelete = (row) => {
     confirmDialog({
-      message: `Do you want to delete  ' ${row.row.name} ' Role?`,
+      message: `Do you want to delete role ${row.name}?`,
       header: 'Delete Confirmation',
       icon: 'pi pi-info-circle',
       acceptClassName: 'p-button-danger',
-      rejectClassName: 'p-button-success',
-      acceptDEletionOfRole,
-      rejectDeletionOfRole
+      accept: () => acceptDEletionOfRole(row),
+      reject: () => rejectDeletionOfRole(row),
     });
   }
 
-
-
-
+  const primetoast = useRef(null);
   return (
 
     <BlockUI blocked={blocked}>
- 
+      <ConfirmDialog />
       <Modal
         open={open}
         onClose={handleClose}
@@ -316,7 +330,7 @@ function RolesTable() {
           <Divider></Divider>
           <form onSubmit={handlerolePermissionsForm(submitRolePermissions)}>
             <Grid container pacing={2} sx={{ mt: 1 }}>
-              
+
               <Grid item sm={12} xs={12} md={12}>
                 <FormGroup>
                   {
