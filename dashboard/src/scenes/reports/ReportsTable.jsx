@@ -7,9 +7,28 @@ import { istofetchvaluationreports } from 'scenes/auth/authSlice';
 import Valuationreportactions from 'scenes/reports/Valuationreportactions';
 import { DownloadDoneOutlined, UpcomingOutlined } from '@mui/icons-material';
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 function ReportsTable  () {
     
+  const toastMessage = (message,type)=>{
+    if(type=="success"){
+      toast.success(message, {
+        position: toast.POSITION.TOP_RIGHT
+    });
+    }else if(type=="error"){
+      toast.error(message, {
+        position: toast.POSITION.TOP_RIGHT
+    });
+    }else if(type=="warning"){
+      toast.warning(message, {
+        position: toast.POSITION.TOP_RIGHT
+    });
+    }
+  } 
+
 
     const columns = [
         {
@@ -49,9 +68,11 @@ function ReportsTable  () {
         isSuccess,
         isError,
         error
-    } =  useGetValuationReportsQuery();     
+    } =  useGetValuationReportsQuery();   
+    isError &&   toastMessage("Error while fetching","error");
+    isError && console.log(error);
     return (
-        <div style={{ height: 475, width: '100%' }}>
+        <div style={{ height: 650, width: '100%' }}>
             {isFetching&& <span>Is refetching</span>}
             {/* {isLoading&& <span>Is refetching</span>} */}
             <DataGrid
@@ -59,6 +80,11 @@ function ReportsTable  () {
                 getRowId={(row) => row.id}
                 rows={reports || []}
                 columns={columns}
+                initialState={{
+                    ...reports,
+                    pagination: { paginationModel: { pageSize: 10 } },
+                  }}
+                  pageSizeOptions={[5, 10, 25]}
             />
         </div>
     )

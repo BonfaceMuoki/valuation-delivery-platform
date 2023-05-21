@@ -1,10 +1,10 @@
 import { apiSlice } from "./apiSlice";
 
-const rolesSlice = apiSlice.injectEndpoints({
+const permissionssSlice = apiSlice.injectEndpoints({
     endpoints: builder =>({
-        getRolesList: builder.query({
+        getPermissionsList: builder.query({
             query: () => ({
-                url: `/api/admin/get-all-roles`,
+                url: `/api/admin/get-all-permissions`,
                 method: 'GET',
                 headers: {
                     'Accept': 'Application/json'
@@ -14,4 +14,4 @@ const rolesSlice = apiSlice.injectEndpoints({
         })
     })
 })
-export const { useGetRolesListQuery } = rolesSlice;
+export const { useGetPermissionsListQuery } = permissionssSlice;

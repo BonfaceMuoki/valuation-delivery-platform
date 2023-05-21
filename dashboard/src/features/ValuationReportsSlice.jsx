@@ -5,10 +5,14 @@ export const valuationReportsApiSlice = apiSlice.injectEndpoints({
    
     endpoints: builder => ({
         getValuationReports: builder.query({
-            query: () => `/api/commons/get-reports-list`,
-            skipCache: true,
-            keepUnusedDataFor:5,
-            refetchOnFocus: true,
+            query: () => ({
+                url: `/api/commons/get-reports-list`,
+                method: 'GET',
+                headers: {
+                    'Accept': 'Application/json'
+                  }          
+            })
+           
         })
     })
 })

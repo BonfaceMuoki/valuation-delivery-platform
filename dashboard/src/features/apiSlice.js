@@ -36,8 +36,8 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
         } else {
             api.dispatch(logOut())
         }
-    }else if((result?.error?.status === 401)){        
-        api.dispatch(logOut);
+    }else if((result?.error?.status === 401)){      
+        api.dispatch(logOut());
         // send refresh token to get new access token 
        
     }

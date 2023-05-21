@@ -23,20 +23,20 @@ class AdminController extends Controller
             try {
                 DB::beginTransaction();
                 $roles = json_decode(stripslashes($request->post('role_name')), true);
-                foreach ($roles as $role) {
-                    $role['name'] = $role['role_name'];
-                    $role['slug'] = strtolower($role['role_name']);
+                // foreach ($roles as $role) {
+                    $role['name'] = $request->post('role_name');
+                    $role['slug'] = strtolower($request->post('role_name'));
                     $role['status'] = 1;
                     Role::create($role);
-                }
+                // }
                 DB::commit();
                 return response()->json([
-                    'message' => 'Added successfully'
+                    'message' => 'Added successfully.'
                 ], 201);
             } catch (\Exception $exception) {
                 DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
                 return response()->json([
-                    'message' => 'Failed.',
+                    'message' => 'Failed.Please contact admin.',
                     'error' => $exception
                 ], 400);
             }
@@ -98,7 +98,7 @@ class AdminController extends Controller
     {
         $user = auth()->user();
         if ($user->hasPermissionTo(Permission::where("slug", "assign role permission")->first())) {
-            return response()->json(['permissions' => Permission::all()], 201);
+            return response()->json(Permission::orderBy('name', 'ASC')->get(), 201);
         } else {
             return response()->json(['message' => 'Permission Denie'], 401);
         }
@@ -107,11 +107,14 @@ class AdminController extends Controller
     {
         $user = auth()->user();
         if ($user->hasPermissionTo(Permission::where("slug", "view roles")->first())) {
-            $roles=Role::with("permissions")->get();
-            return response()->json($roles, 201);
 
+            $roles=Role::with("permissions")->get();            
+            return response()->json($roles, 201);
+            
         } else {
+
             return response()->json(['message' => 'Permission Denied'], 401);
+
         }
     }
     public function assignRolePermissions(Request $request)
@@ -123,10 +126,15 @@ class AdminController extends Controller
                 $data = $request->post('permissions');
                 //  get role details
                 $role = Role::where("id", $request->post('role'))->first();
+                $role->permissions()->detach();
                 $permissions = $request->post("permissions");
                 foreach ($permissions as $permission) {
-                    $perm = Permission::where("id", $permission)->first();
-                    $role->permissions()->attach($perm);
+                    $axist=DB::table("roles_permissions")->where("permission_id",$permission)->where("role_id",$request->post('role'))->get();
+                    // if(sizeof($axist)==0){
+                        $perm = Permission::where("id", $permission)->first();
+                        $role->permissions()->attach($perm);
+                    // }
+                    
                 }
                 DB::commit();
                 return response()->json([
