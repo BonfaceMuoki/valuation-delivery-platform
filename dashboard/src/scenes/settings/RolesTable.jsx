@@ -27,6 +27,7 @@ import { useGetPermissionsListQuery } from 'features/permissionsSlice';
 import { useAssignRolePermissionsListMutation } from 'features/assignRolePermissionsSlice';
 import { useAddRoleMutation } from 'features/addRoleSlice';
 import { apiSlice } from 'features/apiSlice';
+import { useUpdateRoleMutation } from 'features/updateRoleSlice';
 
 const style = {
   position: 'absolute',
@@ -140,6 +141,7 @@ function RolesTable() {
   }
   // close add role
   //edit role form
+  const [submitUpdateRole, {isLoading: updatingrole, isError: errorUpdatingRole}] = useUpdateRoleMutation();
   const [roleToEdit, setRoleToEdit] = useState();
   const [roleNameToEdit, setRoleNameToEdit] = useState();
   const editRoleFormSchema = yup.object().shape({
@@ -148,14 +150,22 @@ function RolesTable() {
   const { register: registerEditRoleForm, handleSubmit: handleSubmitEditRoleForm, setValue: setEditValue, setFocus: setEditFocus, formState: { errors: editRoleForErrors } } = useForm({
     resolver: yupResolver(editRoleFormSchema)
   });
-  const SubmitEditRoleForm = (data) => {
-    // const updatedroles= roles.map((role,key)=>{
-    //   if(role.id==data.role){
-    //     role.name=data.role_name;
-    //   }
-    //   return role;
-    // })
-    // console.log(updatedroles);
+  const SubmitEditRoleForm = async(data) => {
+   console.log(data);
+   const role_name= data.role_name;
+   const role=data.role;
+   const updatedata ={role_name:role_name};
+   const result = await submitUpdateRole({data:updatedata,role});
+   if ('error' in result) {
+    toastMessage(result.error.data.message,"error");
+
+  } else {
+    resetAddroleForm();
+    toastMessage(result.data.message,"success");
+    handleCloseEditRoleModal();
+
+  }
+   refetchRoles();
 
   }
   const handleRoleNameToEditChange = (event) => {

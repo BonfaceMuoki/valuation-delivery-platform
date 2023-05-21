@@ -16,6 +16,37 @@ class AdminController extends Controller
         $this->middleware("Admin");
 
     }
+    public function updateRole(Request $request,$id){
+        $user = auth()->user();
+        if ($user->hasPermissionTo(Permission::where("slug", "add role")->first())) {
+            try {
+                DB::beginTransaction();   
+
+                $roleup['name'] = $request->role_name;
+                $roleup['slug'] = strtolower($request->role_name);
+                $roleup['status'] = 1;
+
+                
+                $role = Role::findOrFail($id);
+                $role->fill($roleup);
+                $role->save();                 
+                DB::commit();
+                return response()->json([
+                    'message' => 'Updated successfully.'
+                ], 201);
+             
+            } catch (\Exception $exception) {
+                DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
+                return response()->json([
+                    'message' => 'Failed.'.$exception->getMessage().'.Please contact admin.',
+                    'error' => $exception,
+                    'payload' => $request->all()
+                ], 400);
+            }
+        } else {
+            return response()->json(['message' => 'Permission Denie'], 401);
+        }
+    }
     public function addRoles(Request $request)
     {
         $user = auth()->user();
@@ -23,22 +54,26 @@ class AdminController extends Controller
             try {
                 DB::beginTransaction();
                 $roles = json_decode(stripslashes($request->post('role_name')), true);
-                // foreach ($roles as $role) {
+                foreach ($roles as $role) {
                     $role['name'] = $request->post('role_name');
                     $role['slug'] = strtolower($request->post('role_name'));
                     $role['status'] = 1;
                     Role::create($role);
-                // }
+                }
                 DB::commit();
-                return response()->json([
-                    'message' => 'Added successfully.'
-                ], 201);
+              
+                    return response()->json([
+                        'message' => 'Added successfully.'
+                    ], 201);
+          
             } catch (\Exception $exception) {
                 DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
                 return response()->json([
                     'message' => 'Failed.Please contact admin.',
                     'error' => $exception
                 ], 400);
+            }finally{
+
             }
         } else {
             return response()->json(['message' => 'Permission Denie'], 401);
