@@ -21,6 +21,7 @@ import PermissionsTable from "scenes/settings/PermissionsTable";
 import RolePermissionTable from "scenes/settings/RolePermissionTable";
 import ValuationFirms from "scenes/organizations/ValuationFirms";
 import UsersList from "scenes/users/UsersList";
+import ReportConsumers from "scenes/organizations/ReportConsumers";
 function App() {
   const mode = useSelector((state) => state.auth.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
@@ -104,7 +105,7 @@ function App() {
                     <AuthorizeRoute checkpermission="view accesors" />
                   }
                 >
-                  <Route path="/report-consumers" element={<ValuationFirms />} />
+                  <Route path="/report-consumers" element={<ReportConsumers />} />
                 </Route>
                 <Route
                   element={
@@ -118,7 +119,7 @@ function App() {
                     <AuthorizeRoute checkpermission="view accesors" />
                   }
                 >
-                  <Route path="/valuation-firm-users" element={<UsersList />} />
+                  <Route path="/valuation-firm-users" element={<UsersList/>} />
                 </Route>
                 <Route
                   element={

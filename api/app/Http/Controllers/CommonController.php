@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Organization;
 use App\Models\ReportConsumer;
 use App\Models\ValuationReport;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Permission;
 use DB;
@@ -15,13 +16,28 @@ class CommonController extends Controller
     public function getAccesorsList()
     {
         $all = ReportConsumer::all();
-        return response()->json(['code' => 1, 'accesors' => $all], 201);
+        return response()->json($all, 201);
+    } 
+    public function getAllUsers(){
+
+        $user = auth()->user();
+        if($user==null){
+            return response()->json(['message'=>'Unautheticated'],403);
+        }
+        if ($user->hasPermissionTo(Permission::where("slug", 'view all Users')->first())) {
+
+            $users=User::all();
+            return response($users,200);
+
+        }
+
+
     }
     public function getAccesorsUsersList($accesor)
     {
         $org = ReportConsumer::where("id", $accesor)->first();
         if ($org) {
-            return response()->json(['code' => 1, 'users_list' => $org->users()->get()], 201);
+            return response()->json($org->users()->get(), 201);
 
         } else {
             return response()->json(['code' => 0, 'users_list' => null, 'message' => 'Organization is not found'], 201);
@@ -30,13 +46,13 @@ class CommonController extends Controller
     public function getUploadersList()
     {
         $all = Organization::all();
-        return response()->json(['code' => 1, 'accesors' => $all], 201);
+        return response()->json($all, 201);
     }
     public function getUploadersUsersList($uploader)
     {
         $org = Organization::where("id", $uploader)->first();
         if ($org) {
-            return response()->json(['code' => 1, 'users_list' => $org->users()->get()], 201);
+            return response()->json($org->users()->get(), 201);
 
         } else {
             return response()->json(['code' => 0, 'users_list' => null, 'message' => 'Organization is not found'], 201);

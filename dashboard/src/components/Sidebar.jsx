@@ -134,12 +134,12 @@ const navItemsadmin = [
     icon: null,
   },
   {
-    text: "Valauation Firms",
+    text: "Valuation Firms",
     icon: <ApartmentOutlined />,
     routeName: "/valuation-firms"
   },
   {
-    text: "Report Consumers",
+    text: "Consumers",
     icon: <ApartmentOutlined />,
     routeName: "/report-consumers"
   },
@@ -153,12 +153,12 @@ const navItemsadmin = [
     routeName: "/all-system-users"
   },
   {
-    text: "Valuation Firm Users",
+    text: "Valuation Users",
     icon: <GradeOutlined />,
     routeName: "/valuation-firm-users"
   },
   {
-    text: "Accesors List Users",
+    text: "Consumer Users",
     icon: <GradeOutlined />,
     routeName: "/accesors-firm-users"
   },

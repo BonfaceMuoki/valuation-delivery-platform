@@ -5,11 +5,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PasswordResetRequestController;
-
 use App\Http\Controllers\ChangePasswordController;
 use App\Http\Controllers\ValuerController;
-
-
 ;
 
 /*
@@ -25,63 +22,51 @@ use App\Http\Controllers\ValuerController;
 Route::group([
     'middleware' => 'api',
     'prefix' => 'auth'
-], function ($router)
-    {
+], function ($router) {
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/all-users', [AuthController::class, 'allUsers']);
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/register-accesor', [AuthController::class, 'registerAccesor']);
-    
     Route::post('/invite-tenant', [AuthController::class, 'inviteTenant']);
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/refresh', [AuthController::class, 'refresh']);
     Route::get('/user-profile', [AuthController::class, 'userProfile']);
     Route::get('/owner-details', [AuthController::class, 'userDetails']);
-    });
-    Route::group([
-        'middleware' => 'api',
-        'prefix' => 'commons'
-    ], function ($router)
-        {
-        Route::get('/get-accesors-list', [CommonController::class, 'getAccesorsList']);
-        Route::get('/get-accesors-users-list/{accesor}', [CommonController::class, 'getAccesorsUsersList']);
-        Route::get('/get-uploaders-list', [CommonController::class, 'getUploadersList']);
-        Route::get('/get-uploaders-users-list/{uploader}', [CommonController::class, 'getUploadersUsersList']);
-        Route::get('/get-reports-list', [CommonController::class, 'getReportsList']);  
-        Route::get('/downloadvaluationreport/{id}/{signed}', [CommonController::class, 'downloadValuationReport']);        
-        });
-        Route::group([
-            'middleware' => 'api',
-            'prefix' => 'admin'
-        ], function ($router)
-            {
-            Route::post('/add-role', [AdminController::class, 'addRoles']);
-            Route::patch('/update-role/{id}', [AdminController::class, 'updateRole']);
-            Route::delete('/delete-role/{id}', [AdminController::class, 'deleteRole']);
-            
-            
-            Route::get('/get-all-roles', [AdminController::class, 'getAllRoles']);
-            Route::get('/get-all-permissions', [AdminController::class, 'getAllPermissions']);
-            Route::post('/add-permissions', [AdminController::class, 'addPermissions']);
-            Route::post('/assign-role-permissions', [AdminController::class, 'assignRolePermissions']);
-            Route::get('/get-role-permissions', [AdminController::class, 'getRolePermissions']);
-            
-
-            
-            });
-            Route::group([
-                'middleware' => 'api',
-                'prefix' => 'uploader'
-            ], function ($router)
-                {
-                Route::post('/upload-report', [ValuerController::class, 'uploadReport']);
-                Route::post('/upload-valuation-report', [ValuerController::class, 'uploadReport']);
-                Route::get('/addimage', [ValuerController::class, 'writeToPDF']);
-                Route::get('/generate-qr-report', [ValuerController::class, 'generateQRCode']);
-                });
-
-            
+});
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'commons'
+], function ($router) {
+    Route::get('/get-accesors-list', [CommonController::class, 'getAccesorsList']);
+    Route::get('/get-accesors-users-list/{accesor}', [CommonController::class, 'getAccesorsUsersList']);
+    Route::get('/get-uploaders-list', [CommonController::class, 'getUploadersList']);
+    Route::get('/get-uploaders-users-list/{uploader}', [CommonController::class, 'getUploadersUsersList']);
+    Route::get('/get-reports-list', [CommonController::class, 'getReportsList']);
+    Route::get('/downloadvaluationreport/{id}/{signed}', [CommonController::class, 'downloadValuationReport']);
+    Route::get('/get-all-users', [CommonController::class, 'getAllUsers']);
     
+});
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'admin'
+], function ($router) {
+    Route::post('/add-role', [AdminController::class, 'addRoles']);
+    Route::patch('/update-role/{id}', [AdminController::class, 'updateRole']);
+    Route::delete('/delete-role/{id}', [AdminController::class, 'deleteRole']);
+    Route::get('/get-all-roles', [AdminController::class, 'getAllRoles']);
+    Route::get('/get-all-permissions', [AdminController::class, 'getAllPermissions']);
+    Route::post('/add-permissions', [AdminController::class, 'addPermissions']);
+    Route::post('/assign-role-permissions', [AdminController::class, 'assignRolePermissions']);
+    Route::get('/get-role-permissions', [AdminController::class, 'getRolePermissions']);
+});
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'uploader'
+], function ($router) {
+    Route::post('/upload-report', [ValuerController::class, 'uploadReport']);
+    Route::post('/upload-valuation-report', [ValuerController::class, 'uploadReport']);
+    Route::get('/addimage', [ValuerController::class, 'writeToPDF']);
+    Route::get('/generate-qr-report', [ValuerController::class, 'generateQRCode']);
+});
 Route::post('/reset-password-request', [PasswordResetRequestController::class, 'sendPasswordResetEmail']);
 Route::post('/change-password', [ChangePasswordController::class, 'passwordResetProcess']);
-

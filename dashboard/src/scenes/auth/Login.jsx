@@ -62,7 +62,6 @@ function Login() {
     // setOpen(true);
     // setOpen(false);
     let formData= new FormData();
-    formData.append("image",image);
     formData.append("email",data.email);
     formData.append("password",data.password);
     let email=data.email;
@@ -81,15 +80,6 @@ function Login() {
     
  
   }
-  //upload image
-  const [image,setImage]=useState();
-  const handleImage=(e)=>{     
-    console.log(e.target.files[0]);
-    setImage(e.target.files[0]);
-
-  }
- 
-  //upload image
   
   return (
 
@@ -117,22 +107,7 @@ function Login() {
         <Typography sx={{ ml: 2 }} className="errorp">{errors.password?.message}</Typography>
         <TextField type='password' placeholder='Password' sx={{ m: 2 }} id="outlined-basic" fullWidth {...register("password")} />
 
-        <input
-          accept="image/*"
-          className="input"
-          style={{ display: 'none' }}
-          id="raised-button-file"
-          multiple
-          type="file"
-          name="files"
-          onChange={handleImage}
-        />
-        <label htmlFor="raised-button-file">
-          <Button variant="raised" component="span" sx={{ m: 2, backgroundColor: theme.palette.primary[1000], width: '100%' }}
-            size='large'  >
-            Upload profile pic
-          </Button>
-        </label>
+
         <Button
           type="submit"
           variant='contained'
