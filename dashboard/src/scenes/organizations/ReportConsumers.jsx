@@ -1,4 +1,4 @@
-import React from 'react'
+import React,{useState} from 'react'
 import { DataGrid } from '@mui/x-data-grid'
 import { Box, Button, ButtonBase, TextField, Grid, Divider } from '@mui/material';
 import Typography from '@mui/material/Typography';
@@ -6,8 +6,12 @@ import Modal from '@mui/material/Modal';
 import FlexBetween from 'components/FlexBetween';
 import Header from 'components/Header';
 import { Add } from '@mui/icons-material';
-import ReportConsuersActions from './ReportConsuersActions';
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import "primereact/resources/themes/bootstrap4-dark-blue/theme.css";
+import "primereact/resources/primereact.min.css";
+import { BlockUI } from 'primereact/blockui';
 import { useMediaQuery } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -27,6 +31,7 @@ const style = {
 };
 
 function ReportConsumers(row) {
+    const [blocked, setBlocked] = useState(false);
   const viewValuationFirmDetails = (row)=>{
 
   }
@@ -113,10 +118,8 @@ const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
       console.log(data);
   }
 
-    return (
-
-        <>
-
+    return (   <BlockUI blocked={blocked}>
+        <ConfirmDialog />
  <FlexBetween sx={{ml:5}}>
         <Header sx={{ml:30}} title="Report Consumers" subtitle="List of Report Consumers" />
         <Button sx={{ mt: 10, ml: 10, mr: 10}} variant='contained' onClick={handleOpen}> <Add></Add>&nbsp;&nbsp; New REport Accessor</Button>
@@ -157,9 +160,8 @@ const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
                     </form>
                 </Box>
       </Modal>
-      <Box style={{ height: 800, width: '98%', padding: "1%" }}>
-                {isFetching && <span>Is refetching</span>}
-                {/* {isLoading&& <span>Is refetching</span>} */}
+      <Box sx={{ mt: 10, ml: 10, mr: 10, height: "650px;" }} >
+            
                 <DataGrid
                     loading={isLoading || !firms}
                     getRowId={(row) => row.id}
@@ -172,7 +174,7 @@ const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
                     pageSizeOptions={[5, 10, 25]}
                 />
             </Box>
-        </>
+        </BlockUI>
 
     )
 }

@@ -1,4 +1,4 @@
-import React from 'react'
+import React,{useState} from 'react'
 import { DataGrid } from '@mui/x-data-grid'
 import { Box, Button } from '@mui/material';
 import Typography from '@mui/material/Typography';
@@ -11,7 +11,12 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import "../../assets/scss/validation.css";
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import "primereact/resources/themes/bootstrap4-dark-blue/theme.css";
+import "primereact/resources/primereact.min.css";
+import { BlockUI } from 'primereact/blockui';
 import 'react-toastify/dist/ReactToastify.css';
 import { useGetValuationFirmsQuery } from 'features/valuationFirmsSlice';
 import { useGetValuationFirmUsersQuery } from 'features/valuationFirmUsersSlice';
@@ -29,6 +34,7 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
+
 function UsersList() {
 
 const viewUserDEtails = (row) =>{
@@ -67,6 +73,11 @@ const blockUser = (row)=>{
 }
   const columns = [
     {
+      headerName: "User ID",
+      field: "id",
+      flex: 1
+    },
+    {
       headerName: "Full Name",
       field: "full_name",
       flex: 1
@@ -78,8 +89,8 @@ const blockUser = (row)=>{
     },
     {
       headerName: "Role",
-      field: "created_at",
-      flex: 1
+      flex: 1,
+      valueGetter: (params) => params.row.roles.map((role) => role.name).join(', ') 
     },
     {
       field: 'actions',
@@ -93,7 +104,11 @@ const blockUser = (row)=>{
         },
     }
   ];
-  return (<Box style={{ height: "90vh", width: '98%', padding: "1%" }}>
+  const [blocked, setBlocked] = useState(false);
+  return (
+    
+    <BlockUI blocked={blocked}>
+       <Box sx={{ mt: 10, ml: 10, mr: 10, height: "650px;" }} >
            
             <DataGrid
                 loading={isLoading || !users}
@@ -107,6 +122,7 @@ const blockUser = (row)=>{
                   pageSizeOptions={[5, 10, 25]}
             />
         </Box>
+        </BlockUI>
   )
 }
 

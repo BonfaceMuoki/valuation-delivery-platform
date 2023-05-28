@@ -7,6 +7,13 @@ import Modal from '@mui/material/Modal';
 import FlexBetween from 'components/FlexBetween';
 import Header from 'components/Header';
 import { Add } from '@mui/icons-material';
+
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import 'react-toastify/dist/ReactToastify.css';
+import "primereact/resources/themes/bootstrap4-dark-blue/theme.css";
+import "primereact/resources/primereact.min.css";
+import { BlockUI } from 'primereact/blockui';
+
 import ValuationFirmActions from './ValuationFirmActions';
 import { useMediaQuery } from '@mui/material';
 import { useForm } from 'react-hook-form';
@@ -14,7 +21,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import "../../assets/scss/validation.css";
 import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { useGetValuationFirmsQuery } from 'features/valuationFirmsSlice';
 
 const style = {
@@ -29,6 +35,7 @@ const style = {
 };
 
 function ValuationFirms(row) {
+    const [blocked, setBlocked] = useState(false);
     const viewValuationFirmDetails = (row)=>{
 
     }
@@ -144,12 +151,14 @@ function ValuationFirms(row) {
     const handleOpenValauationFirmModal = () => setOpenEditValauationFirmModal(true);
     const handleCloseValauationFirmModal = () => setOpenEditValauationFirmModal(false);
 
+    
+
     const onSubmitInviteFormsubmit = (data) => {
         console.log(data);
     }
     return (
 
-        <>
+        <BlockUI blocked={blocked}>
             {/* close modal edit valuation firm */}
             <Modal
                 open={openEditValauationFirmModal}
@@ -227,7 +236,7 @@ function ValuationFirms(row) {
             </Modal>
 
 
-            <div style={{ height: 800, width: '98%', padding: "1%" }}>
+            <Box sx={{ mt: 10, ml: 10, mr: 10, height: "650px;" }} >
                 {isFetching && <span>Is refetching</span>}
                 {/* {isLoading&& <span>Is refetching</span>} */}
                 <DataGrid
@@ -241,8 +250,8 @@ function ValuationFirms(row) {
                     }}
                     pageSizeOptions={[5, 10, 25]}
                 />
-            </div>
-        </>
+            </Box>
+        </BlockUI>
 
     )
 }

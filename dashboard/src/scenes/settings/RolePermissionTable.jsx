@@ -1,4 +1,4 @@
-import React from 'react'
+import React,{useEffect, useState} from 'react'
 import AddRole from './AddRole'
 import { DataGrid } from '@mui/x-data-grid'
 import { Box,Button } from '@mui/material';
@@ -8,6 +8,10 @@ import Modal from '@mui/material/Modal';
 import FlexBetween from 'components/FlexBetween';
 import Header from 'components/Header';
 import { Add } from '@mui/icons-material';
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useGetRolePermissionsQuery } from 'features/rolePermissionsSlice';
 
 const style = {
   position: 'absolute',
@@ -21,15 +25,39 @@ const style = {
   p: 4,
 };
 function RolePermissionTable() {
+
+
+  const toastMessage = (message, type) => {
+    if (type == "success") {
+      toast.success(message, {
+        position: toast.POSITION.TOP_RIGHT
+      });
+    } else if (type == "error") {
+      toast.error(message, {
+        position: toast.POSITION.TOP_RIGHT
+      });
+    } else if (type == "warning") {
+      toast.warning(message, {
+        position: toast.POSITION.TOP_RIGHT
+      });
+    }
+  }
+
   const columns = [
     {
         headerName: "ROLE ID",
-        field: "id",
+        field: "role_id",
         flex: 1
     },
     {
         headerName: "ROLE NAME",
-        field: "name",
+        field: "role_name",
+        flex: 1
+    },
+    ,
+    {
+        headerName: "PERMISSION NAME",
+        field: "permission_name",
         flex: 1
     },
     {
@@ -40,21 +68,30 @@ function RolePermissionTable() {
         renderCell: (params) => <RolesActions {...{ params }} />,
     }
 ];
-const roles = [
-    {
-        name: "Add permission",
-        id: 1
-    }, {
-        name: "Add Role",
-        id: 2
-    },
-];
-const [open, setOpen] = React.useState(false);
+const { data: allrolepermissions,
+  isFetching: isRolePermissions,
+  isLoading: isLoadingRolePermissions,
+  refetch: refetchRolePermissions,
+  isSuccess: isSuccessRolePermission,
+  isError: isErrorRolePermissions,
+  error: errorPermissions } = useGetRolePermissionsQuery();
+
+const [roles, setRoles] = useState(null);
+useEffect(()=>{
+setRoles(allrolepermissions);
+},[allrolepermissions]);
+const [open, setOpen] = useState(false);
 const handleOpen = () => setOpen(true);
 const handleClose = () => setOpen(false);
+
+const getRowId = (row) => {
+  // Generate custom ID based on row properties
+  return `${row.role_id}-${row.permission_id}`;
+};
+
 return (
 
-    <>
+    <Box>
 
 <FlexBetween sx={{ml:5}}>
     <Header sx={{ml:30}} title="Role Permissions" subtitle="List of Role Permissios" />
@@ -75,15 +112,20 @@ return (
       </Typography>
     </Box>
   </Modal>
-        <Box sx={{ mt: 10, ml: 10, mr: 10, height: "450px;" }} >
-            <DataGrid
-                columns={columns}
-                rows={roles}
-                getRowId={(row) => row.id}
+  <Box sx={{ mt: 10, ml: 10, mr: 10, height: "650px;" }} >
 
-            />
-        </Box>
-    </>
+        <DataGrid
+          getRowId={getRowId}
+          columns={columns}
+          rows={roles || []}
+          initialState={{
+            ...roles,
+            pagination: { paginationModel: { pageSize: 10 } },
+          }}
+          pageSizeOptions={[5, 10, 25]}
+        />
+      </Box>
+    </Box>
 
 )
 }

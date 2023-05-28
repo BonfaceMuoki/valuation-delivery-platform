@@ -6,6 +6,11 @@ use Illuminate\Http\Request;
 use App\Models\Role;
 use App\Models\Permission;
 use DB;
+use Mail;
+use Validator;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
+use App\Mail\SendValuationFirmInviteMail;
 
 class AdminController extends Controller
 {
@@ -20,8 +25,7 @@ class AdminController extends Controller
         $user = auth()->user();
         if ($user->hasPermissionTo(Permission::where("slug", "add role")->first())) {
             try {
-                DB::beginTransaction();   
-               
+                DB::beginTransaction();                  
                 $role = Role::findOrFail($id);
                 $rolede=Role::where("id",$id)->first();
                 $rolede->permissions()->detach();
@@ -219,11 +223,62 @@ class AdminController extends Controller
     }
     public function getRolePermissions(Request $request)
     {
-        $role = Role::where("id", $request->get('role'))->first();
+       $roleperms= DB::table("roles_permissions")
+            ->join("roles", "roles.id", "=", "roles_permissions.role_id")
+            ->join("permissions", "permissions.id", "=", "roles_permissions.permission_id")
+            ->select("roles.name as role_name","permissions.name as permission_name","roles_permissions.*")->get();
+        // $role = Role::where("id", $request->get('role'))->first();
+        return response()->json($roleperms, 200);
+    }
+  
+    public function sendValuationFirmInvite(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'registration_url' => 'required|url',
+            'login_url' => 'required|url',
+            'company_name' => 'required',
+            'directors_name' => 'required',
+            'isk_number' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(["message" => "Unprocessable data", "errors" => $validator->errors()], 422);
+        }
+        // If email does not exist
+
+        // If email exists
+        $this->sendValuationInviteMail($request->all());
         return response()->json([
-            'role' => $role,
-            'permissions' => $role->permissions()->get()
-        ], 400);
+            'message' => 'Check your inbox, we have sent a link to reset email.'
+        ], Response::HTTP_OK);
+
+
+    }
+    public function sendValuationInviteMail($request)
+    {
+        $token = $this->generateInviteToken($request);
+        Mail::to($request['email'])->send(new SendValuationFirmInviteMail($token,$request['registration_url'],$request['login_url']));
+    }
+    public function generateInviteToken($request)
+    {
+        $token = Str::random(80);
+        $this->storeToken($token, $request);
+        return $token;
+    }
+
+    public function storeToken($token, $request)
+    {
+        DB::table('valuation_firm_invites')->insert([
+            'valauaion_firm_name' => $request['company_name'],
+            'isk_number' => $request['isk_number'],
+            'vrb_number' => $request['vrb_number'],
+            'director_name' => $request['directors_name'],
+            'invite_email' => $request['email'],
+            'registration_url' => $request['registration_url'],
+            'login_url' => $request['login_url'],
+            'invite_token' => $token,
+            'created_at' => Carbon::now()
+        ]);
     }
 
 }

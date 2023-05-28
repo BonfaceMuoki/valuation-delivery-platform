@@ -76,7 +76,7 @@ return (
       </Typography>
     </Box>
   </Modal>
-        <Box sx={{ mt: 10, ml: 10, mr: 10, height: "450px;" }} >
+  <Box sx={{ mt: 10, ml: 10, mr: 10, height: "650px;" }} >
             <DataGrid
                 columns={columns}
                 rows={roles}

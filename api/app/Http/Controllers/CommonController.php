@@ -26,7 +26,7 @@ class CommonController extends Controller
         }
         if ($user->hasPermissionTo(Permission::where("slug", 'view all Users')->first())) {
 
-            $users=User::all();
+            $users=User::with("roles")->get();
             return response($users,200);
 
         }

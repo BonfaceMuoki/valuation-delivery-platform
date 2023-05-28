@@ -32,6 +32,7 @@ return new class extends Migration
             $table->string("upload_link");
             $table->integer("download_count")->default(0);
             $table->integer("views_count")->default(0);
+            $table->integer("insurence_value")->default(0);
             $table->timestamps();
         });
     }

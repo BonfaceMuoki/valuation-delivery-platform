@@ -241,7 +241,7 @@ const Sidebar = ({
               <FlexBetween color={theme.palette.secondary.main}>
                 <Box display="flex" alignItems="center" gap="0.5rem">
                   <Typography variant="h4" fontWeight="bold">
-                    Valuation Track
+                    VALDEL
                   </Typography>
                 </Box>
                 {!isNonMobile && (
@@ -250,7 +250,9 @@ const Sidebar = ({
                   </IconButton>
                 )}
               </FlexBetween>
+              
             </Box>
+            <Divider></Divider>
             <List>
               {navItems.map(({ text, icon,routeName }) => {
                 if (!icon) {

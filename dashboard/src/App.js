@@ -22,6 +22,8 @@ import RolePermissionTable from "scenes/settings/RolePermissionTable";
 import ValuationFirms from "scenes/organizations/ValuationFirms";
 import UsersList from "scenes/users/UsersList";
 import ReportConsumers from "scenes/organizations/ReportConsumers";
+import AcceptInviteByLogin from "scenes/auth/AcceptInviteByLogin";
+import AcceptInviteSignup from "scenes/auth/AcceptInviteBySignup";
 function App() {
   const mode = useSelector((state) => state.auth.mode);
   const theme = useMemo(() => createTheme(themeSettings(mode)), [mode]);
@@ -34,6 +36,9 @@ function App() {
             <Route element={<AuthLayout />}>
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/complete-invite-by-registering" element={<AcceptInviteSignup />} />
+              <Route path="/complete-invite-by-login" element={<AcceptInviteByLogin />} />
+              
             </Route>
             <Route element={<ProtectedRoutes />}>
               <Route element={<Layout />}>

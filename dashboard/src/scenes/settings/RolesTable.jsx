@@ -8,12 +8,9 @@ import FlexBetween from 'components/FlexBetween';
 import Header from 'components/Header';
 import { Add } from '@mui/icons-material';
 import { Divider } from 'antd';
-
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
-
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
 import "primereact/resources/themes/bootstrap4-dark-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import { BlockUI } from 'primereact/blockui';
@@ -28,9 +25,6 @@ import { useAssignRolePermissionsListMutation } from 'features/assignRolePermiss
 import { useAddRoleMutation } from 'features/addRoleSlice';
 import { apiSlice } from 'features/apiSlice';
 import { useUpdateRoleMutation } from 'features/updateRoleSlice';
-
-import { ConfirmPopup, confirmPopup } from 'primereact/confirmpopup';
-import { Toast as PrimeToast } from 'primereact/toast';
 import { useDeleteRoleMutation } from 'features/deleteRoleSlice';
 
 const style = {

@@ -17,7 +17,8 @@ use Mail;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Illuminate\Http\Response;
-
+use App\Models\ValuationFirmInvite;
+use App\Models\AccesorInvite;
 class AuthController extends Controller
 {
 
@@ -28,7 +29,17 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['registertenant', 'login', 'register', 'allUsers','registerAccesor']]);
+        $this->middleware('auth:api', [
+            'except' => [
+                'registertenant',
+                'login',
+                'register',
+                'allUsers',
+                'registerAccesor',
+                'retrieveValuerInviteDetails',
+                'retrieveAccesorInviteDetails'
+            ]
+        ]);
     }
     /**
      * Get a JWT via given credentials.
@@ -401,5 +412,18 @@ public function registerAccesor(Request $request){
     public function allUsers()
     {
         return response()->json(["users" => User::all()]);
+    }
+
+    public function retrieveValuerInviteDetails(Request $request){
+
+       $detailss= ValuationFirmInvite::where("invite_token",$request->invite_token)->first();
+       return response()->json($detailss,200);
+
+    }
+    public function retrieveAccesorInviteDetails(Request $request){
+
+        $detailss= AccesorInvite::where("invite_token",$request->invite_token)->first();
+        return response()->json($detailss,200); 
+        
     }
 }

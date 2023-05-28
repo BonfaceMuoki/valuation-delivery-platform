@@ -32,6 +32,10 @@ Route::group([
     Route::get('/refresh', [AuthController::class, 'refresh']);
     Route::get('/user-profile', [AuthController::class, 'userProfile']);
     Route::get('/owner-details', [AuthController::class, 'userDetails']);
+
+    Route::get('/retrieve-valuer-invite-details', [AuthController::class, 'retrieveValuerInviteDetails']);
+    Route::get('/retrieve-accessor-invite-details', [AuthController::class, 'retrieveAccesorInviteDetails']);
+
 });
 Route::group([
     'middleware' => 'api',
@@ -45,6 +49,7 @@ Route::group([
     Route::get('/downloadvaluationreport/{id}/{signed}', [CommonController::class, 'downloadValuationReport']);
     Route::get('/get-all-users', [CommonController::class, 'getAllUsers']);
     
+    
 });
 Route::group([
     'middleware' => 'api',
@@ -57,7 +62,8 @@ Route::group([
     Route::get('/get-all-permissions', [AdminController::class, 'getAllPermissions']);
     Route::post('/add-permissions', [AdminController::class, 'addPermissions']);
     Route::post('/assign-role-permissions', [AdminController::class, 'assignRolePermissions']);
-    Route::get('/get-role-permissions', [AdminController::class, 'getRolePermissions']);
+    Route::post('/send-valuation-firm-invite', [AdminController::class, 'sendValuationFirmInvite']);
+    
 });
 Route::group([
     'middleware' => 'api',
