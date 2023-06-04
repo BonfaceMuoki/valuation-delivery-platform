@@ -74,12 +74,14 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'register_as' => 'required|in:Super Admin,Report Uploader,Uploaders Accesser,Report Uploader Admin,Valuation Firm Director',
             'full_name' => 'required|string|between:2,100',
-            'email' => 'required|string|between:2,100',
+            'email' => 'required|string|between:2,100|unique:users',
+            'isk_number' => 'required|string|unique:organizations',
+            'vrb_number' => 'required|unique:organizations',
             'password' => ['required', Password::min(6)->letters()->mixedCase()->numbers()->symbols()->uncompromised()],
             'password_confirmation' => 'required|same:password'
         ]);
         if ($validator->fails()) {
-            return response()->json($validator->errors()->toJson(), 400);
+            return response()->json(["message"=>"Unprocessable data","backendvalerrors"=>$validator->errors()], 400);
         }
         $user = [];
         try {
@@ -171,8 +173,8 @@ class AuthController extends Controller
         } catch (\Exception $exp) {
             DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
             return response()->json([
-                'message' => 'Account has mot been created successfully',
-                'error' => $exp
+                'message' => 'Account has not been created successfully '.$exp->getMessage(),
+                
             ], 400);
 
         }

@@ -21,6 +21,9 @@ return new class extends Migration
             $table->boolean("completed")->default(false);
             $table->string('invite_email');
             $table->string('accessor_name');
+            $table->string('contact_person_name');
+            $table->string('contact_person_phone');
+            $table->string('type')->default("Court");  
             $table->timestamps();
         });
     }

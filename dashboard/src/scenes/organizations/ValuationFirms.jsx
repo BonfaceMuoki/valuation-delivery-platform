@@ -22,6 +22,7 @@ import * as yup from "yup";
 import "../../assets/scss/validation.css";
 import { ToastContainer, toast } from 'react-toastify';
 import { useGetValuationFirmsQuery } from 'features/valuationFirmsSlice';
+import { useInviteUploaderMutation } from 'features/inviteUploaderSlice';
 
 const style = {
     position: 'absolute',
@@ -65,6 +66,7 @@ function ValuationFirms(row) {
     const inviteformschema = yup.object().shape({
         valuation_firm_name: yup.string().required("Please provide the valuation firm registred name"),
         valuation_firm_admin_email: yup.string().email("Plase provide valid Email").required("Please provide email"),
+        valuation_firm_vrb_number: yup.string().required("Please provide the VRB number"),
         valuation_firm_isk_number: yup.string().required("Please provide the ISK number"),
         valuation_firm_director_name: yup.string().required("Please provide the director name")
     });
@@ -141,6 +143,9 @@ function ValuationFirms(row) {
         isError,
         error
     } = useGetValuationFirmsQuery();
+
+    const [inviteUploader,{isLoading: loadingInvite}] = useInviteUploaderMutation();
+
     isError && toastMessage("Error while fetching", "error");
     isError && console.log(error);
     const [open, setOpen] = React.useState(false);
@@ -155,6 +160,16 @@ function ValuationFirms(row) {
 
     const onSubmitInviteFormsubmit = (data) => {
         console.log(data);
+        const formdata = new FormData();
+        formdata.append("company_name",data.valuation_firm_name);
+        formdata.append("vrb_number",data.valuation_firm_isk_number);
+        formdata.append("isk_number",data.valuation_firm_isk_number);
+        formdata.append("login_url","http://www.localhost:3000/complete-invite-by-login");
+        formdata.append("registration_url","http://www.localhost:3000/complete-invite-by-registering");
+        formdata.append("email",data.valuation_firm_admin_email);
+        formdata.append("directors_name",data.valuation_firm_director_name);
+        inviteUploader(formdata);
+    
     }
     return (
 
@@ -181,7 +196,7 @@ function ValuationFirms(row) {
 
             <FlexBetween sx={{ ml: 5 }}>
                 <Header sx={{ ml: 30 }} title="Valuation Firms" subtitle="List of Valuation Firms" />
-                <Button sx={{ mt: 10, ml: 10, mr: 10 }} variant='contained' onClick={handleOpen}> <Add></Add>&nbsp;&nbsp; New Role</Button>
+                <Button sx={{ mt: 10, ml: 10, mr: 10 }} variant='contained' onClick={handleOpen}> <Add></Add>&nbsp;&nbsp; New Invite</Button>
             </FlexBetween>
             {/* modal invite valuation firm */}
             <Modal
@@ -195,7 +210,7 @@ function ValuationFirms(row) {
                         INVITE VALUATION FIRM
                     </Typography>
                     <hr></hr>
-                    <form name='invitevaluationformform' onSubmit={handleInviteFormsubmit(onSubmitInviteFormsubmit())}>
+                    <form name='invitevaluationformform' onSubmit={handleInviteFormsubmit(onSubmitInviteFormsubmit)}>
                         <Grid container spacing={2} sx={{ mt: 2, width: "100%" }}>
 
                             <Grid item xs={12} sm={6} md={6} >
@@ -208,18 +223,25 @@ function ValuationFirms(row) {
                             <Grid item xs={12} sm={6} md={6} >
                                 <Typography>Admin Email</Typography>
                                 <div>
-                                    <TextField autoComplete="off" fullWidth {...registerInvitForm("valuation_firm_isk_number")} />
-                                    <span className='errorSpan' >{inviteFormErrors.valuation_firm_isk_number?.message}</span>
+                                    <TextField autoComplete="off" fullWidth {...registerInvitForm("valuation_firm_admin_email")} />
+                                    <span className='errorSpan' >{inviteFormErrors.valuation_firm_admin_email?.message}</span>
                                 </div>
                             </Grid>
-                            <Grid item xs={12} sm={6} md={6} >
+                            <Grid item xs={12} sm={4} md={4} >
                                 <Typography>ISK Number</Typography>
                                 <div>
                                     <TextField autoComplete="off" fullWidth {...registerInvitForm("valuation_firm_isk_number")} />
                                     <span className='errorSpan' >{inviteFormErrors.valuation_firm_isk_number?.message}</span>
                                 </div>
                             </Grid>
-                            <Grid item xs={12} sm={6} md={6} >
+                            <Grid item xs={12} sm={4} md={4} >
+                                <Typography>VRB Number</Typography>
+                                <div>
+                                    <TextField autoComplete="off" fullWidth {...registerInvitForm("valuation_firm_vrb_number")} />
+                                    <span className='errorSpan' >{inviteFormErrors.valuation_firm_vrb_number?.message}</span>
+                                </div>
+                            </Grid>
+                            <Grid item xs={12} sm={4} md={4} >
                                 <Typography>Director Name</Typography>
                                 <div>
                                     <TextField autoComplete="off" fullWidth {...registerInvitForm("valuation_firm_director_name")} />

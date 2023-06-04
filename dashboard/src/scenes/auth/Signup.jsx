@@ -47,8 +47,6 @@ function Signup() {
             borderRadius: '10px'
           }}  >
 
-
-
           <Typography variant='h5' sx={{ mb: 2, fontWeight: 'bold' }} align='center'  >CREATE ACCOUNT</Typography>
 
           <Typography variant='p' sx={{ mb: 4 }} align='center' >Creating A company Account</Typography>

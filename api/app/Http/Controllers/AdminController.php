@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Models\Role;
 use App\Models\Permission;
 use DB;
@@ -11,7 +12,7 @@ use Validator;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Mail\SendValuationFirmInviteMail;
-
+use App\Mail\SendAccesorInviteMail;
 class AdminController extends Controller
 {
     //
@@ -234,12 +235,13 @@ class AdminController extends Controller
     public function sendValuationFirmInvite(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
+            'email' => 'required|email|unique:users|unique:valuation_firm_invites,invite_email',
             'registration_url' => 'required|url',
             'login_url' => 'required|url',
             'company_name' => 'required',
             'directors_name' => 'required',
-            'isk_number' => 'required'
+            'isk_number' => 'required|unique:organizations',
+            'vrb_number' => 'required|unique:organizations,directors_vrb'
         ]);
         if ($validator->fails()) {
             return response()->json(["message" => "Unprocessable data", "errors" => $validator->errors()], 422);
@@ -280,5 +282,67 @@ class AdminController extends Controller
             'created_at' => Carbon::now()
         ]);
     }
+    //send accesor invite
+    public function sendAccesorInvite(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email|unique:users|unique:accesor_invites,invite_email',
+                'registration_url' => 'required|url',
+                'login_url' => 'required|url',
+                'accesor_name' => 'required',
+                'contact_person_name' => 'required',
+                'contact_person_phone' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(["message" => "Unprocessable data", "errors" => $validator->errors()], 422);
+            }
+            // If email does not exist
+
+            // If email exists
+            $this->sendAccesorInviteEMail($request->all());
+            DB::commit();
+            return response()->json([
+                'message' => 'Check your inbox, we have sent a link to reset email.'
+            ], Response::HTTP_OK);
+        } catch (\Exception $exp) {
+            DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
+            return response()->json([
+                'message' => 'Failed.',
+                'error' => $exp->getMessage()
+            ], 400);
+        }
+
+    }
+    public function sendAccesorInviteEMail($request)
+    {
+
+        $token = $this->generateAccesorInviteToken($request);
+        Mail::to($request['email'])->send(new SendAccesorInviteMail($token,$request['registration_url'],$request['login_url']));
+
+    }
+    public function generateAccesorInviteToken($request)
+    {
+        $token = Str::random(80);
+        $this->storeAccesorToken($token, $request);
+        return $token;
+    }
+
+    public function storeAccesorToken($token, $request)
+    {
+        DB::table('accesor_invites')->insert([
+            'accessor_name' => $request['accesor_name'],
+            'contact_person_phone' => $request['contact_person_phone'],
+            'contact_person_name' => $request['contact_person_name'],
+            'invite_email' => $request['email'],
+            'registration_url' => $request['registration_url'],
+            'login_url' => $request['login_url'],
+            'invite_token' => $token,
+            'created_at' => Carbon::now()
+        ]);
+    }
+    //close send accesor invite
 
 }

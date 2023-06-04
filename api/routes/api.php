@@ -63,6 +63,9 @@ Route::group([
     Route::post('/add-permissions', [AdminController::class, 'addPermissions']);
     Route::post('/assign-role-permissions', [AdminController::class, 'assignRolePermissions']);
     Route::post('/send-valuation-firm-invite', [AdminController::class, 'sendValuationFirmInvite']);
+    Route::post('/send-accesor-invite', [AdminController::class, 'sendAccesorInvite']);
+
+    
     
 });
 Route::group([
