@@ -71,10 +71,10 @@ function Login() {
     console.log(userData.role.name);
     if(userData.role.name==="Super Admin"){
       navigate('/admin-dashboard')
-    }else if(userData.role.name==="Report Uploader"){
-      navigate('/dashbaord')
-    }else if(userData.role.name==="Report Accesor"){
-      navigate('/dashbaord')
+    }else if(userData.role.name==="Report Uploader"||userData.role.name==="Report Uploader Admin"){
+      navigate('/valuer-dashboard')
+    }else if(userData.role.name==="Report Accesor"||userData.role.name==="Report Accessor Admin"){
+      navigate('/accessor-dashboard')
     }
     
     

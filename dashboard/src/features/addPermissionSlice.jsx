@@ -1,10 +1,10 @@
 import { apiSlice } from "./apiSlice";
 
-export const registerAccesorOrgSlice = apiSlice.injectEndpoints({
+export const addPermissionSlice = apiSlice.injectEndpoints({
     endpoints: bulder => ({
-        registerAccesor: bulder.mutation({
+        addPermission: bulder.mutation({
             query: (formData) => ({
-                url: `/api/auth/register-accesor`,
+                url: `/api/admin/add-permissions`,
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -15,5 +15,5 @@ export const registerAccesorOrgSlice = apiSlice.injectEndpoints({
     })
 })
 
-export const { useRegisterAccesorMutation} = registerAccesorOrgSlice;
+export const { useAddPermissionMutation} = addPermissionSlice;
 

@@ -50,26 +50,18 @@
                                         <p
                                             style="color:#1e1e2d; font-weight:500; margin:0;font-size:32px;font-family:'Rubik',sans-serif;text-align:left;">
                                             Hello there, </p>
-
-                                        <p style="color:#455056; font-size:15px;line-height:24px; margin:0; text-align:left">
-                                            You have been invited by ISK to set up an account on valdel.</p>
-
-                                        <p style="text-align:left;">Some of the advantages of using this platform are : - </p>
-                                        <ul style="text-align:left;">
-                                            <li>Helps you receive valuation reports easily and securely.</li>
-                                            <li>Cautions you against unregistered/fake valuers.</li>
-                                            <li>Alerts on property with issues.</li>
-                                        </ul>
-                                        <p style="text-align:left;">To join your community simply click the button below. For assistance kindly
-                                            contact your management. If you have an account just click the other link to
-                                            login. Thank you.
+                                       <p style="text-align:left;">
+                                        The Valuers Chapter of the Institution of Surveyors of Kenya invites you to  Electronic Valuation Delivery Platform. 
+                                        Join today for streamlined, secure and efficient valuation delivery. Click here to update your account details. </p>
+                                        <p style="text-align:left;">To join your community simply click the button below to create an account.If ou already
+                                        have an account please login.
                                         </p>
                                         <a href="{{$rgistrationcallbackurl}}?token={{$token}}"
                                             style="background:#986B37;text-decoration:none !important; font-weight:500; margin-top:35px; color:#fff;text-transform:uppercase; font-size:14px;padding:10px 24px;display:inline-block;border-radius:50px;">
                                             proceed to create an account</a>
-                                        <a href="{{$logincallback}}?token={{$token}}"
+                                        <!-- <a href="{{$logincallback}}?token={{$token}}"
                                             style="background:#986B37;text-decoration:none !important; font-weight:500; margin-top:35px; color:#fff;text-transform:uppercase; font-size:14px;padding:10px 24px;display:inline-block;border-radius:50px;">
-                                            proceed to Login</a>
+                                            proceed to Login</a> -->
                                     </td>
                                 </tr>
                                 <tr>

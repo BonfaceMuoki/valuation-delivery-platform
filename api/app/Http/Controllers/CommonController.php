@@ -75,10 +75,14 @@ class CommonController extends Controller
             $reports_query->select("valuation_reports.*", "report_consumers.organization_name",DB::raw("CONCAT('".$url."','/reports/',valuation_reports.upload_link) as report_url"));
             $reports = $reports_query->get();
         } else if ($user->hasPermissionTo((Permission::where("slug", 'view accesors reports only')->first()))) {
+            // echo "hallo";
             $org = $user->AccessorOrganization()->first();
+
             $reports_query->join("organizations", "organizations.id", "=", "valuation_reports.report_uploading_from");
-            $reports_query->where("report_uploading_from", $org->id);
+            $reports_query->where("receiving_company_id", $org->id);
             $reports_query->select('valuation_reports.*', 'organizations.organization_name');
+            // $reports_query->select("valuation_reports.*", "organizations.organization_name",DB::raw("CONCAT('".$url."','/reports/',valuation_reports.upload_link) as report_url"));
+          
             $reports = $reports_query->get();
         } else if ($user->hasPermissionTo((Permission::where("slug", 'view all reports')->first()))) {
             

@@ -47,6 +47,7 @@ const navItemsvaluer = [
   {
     text: "Dashboard",
     icon: <HomeOutlined />,
+    routeName: "/valuer-dashboard"
   },
   {
     text: "Valuation Reports",
@@ -55,26 +56,21 @@ const navItemsvaluer = [
   {
     text: "Uploaded",
     icon: <ShoppingCartOutlined />,
+    routeName: "/valuation-firm/my-reports"
   },
   {
-    text: "Upload",
-    icon: <Groups2Outlined />,
-  },
-  {
-    text: "User Mnager",
+    text: "User Manager",
     icon: null,
   },
   {
     text: "My Uploaders",
     icon: <PointOfSaleOutlined />,
-  },
-  {
-    text: "Accesors List",
-    icon: <TodayOutlined />,
+    routeName: "/valuation-firm/my-uploaders"
   },
   {
     text: "My Accesors",
     icon: <CalendarMonthOutlined />,
+    routeName: "/valuation-firm/my-accesors"
   }
 ];
 
@@ -82,34 +78,31 @@ const navItemsaccesor = [
   {
     text: "Dashboard",
     icon: <HomeOutlined />,
+    routeName: "/accessor-dashboard"
   },
   {
     text: "Valuation Reports",
     icon: null,
+
   },
   {
-    text: "Uploaded",
+    text: "My Reports",
     icon: <ShoppingCartOutlined />,
-  },
-  {
-    text: "Upload",
-    icon: <Groups2Outlined />,
+    routeName: "/accessor/my-reports"
   },
   {
     text: "User Mnager",
     icon: null,
   },
   {
-    text: "My Uploaders",
+    text: "My Users",
     icon: <PointOfSaleOutlined />,
+    routeName: "accessor/my-users"
   },
   {
-    text: "Accesors List",
+    text: "My Uploaders",
     icon: <TodayOutlined />,
-  },
-  {
-    text: "My Accesors",
-    icon: <CalendarMonthOutlined />,
+    routeName: "accessor/my-uploaders"
   }
 ];
 
@@ -207,10 +200,14 @@ const Sidebar = ({
   useEffect(() => {
     if (userrole === "Super Admin") {
       setNavItems(navItemsadmin);
-    } else if (userrole == "Report Uploader") {
+    } else if (userrole == "Report Uploader"||userrole == "Report Uploader Admin") {
+
       setNavItems(navItemsvaluer);
-    } else if (userrole == "Report Accessor") {
+
+    } else if (userrole == "Report Accessor"||userrole == "Report Accessor Admin") {
+
       setNavItems(navItemsaccesor);
+
     }
   }, [userrole]);
   useEffect(() => {

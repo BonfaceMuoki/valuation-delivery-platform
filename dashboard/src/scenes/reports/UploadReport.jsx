@@ -19,6 +19,8 @@ import { useUploadValuationReportMutation } from 'features/valuationReportUpload
 import { useDispatch } from 'react-redux';
 import { setfetchvaluationreports } from 'scenes/auth/authSlice';
 import { useGetValuationReportsQuery } from 'features/ValuationReportsSlice';
+import { useSelector } from "react-redux"
+import { selectCurrentPermissions } from 'scenes/auth/authSlice';
 const style = {
     position: 'absolute',
     top: '5%',
@@ -35,9 +37,11 @@ const style = {
 };
 
 function UploadReport() {
+    const permissions = useSelector(selectCurrentPermissions); 
     const {refetch} =  useGetValuationReportsQuery();
     const [uploadReport, { isLoading: isUploading }] = useUploadValuationReportMutation();
     const dispatch = useDispatch();
+    const [existingAccessors,setExistingAccessors] = useState();
     const {
         data: accesorslist,
         isLoading,
@@ -45,6 +49,11 @@ function UploadReport() {
         isError,
         error
     } = useGetAccesorsListQuery();
+    
+  useEffect(()=>{
+setExistingAccessors(accesorslist);
+  },[accesorslist]);
+
     const schema = yup.object().shape({
         market_value: yup
             .number().typeError('Invalid Market Value: not a number')
@@ -132,8 +141,10 @@ function UploadReport() {
     return (
         
         <Box>
-            { accesorslist?.accesors &&<>
-            <Button icon={<UploadOutlined />} onClick={handleOpen}>Upload New Report</Button>
+     {
+        (permissions.find(p => p.name ==="upload report"))?  <Button icon={<UploadOutlined />} onClick={handleOpen}>Upload New Report</Button> : ""
+     }
+           {/* <Button icon={<UploadOutlined />} onClick={handleOpen}>Upload New Report</Button> */}
             <Modal
                 open={open}
                 onClose={handleClose}
@@ -156,7 +167,7 @@ function UploadReport() {
                                             disableClearable
                                             disablePortal
                                             filterSelectedOptions
-                                            options={accesorslist?.accesors}
+                                            options={existingAccessors}
                                             multiple
                                             getOptionDisabled={(option) => option.disabled}
                                             getOptionLabel={(option) => option.organization_name}
@@ -323,7 +334,7 @@ function UploadReport() {
                     </form>
                 </Box>
             </Modal>
-            </>   }
+            
         </Box>
 
     )

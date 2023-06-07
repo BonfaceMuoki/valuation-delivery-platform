@@ -31,7 +31,7 @@ const style = {
     p: 4,
 };
 
-function ReportConsumers(row) {
+function UploaderReportConsumers(row) {
     
     const [blocked, setBlocked] = useState(false);
     const base_url = process.env.REACT_APP_FRONTEND_BASE_URL;
@@ -236,4 +236,4 @@ function ReportConsumers(row) {
     )
 }
 
-export default ReportConsumers
+export default UploaderReportConsumers

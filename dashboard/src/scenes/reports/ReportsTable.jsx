@@ -11,7 +11,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 
-function ReportsTable  () {
+function ReportsTable () {
     
   const toastMessage = (message,type)=>{
     if(type=="success"){
@@ -73,6 +73,7 @@ function ReportsTable  () {
     isError && console.log(error);
     return (
         <div style={{ height: 650, width: '100%' }}>
+            
             {isFetching&& <span>Is refetching</span>}
             {/* {isLoading&& <span>Is refetching</span>} */}
             <DataGrid

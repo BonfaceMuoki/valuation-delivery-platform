@@ -37,7 +37,7 @@ const style = {
     p: 4,
 };
 
-function ValuationFirms(row) {
+function AccesorValuationFirms(row) {
     const [blocked, setBlocked] = useState(false);
     const viewValuationFirmDetails = (row)=>{
 
@@ -308,4 +308,4 @@ function ValuationFirms(row) {
     )
 }
 
-export default ValuationFirms
+export default AccesorValuationFirms

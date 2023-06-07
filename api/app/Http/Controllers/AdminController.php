@@ -115,21 +115,27 @@ class AdminController extends Controller
     {
         $user = auth()->user();
         if ($user->hasPermissionTo(Permission::where("slug", "add permission")->first())) {
+            $validator = Validator::make($request->all(), [
+                'permission_name' => 'required|unique:permissions,name',
+            ]);
+            if ($validator->fails()) {
+                return response()->json(["message" => "Unprocessable data", "errors" => $validator->errors()], 422);
+            }
             try {
                 DB::beginTransaction();
-                $permissions = json_decode(stripslashes($request->post('permission_name')), true);
-                foreach ($permissions as $perm) {
-                    //check if exists
-                    $found = Permission::where("name", $perm['permission_name'])->get();
-                    if (sizeof($found) == 0) {
-                        $permission['name'] = $perm['permission_name'];
-                        $permission['slug'] = strtolower($perm['permission_name']);
+                // $permissions = json_decode(stripslashes($request->post('permission_name')), true);
+                // foreach ($permissions as $perm) {
+                //     //check if exists
+                // $found = Permission::where("name", )->get();
+                // if (sizeof($found) == 0) {
+                        $permission['name'] = $request->permission_name;
+                        $permission['slug'] = strtolower($request->permission_name);
                         $permission['status'] = 1;
                         Permission::create($permission);
-                    }
+                    // }
                     //check if exists
 
-                }
+                // }
                 DB::commit();
                 return response()->json([
                     'message' => 'Added successfully'

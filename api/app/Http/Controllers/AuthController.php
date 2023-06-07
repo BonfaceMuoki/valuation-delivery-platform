@@ -76,7 +76,7 @@ class AuthController extends Controller
             'full_name' => 'required|string|between:2,100',
             'email' => 'required|string|between:2,100|unique:users',
             'isk_number' => 'required|string|unique:organizations',
-            'vrb_number' => 'required|unique:organizations',
+            'vrb_number' => 'required|unique:organizations,directors_vrb|unique:users',
             'password' => ['required', Password::min(6)->letters()->mixedCase()->numbers()->symbols()->uncompromised()],
             'password_confirmation' => 'required|same:password'
         ]);
