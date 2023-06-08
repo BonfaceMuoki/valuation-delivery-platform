@@ -7,6 +7,7 @@ import {
   Search,
   SettingsOutlined,
   ArrowDropDownOutlined,
+  VerifiedUserRounded
 } from "@mui/icons-material";
 import FlexBetween from "components/FlexBetween";
 import { useDispatch } from "react-redux";
@@ -24,6 +25,7 @@ import {
   MenuItem,
   useTheme,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
   const dispatch = useDispatch();
@@ -33,6 +35,11 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
   const isOpen = Boolean(anchorEl);
   const handleClick = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
+  const navigate = useNavigate();
+  const seeProfile =()=>{
+    
+    navigate('/profile');
+  }
 
   return (
     <AppBar
@@ -120,7 +127,10 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
               <MenuItem onClick={() => dispatch(logOut())}><IconButton><LogoutOutlined sx={{ fontSize: "25px" }} /></IconButton>Log Out</MenuItem>
               <MenuItem>     <IconButton>
                 <SettingsOutlined sx={{ fontSize: "25px" }} />
-              </IconButton>Settings</MenuItem>
+               </IconButton>Settings</MenuItem>
+               <MenuItem onClick={() => seeProfile()}>     <IconButton>
+                <VerifiedUserRounded sx={{ fontSize: "25px" }} />
+               </IconButton>Profile</MenuItem>
             </Menu>
           </FlexBetween>
         </FlexBetween>

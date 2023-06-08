@@ -122,19 +122,6 @@ function AccesorValuationFirms(row) {
             headerName: 'Idemnity Amount',
             field: 'idemnity_amount',
             flex: 1
-        },
-        {
-            field: 'actions',
-            headerName: 'Actions',
-            type: 'actions',
-            width: 400,
-            renderCell:(params) => {
-                return <>
- <Button variant='contained' onClick={() => viewValuationFirmDetails(params.row)}>view</Button> &nbsp;&nbsp;
-          <Button variant='contained' onClick={() => editValuationFirm(params.row)}>Edit</Button> &nbsp;&nbsp;
-          <Button variant='contained' onClick={() => blockValuationFirm(params.row)} >Block</Button>
-                </>
-            },
         }
     ];
     const {
@@ -215,8 +202,7 @@ function AccesorValuationFirms(row) {
 
             <FlexBetween sx={{ ml: 5 }}>
                 <Header sx={{ ml: 30 }} title="Valuation Firms" subtitle="List of Valuation Firms" />
-                <Button sx={{ mt: 10, ml: 10, mr: 10 }} variant='contained' onClick={handleOpen}> <Add></Add>&nbsp;&nbsp; New Invite</Button>
-            </FlexBetween>
+                  </FlexBetween>
             {/* modal invite valuation firm */}
             <Modal
                 open={open}

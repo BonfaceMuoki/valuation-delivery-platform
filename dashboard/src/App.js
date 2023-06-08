@@ -31,6 +31,7 @@ import AccesorUserList from "scenes/users/AccesorUserList";
 import AccesorValuationFirms from "scenes/organizations/AccesorValuationFirms";
 import UploaderReportConsumers from "scenes/organizations/UploaderReportConsumers";
 import UploaderUsersList from "scenes/users/UploaderUserList";
+import ProfilePage from "scenes/users/ProfilePage";
 
 function App() {
   const mode = useSelector((state) => state.auth.mode);
@@ -232,6 +233,16 @@ function App() {
                     element={<AccesorValuationFirms />}
                   />
                 </Route> 
+                {/* <Route
+                  element={
+                    <AuthorizeRoute checkpermission="view accesors uploaders only" />
+                  }
+                > */}
+                  <Route
+                    path="/profile"
+                    element={<ProfilePage />}
+                  />
+                {/* </Route>  */}
                 {/* /* close accesors rutes */}
               </Route>
             </Route>
