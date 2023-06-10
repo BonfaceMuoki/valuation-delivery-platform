@@ -18,6 +18,7 @@ use Endroid\QrCode\Logo\Logo;
 use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Writer\ValidationException;
+use App\Mail\sendValuationFirUserInviteMail;
 
 use setasign\Fpdi\Fpdi;
 use DB;
@@ -243,5 +244,8 @@ class ValuerController extends Controller
                 ], 400);
             }
        
+    }
+    public function sendUserInvite(REquest $request){
+
     }
 }

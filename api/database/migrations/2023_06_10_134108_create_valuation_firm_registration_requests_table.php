@@ -13,18 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('valuation_firm_invites', function (Blueprint $table) {
+        Schema::create('valuation_firm_registration_requests', function (Blueprint $table) {
             $table->id();
-            $table->text("invite_token");
-            $table->text("registration_url")->nullable();
-            $table->string("login_url")->nullable();
-            $table->boolean("completed")->default(false);
             $table->string('invite_email');
             $table->string('invite_phone');
             $table->string('valauaion_firm_name');
             $table->string('vrb_number');
             $table->string('isk_number');           
-            $table->string('director_name');            
+            $table->string('director_name');   
             $table->timestamps();
         });
     }
@@ -36,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('valuation_firm_invites');
+        Schema::dropIfExists('valuation_firm_registration_requests');
     }
 };

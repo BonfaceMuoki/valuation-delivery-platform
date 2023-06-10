@@ -1,6 +1,6 @@
 import React,{useState} from 'react'
 import { DataGrid } from '@mui/x-data-grid'
-import { Box, Button } from '@mui/material';
+import { Box, Button, ButtonBase, TextField, Grid, Divider } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import FlexBetween from 'components/FlexBetween';
@@ -105,11 +105,126 @@ const blockUser = (row)=>{
     }
   ];
   const [blocked, setBlocked] = useState(false);
+  const [openInviteModal,setOpenInviteModal] = useState(false);
+  const handleOpen = ()=>{
+    setOpenInviteModal(true);
+  }
+  const handleClose = ()=>{
+    setOpenInviteModal(false);
+  }
+   ///intialize invite form
+   const inviteformschema = yup.object().shape({
+    name: yup.string().required("Please provide the valuation firm registred name"),
+    email: yup.string().email("Plase provide valid Email").required("Please provide email"),
+    phone: yup.string().required("Please provide the VRB number"),
+    isk_number: yup.string(),
+    instruction: yup.string()
+});
+const {
+    register: registerInvitForm,
+    handleSubmit: handleInviteFormsubmit,
+    reset: resetValuerInviteForm,
+    formState: { errors: inviteFormErrors } } = useForm({
+        resolver: yupResolver(inviteformschema)
+    });
+
+    const onSubmitInviteFormsubmit = async (data) => {
+      setBlocked(true);
+      console.log(data);
+      const formdata = new FormData();
+      formdata.append("name",data.name);
+      formdata.append("vrb_number",data.vrb_number);
+      formdata.append("isk_number",data.isk_number);
+      formdata.append("phone",data.phone);
+      formdata.append("email",data.email);
+    //  const result =await inviteUploader(formdata);
+      // console.log(result);
+      // if ('error' in result) {    
+      //   toastMessage(result.error.data.message, "error");
+      //   if('backendvalerrors' in result.error.data){
+      //     // setBackendValErrors(result.error.data.backendvalerrors);
+      //     resetValuerInviteForm();
+      //     setBlocked(false);   
+      //   }  
+      // } else {
+
+      //   toastMessage(result.data.message, "success");
+      //   setBlocked(false);   
+  
+      // }
+  
+  }
+///intialize invite form
   return (
     
     <BlockUI blocked={blocked}>
+
+            <FlexBetween sx={{ ml: 5 }}>
+                <Header sx={{ ml: 30 }} title="Valuation Firms" subtitle="List of Valuation Firms" />
+                <Button sx={{ mt: 10, ml: 10, mr: 10 }} variant='contained' onClick={handleOpen}> <Add></Add>&nbsp;&nbsp; Invite User</Button>
+            </FlexBetween>
+            <Modal
+                open={openInviteModal}
+                onClose={handleClose}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Box sx={style}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                        INVITE VALUATION FIRM USER
+                    </Typography>
+                    <hr></hr>
+                    <form name='invitevaluationfirmuser' onSubmit={handleInviteFormsubmit(onSubmitInviteFormsubmit)}>                    
+                          <Grid container spacing={2} sx={{ mt: 2, width: "100%" }}>
+                          <Grid item xs={12} sm={12} md={12} >
+                                <Typography>Name</Typography>
+                                <div>
+                                    <TextField autoComplete="off" fullWidth {...registerInvitForm("name")} />
+                                    <span className='errorSpan' >{inviteFormErrors.name?.message}</span>
+                                </div>
+                            </Grid>
+                            <Grid item xs={12} sm={12} md={12} >
+                                <Typography>Email</Typography>
+                                <div>
+                                    <TextField autoComplete="off" fullWidth {...registerInvitForm("phone")} />
+                                    <span className='errorSpan' >{inviteFormErrors.phone?.message}</span>
+                                </div>
+                            </Grid>
+                            <Grid item xs={12} sm={12} md={12} >
+                                <Typography>ISK Number</Typography>
+                                <div>
+                                    <TextField autoComplete="off" fullWidth {...registerInvitForm("isk_number")} />
+                                    <span className='errorSpan' >{inviteFormErrors.isk_number?.message}</span>
+                                </div>
+                            </Grid>
+                            <Grid item xs={12} sm={12} md={12} >
+                                <Typography>VRB Number</Typography>
+                                <div>
+                                    <TextField autoComplete="off" fullWidth {...registerInvitForm("vrb_number")} />
+                                    <span className='errorSpan' >{inviteFormErrors.vrb_number?.message}</span>
+                                </div>
+                            </Grid>
+                            <Grid item xs={12} sm={12} md={12} >
+                                <Typography>Invite Note</Typography>
+                                <div>
+                                    <TextField autoComplete="off" fullWidth {...registerInvitForm("vrb_number")} />
+                                    <span className='errorSpan' >{inviteFormErrors.valuation_firm_vrb_number?.message}</span>
+                                </div>
+                            </Grid>
+                            <Grid item xs={12} sm={12} md={12} >
+                                {
+                                    // !sendingUploaderInvite &&
+                                    <Button variant='contained' fullWidth type="submit">Send Invite</Button>
+                                }
+                               
+                            </Grid>
+
+                        </Grid>
+                    </form>
+                </Box>
+            </Modal>
        <Box sx={{ mt: 10, ml: 10, mr: 10, height: "650px;" }} >
-           
+        
             <DataGrid
                 loading={isLoading || !users}
                 getRowId={(row) => row.id}
