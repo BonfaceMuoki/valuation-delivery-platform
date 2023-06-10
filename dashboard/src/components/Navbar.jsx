@@ -10,8 +10,8 @@ import {
   VerifiedUserRounded
 } from "@mui/icons-material";
 import FlexBetween from "components/FlexBetween";
-import { useDispatch } from "react-redux";
-import { setMode,logOut } from '../scenes/auth/authSlice';
+import { useDispatch,useSelector } from "react-redux";
+import { setMode,logOut, selectCurrentUser, selectCurrentPermissions } from '../scenes/auth/authSlice';
 import profileImage from "assets/profile.jpg";
 import {
   AppBar,
@@ -36,9 +36,18 @@ const Navbar = ({ user, isSidebarOpen, setIsSidebarOpen }) => {
   const handleClick = (event) => setAnchorEl(event.currentTarget);
   const handleClose = () => setAnchorEl(null);
   const navigate = useNavigate();
+  const currentuser = useSelector(selectCurrentUser);
+  const permissions = useSelector(selectCurrentPermissions);
   const seeProfile =()=>{
-    
-    navigate('/profile');
+    if(currentuser.role_name==="Report Uploader Admin"){
+      navigate('/profile');
+    }else if(currentuser.role_name==="Report Accessor Admin"){
+      navigate('/accesor/profile');
+    }
+    else if(currentuser.role_name==="Super Admin"){
+      navigate('/super-admin/profile');
+    }
+  
   }
 
   return (

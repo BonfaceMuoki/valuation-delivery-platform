@@ -63,14 +63,14 @@ const navItemsvaluer = [
     icon: null,
   },
   {
-    text: "My Uploaders",
+    text: "My Users",
     icon: <PointOfSaleOutlined />,
-    routeName: "/valuation-firm/my-uploaders"
+    routeName: "/valuation-firm/my-users"
   },
   {
-    text: "My Accesors",
+    text: "My Clients",
     icon: <CalendarMonthOutlined />,
-    routeName: "/valuation-firm/my-accesors"
+    routeName: "/valuation-firm/my-clients"
   }
 ];
 
@@ -102,7 +102,7 @@ const navItemsaccesor = [
   {
     text: "My Uploaders",
     icon: <TodayOutlined />,
-    routeName: "accessor/my-uploaders"
+    routeName: "accessor/my-valuers"
   }
 ];
 
@@ -192,7 +192,7 @@ const Sidebar = ({
   const [navItems, setNavItems] = useState([]);
   const currentuser = useSelector(selectCurrentUser);
 
-  const userrole = currentuser.role_name;
+  const userrole = currentuser?.role_name;
 
   // const issuperadin=roles.find(c=>c.name=="Super Admin");
   // const isvaluer=roles.find(c=>c.name=="Super Admin");

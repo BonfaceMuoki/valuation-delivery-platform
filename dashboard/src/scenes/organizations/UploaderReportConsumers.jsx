@@ -141,68 +141,9 @@ function UploaderReportConsumers(row) {
     <BlockUI blocked={blocked}>
         <ConfirmDialog />
         <FlexBetween sx={{ ml: 5 }}>
-            <Header sx={{ ml: 30 }} title="Report Consumers" subtitle="List of Report Consumers" />
+            <Header sx={{ ml: 30 }} title="Clients" subtitle="List of Clients" />
          </FlexBetween>
-        <Modal
-            open={open}
-            onClose={handleClose}
-            aria-labelledby="modal-modal-title"
-            aria-describedby="modal-modal-description"
-        >
-            <Box sx={style}>
-                <Typography id="modal-modal-title" variant="h6" component="h2">
-                    INVITE ACCESOR FIRM
-                </Typography>
-                <hr></hr>
-                <form name='invitevaluationformform' onSubmit={handleInviteFormsubmit(onSubmitInviteFormsubmit)}>
-                {
-                            sendingAccesorInvite &&
-                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                                <CircularProgress />
-                            </Box>
-                        }
-                    <Grid container spacing={2} sx={{ mt: 2, width: "100%" }}>
 
-                        <Grid item xs={12} sm={6} md={6} >
-                            <Typography>Accesor Name</Typography>
-                            <div>
-                                <TextField autoComplete="off" fullWidth {...registerInvitForm("accesor_name")} />
-                                <span className='errorSpan' >{inviteFormErrors.accesor_name?.message}</span>
-                            </div>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={6} >
-                            <Typography>Admin Email</Typography>
-                            <div>
-                                <TextField autoComplete="off" fullWidth {...registerInvitForm("email")} />
-                                <span className='errorSpan' >{inviteFormErrors.email?.message}</span>
-                            </div>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={6} >
-                            <Typography>Contact Person Name</Typography>
-                            <div>
-                                <TextField autoComplete="off" fullWidth {...registerInvitForm("contact_person_name")} />
-                                <span className='errorSpan' >{inviteFormErrors.contact_person_name?.message}</span>
-                            </div>
-                        </Grid>
-                        <Grid item xs={12} sm={6} md={6} >
-                            <Typography>Contact Person Phone</Typography>
-                            <div>
-                                <TextField autoComplete="off" fullWidth {...registerInvitForm("contact_person_phone")} />
-                                <span className='errorSpan' >{inviteFormErrors.contact_person_phone?.message}</span>
-                            </div>
-                        </Grid>
-
-                        <Grid item xs={12} sm={12} md={12} >
-                            {
-                                !sendingAccesorInvite && <Button variant='contained' fullWidth type="submit">Send Invite</Button>
-                            }
-                            
-                        </Grid>
-
-                    </Grid>
-                </form>
-            </Box>
-        </Modal>
         <Box sx={{ mt: 10, ml: 10, mr: 10, height: "650px;" }} >
 
             <DataGrid

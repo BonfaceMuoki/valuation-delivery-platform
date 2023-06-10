@@ -20,13 +20,12 @@ import { selectCurrentUser } from "scenes/auth/authSlice";
 import "../../assets/scss/validation.css";
 import FlexBetween from "components/FlexBetween";
 import Header from "components/Header";
-import { useUpdatePersonalInfoMutation } from "features/updatePersonalInfoSlice";
+import { useUpdateAccesorPersonalInfoMutation } from "features/updateAccesorPersonalInfoSlice";
 import { updateUserDetails } from "scenes/auth/authSlice";
-import { useGetValuerOrgDetailsDetailsQuery } from "features/retrieveValuerOrgDetailsSlice";
-import { useUpdateCompanyInfoMutation } from "features/updateCompanyInfoSlice";
+import { useGetAccesorOrgDetailsDetailsQuery } from "features/retrieveAccesorOrgDetailsSlice";
+import { useUpdateAccesorCompanyInfoMutation } from "features/updateAccesorCompanyInfoSlice";
 
-
-function ProfilePage() {
+function AccesorProfilePage() {
   const theme = useTheme();
   const dispatch = useDispatch();
   const isNonMobile = useMediaQuery("(min-width: 1200px)");
@@ -34,8 +33,6 @@ function ProfilePage() {
   const schemaPersonal = yup.object().shape({
     full_name: yup.string().required("Please provide your Username/Email"),
     email: yup.string().required("Please provide your Password."),
-    isk_number: yup.string(),
-    vrb_number: yup.string(),
     profile_pic: yup
       .mixed()
       .required("Please upload a file")
@@ -62,7 +59,7 @@ function ProfilePage() {
   } = useForm({
     resolver: yupResolver(schemaPersonal),
   });
-  const [updatePersonalInformation,{isLoading:updatingpersonalInformation}]= useUpdatePersonalInfoMutation();
+  const [updatePersonalInformation,{isLoading:updatingpersonalInformation}]= useUpdateAccesorPersonalInfoMutation();
   const submitPersonalInformation =  async(data) => {
     console.log(data);
     console.log(currentuser);
@@ -70,8 +67,6 @@ function ProfilePage() {
     const formData= new FormData();
     formData.append("full_name",data.full_name);
     formData.append("email",data.email);
-    formData.append("isk_number",data.isk_number);
-    formData.append("vrb_number",data.vrb_number);
     formData.append("profile_pic",data.profile_pic[0]);
     formData.append("userid",userid);
     const email = data.email;
@@ -105,8 +100,6 @@ function ProfilePage() {
   useEffect(() => {
     if (currentuser) {
       setPersonalInfoValue("full_name", currentuser?.full_name);
-      setPersonalInfoValue("isk_number", currentuser?.isk_number);
-      setPersonalInfoValue("vrb_number", currentuser?.vrb_number);
       setPersonalInfoValue("email", currentuser?.email);
     }
   }, [currentuser]);
@@ -116,7 +109,7 @@ function ProfilePage() {
   const [logo, setLogo] = useState();
   const [uploadedLogoFile, setUploadedLogoFile] = useState();
   const handleLogo = (e) => {
-    console.log("LOgo upload");
+    console.log("Logo upload");
     const file = e.target.files[0];
     console.log(file);
     const reader = new FileReader();
@@ -136,9 +129,6 @@ function ProfilePage() {
       .required("Please provide your Username/Email"),
     organization_email: yup.string().required("Please provide your Password."),
     organization_phone: yup.string().required("Please provide your Password."),
-    directors_vrb: yup.string().required("Please provide your Password."),
-    idemnity_amount: yup.string().required("Please provide your Password."),
-    idemnity_expiry: yup.string().required("Please provide your Password."),
     organization_logo: yup
       .mixed()
       .required("Please upload a file")
@@ -165,19 +155,17 @@ function ProfilePage() {
   } = useForm({
     resolver: yupResolver(schemaCompany),
   });
-  const {data:retrivedOrgDetails,isLoading:loadingOrgDetails,refetch:refetchOrgdetails}=useGetValuerOrgDetailsDetailsQuery();
+  const {data:retrivedOrgDetails,isLoading:loadingOrgDetails,refetch:refetchOrgdetails}=useGetAccesorOrgDetailsDetailsQuery()
   useEffect(() => {
     if (!loadingOrgDetails && retrivedOrgDetails) {
       setOrgValue("organization_name",retrivedOrgDetails?.organization_name);
       setOrgValue("organization_email",retrivedOrgDetails?.organization_email);
       setOrgValue("organization_phone",retrivedOrgDetails?.organization_phone);
       setOrgValue("directors_vrb",retrivedOrgDetails?.directors_vrb);
-      setOrgValue("idemnity_amount",retrivedOrgDetails?.idemnity_amount);
-      setOrgValue("idemnity_expiry",retrivedOrgDetails?.idemnity_expiry);
     }
   }, [retrivedOrgDetails, loadingOrgDetails, setOrgValue]);
 
-  const [updateCompanyInformation,{isLoading:updatingcompanyInformation}]= useUpdateCompanyInfoMutation();
+  const [updateCompanyInformation,{isLoading:updatingcompanyInformation}]= useUpdateAccesorCompanyInfoMutation();
 
   const submitCompanyInformation =  async (data) => {
     console.log(data);
@@ -185,9 +173,6 @@ function ProfilePage() {
     formData.append("organization_name",data.organization_name);
     formData.append("organization_email",data.organization_email);
     formData.append("organization_phone",data.organization_phone);
-    formData.append("directors_vrb",data.directors_vrb);
-    formData.append("idemnity_amount",data.idemnity_amount);
-    formData.append("idemnity_expiry",data.idemnity_expiry);
     formData.append("organization_logo",data.organization_logo[0]);
     const response= await updateCompanyInformation(formData);
     refetchOrgdetails();
@@ -283,34 +268,7 @@ function ProfilePage() {
                       {personalFormErrors.email?.message}
                     </span>
                   </Grid>
-                  <Grid item xs={12} sm={12} md={12}>
-                    <Typography sx={{ ml: 0 }}>VRB Number</Typography>
-                    <br></br>
-                    <TextField
-                      placeholder="vrb number"
-                      id="outlined-basic"
-                      fullWidth
-                      {...registerPersonalForm("vrb_number")}
-                    />
-                    <span className="errorSpan">
-                      <br></br>
-                      {personalFormErrors.vrb_number?.message}
-                    </span>
-                  </Grid>
-                  <Grid item xs={12} sm={12} md={12}>
-                    <Typography sx={{ ml: 0 }}>ISK Number</Typography>
-                    <br></br>
-                    <TextField
-                      placeholder="ISK number"
-                      id="outlined-basic"
-                      fullWidth
-                      {...registerPersonalForm("isk_number")}
-                    />
-                    <span className="errorSpan">
-                      <br></br>
-                      {personalFormErrors.isk_number?.message}
-                    </span>
-                  </Grid>
+
                   <Grid item xs={12} sm={12} md={12}>
                     <label htmlFor="upload-photo">
                       <input
@@ -427,50 +385,7 @@ function ProfilePage() {
                       </span>
                     </Grid>
                   </Grid>
-                  <Grid item xs={12} sm={12} md={12}>
-                    <Typography sx={{ ml: 0 }}>Directors VRB</Typography>
-                    <br></br>
-                    <TextField
-                      placeholder="Directors VRB"
-                      id="outlined-basic"
-                      fullWidth
-                      {...registerCompanyForm("directors_vrb")}
-                    />
-                    <span className="errorSpan">
-                      <br></br>
-                      {companyFormErrors.directors_vrb?.message}
-                    </span>
-                  </Grid>
-                  <Grid container spacing={2} item xs={12} sm={12} md={12}>
-                    <Grid item xs={12} sm={6} md={6}>
-                      <Typography>Idemnity Amount</Typography>
-                      <br></br>
-                      <TextField
-                        placeholder="idemnity Amount"
-                        id="outlined-basic"
-                        fullWidth
-                        {...registerCompanyForm("idemnity_amount")}
-                      />
-                      <span className="errorSpan">
-                        <br></br>
-                        {companyFormErrors.idemnity_amount?.message}
-                      </span>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={6}>
-                      <Typography sx={{ ml: 2 }}>Idemnity Expiry</Typography>
-                      <br></br>
-                      <TextField
-                        placeholder="Idemnity Expiry"
-                        id="outlined-basic"
-                        fullWidth
-                        {...registerCompanyForm("idemnity_expiry")}
-                      />
-                      <span className="errorSpan">
-                        <br></br>
-                        {companyFormErrors.idemnity_expiry?.message}
-                      </span>
-                    </Grid>
-                  </Grid>
+
                   <Grid container spacing={2} item xs={12} sm={12} md={12}>
                   <Grid item xs={12} sm={6} md={6}>
                     <label htmlFor="upload-logo">
@@ -545,4 +460,4 @@ function ProfilePage() {
   );
 }
 
-export default ProfilePage;
+export default AccesorProfilePage;

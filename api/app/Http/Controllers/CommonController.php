@@ -30,6 +30,24 @@ class CommonController extends Controller
             return response($users,200);
 
         }
+        else if ($user->hasPermissionTo(Permission::where("slug", 'view valuation firm users only')->first())) {
+            
+            $org=$user->UploaderOrganization()->first();
+            $orgid=$org->id;
+            $users = User::with("UploaderOrganization")
+                ->with("roles")
+                ->whereHas("UploaderOrganization", function ($query) use ($orgid) {
+                    $query->where("organization_id", $orgid);
+                })->get();
+            return response($users, 200);
+                                    
+        }
+        else if ($user->hasPermissionTo(Permission::where("slug", 'view accesors users only')->first())) {
+
+            $users=User::with("roles")->get();
+            return response($users,200);
+            
+        }
 
 
     }
@@ -60,15 +78,17 @@ class CommonController extends Controller
     }
     public function getReportsList()
     {
+       
         $user = auth()->user();
+        // return response()->json(['code' => 0, 'org' =>$user->UploaderOrganization()->first(), 'message' => 'Organization is not found'], 201);
+       
         if($user==null){
             return response()->json(['message'=>'Unautheticated'],403);
         }
         $reports_query = ValuationReport::query();
         $reports = array();
         $url=url("/");
-        if ($user->hasPermissionTo(Permission::where("slug", 'view valuation firm reports only')->first())) {
-           
+        if ($user->hasPermissionTo(Permission::where("slug", 'view valuation firm reports only')->first())) {           
             $org = $user->UploaderOrganization()->first();
             $reports_query->join("report_consumers", "report_consumers.id", "=", "valuation_reports.receiving_company_id");
             $reports_query->where("report_uploading_from", $org->id);
@@ -97,7 +117,13 @@ class CommonController extends Controller
             $reports = $reports_query->get();
             return response()->json(['message' => 'You do not have the permission to view this resource'], 401);
         }
-        return response()->json($reports);
+        $formattedreports = array_map(function ($item) {
+            $item['forced_market_value'] = number_format($item['forced_market_value'], 2, '.', ',');
+            $item['market_value'] = number_format($item['market_value'], 2, '.', ',');
+            return $item;
+        }, $reports->toArray());
+
+        return response()->json($formattedreports);
     }
     public function downloadValuationReport($id, $signed = 0)
     {

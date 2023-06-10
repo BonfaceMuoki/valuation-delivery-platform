@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('vrb_number')->nullable();
             $table->string('isk_number')->nullable();
+            $table->string('profile_pic')->nullable();            
             $table->rememberToken();
             $table->timestamps();
             });

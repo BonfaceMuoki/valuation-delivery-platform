@@ -40,17 +40,17 @@ function ReportsTable () {
             field: "valuation_date",
             flex: 1
         }, {
-            headerName: "Accesor Name",
+            headerName: "Client Name",
             field: "organization_name",
             flex: 1
         }, {
-            headerName: "Market Value",
+            headerName: "Market Value (KES)",
             field: "market_value",
             flex: 1
         }, {
-            headerName: "Forced Market value",
+            headerName: "Forced Market value(KES)",
             field: "forced_market_value",
-            flex: 1
+            flex: 1,
         },
         {
             field: 'actions',

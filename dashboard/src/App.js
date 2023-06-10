@@ -32,6 +32,7 @@ import AccesorValuationFirms from "scenes/organizations/AccesorValuationFirms";
 import UploaderReportConsumers from "scenes/organizations/UploaderReportConsumers";
 import UploaderUsersList from "scenes/users/UploaderUserList";
 import ProfilePage from "scenes/users/ProfilePage";
+import AccesorProfilePage from "scenes/users/AccesorProfilePage";
 
 function App() {
   const mode = useSelector((state) => state.auth.mode);
@@ -166,7 +167,7 @@ function App() {
                   }
                 >
                   <Route
-                    path="/valuation-firm/my-uploaders"
+                    path="/valuation-firm/my-users"
                     element={<UploaderUsersList/>}
                   />
                 </Route>
@@ -176,7 +177,7 @@ function App() {
                   }
                 >
                   <Route
-                    path="/valuation-firm/my-accesors"
+                    path="/valuation-firm/my-clients"
                     element={<UploaderReportConsumers/>}
                   />
                 </Route>
@@ -186,10 +187,14 @@ function App() {
                   }
                 >
                   <Route
-                    path="/valuation-firm/my-accesors"
+                    path="/valuation-firm/my-clients"
                     element={<UploaderValuationReports />}
                   />
                 </Route>
+                <Route
+                    path="/profile"
+                    element={<ProfilePage />}
+                  />
                 {/* close valuers routes */}
                 {/* accessors routes */}
                 
@@ -229,7 +234,7 @@ function App() {
                   }
                 >
                   <Route
-                    path="/accessor/my-uploaders"
+                    path="/accessor/my-valuers"
                     element={<AccesorValuationFirms />}
                   />
                 </Route> 
@@ -239,8 +244,8 @@ function App() {
                   }
                 > */}
                   <Route
-                    path="/profile"
-                    element={<ProfilePage />}
+                    path="/accesor/profile"
+                    element={<AccesorProfilePage />}
                   />
                 {/* </Route>  */}
                 {/* /* close accesors rutes */}

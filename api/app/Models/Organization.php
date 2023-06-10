@@ -15,6 +15,8 @@ class Organization extends Model
       'directors_vrb',
       'isk_number',
       'created_by',
+      'idemnity_amount',
+      'idemnity_expiry'
   ];
     public function users()
     {

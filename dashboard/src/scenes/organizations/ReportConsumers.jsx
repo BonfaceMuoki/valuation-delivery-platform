@@ -155,7 +155,7 @@ function ReportConsumers(row) {
         <ConfirmDialog />
         <FlexBetween sx={{ ml: 5 }}>
             <Header sx={{ ml: 30 }} title="Report Consumers" subtitle="List of Report Consumers" />
-            <Button sx={{ mt: 10, ml: 10, mr: 10 }} variant='contained' onClick={handleOpen}> <Add></Add>&nbsp;&nbsp; New REport Accessor</Button>
+            <Button sx={{ mt: 10, ml: 10, mr: 10 }} variant='contained' onClick={handleOpen}> <Add></Add>&nbsp;&nbsp; New Client</Button>
         </FlexBetween>
         <Modal
             open={open}
@@ -165,7 +165,7 @@ function ReportConsumers(row) {
         >
             <Box sx={style}>
                 <Typography id="modal-modal-title" variant="h6" component="h2">
-                    INVITE ACCESOR FIRM
+                    Invite Client
                 </Typography>
                 <hr></hr>
                 <form name='invitevaluationformform' onSubmit={handleInviteFormsubmit(onSubmitInviteFormsubmit)}>

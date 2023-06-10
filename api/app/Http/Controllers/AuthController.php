@@ -342,13 +342,15 @@ public function registerAccesor(Request $request){
     protected function createNewToken($token)
     {
         $role=auth()->user()->roles()->first(["id", "name","name as role_name"]);
+        $userid=['user_id'=>auth()->user()->id];
         $user=auth()->user();
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60,
-            'user' => array_merge($user->toArray(),$role->toArray()),
+            'user' => array_merge($user->toArray(),$role->toArray(),$userid),
             'role' => $role,
+            'user_id' => $user,
             'roles' => $user->roles()->get(["id", "name"]),
             'permissions' => array_merge($user->permissions()->get(["id", "slug as name"])->toArray(),$role->permissions()->get(['id','slug as name'])->toArray())
         ]);

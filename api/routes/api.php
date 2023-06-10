@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\AccesorController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CommonController;
 use Illuminate\Http\Request;
@@ -35,6 +36,7 @@ Route::group([
 
     Route::get('/retrieve-valuer-invite-details', [AuthController::class, 'retrieveValuerInviteDetails']);
     Route::get('/retrieve-accessor-invite-details', [AuthController::class, 'retrieveAccesorInviteDetails']);
+    
 
 });
 Route::group([
@@ -76,6 +78,20 @@ Route::group([
     Route::post('/upload-valuation-report', [ValuerController::class, 'uploadReport']);
     Route::get('/addimage', [ValuerController::class, 'writeToPDF']);
     Route::get('/generate-qr-report', [ValuerController::class, 'generateQRCode']);
+    Route::get('/retrieve-valuer-org-details', [ValuerController::class, 'retriveValuerOrgDetails']);
+    
+    Route::post('/update-personal-information', [ValuerController::class, 'updatePersonalInfromation']);
+    Route::post('/update-company-information', [ValuerController::class, 'updateCompanyInfromation']);
 });
+
+Route::group([
+    'middleware' => 'api',
+    'prefix' => 'accesor'
+], function ($router) {    
+    Route::get('/retrieve-accesor-org-details', [AccesorController::class, 'retriveAccesorOrgDetails']);
+    Route::post('/update-personal-information', [AccesorController::class, 'updatePersonalInfromation']);
+    Route::post('/update-company-information', [AccesorController::class, 'updateCompanyInfromation']);
+});
+
 Route::post('/reset-password-request', [PasswordResetRequestController::class, 'sendPasswordResetEmail']);
 Route::post('/change-password', [ChangePasswordController::class, 'passwordResetProcess']);
