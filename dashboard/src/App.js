@@ -33,6 +33,7 @@ import UploaderReportConsumers from "scenes/organizations/UploaderReportConsumer
 import UploaderUsersList from "scenes/users/UploaderUserList";
 import ProfilePage from "scenes/users/ProfilePage";
 import AccesorProfilePage from "scenes/users/AccesorProfilePage";
+import AcceptValuationUserInviteSignup from "scenes/auth/AcceptValuationUserInviteBySignup";
 
 function App() {
   const mode = useSelector((state) => state.auth.mode);
@@ -58,6 +59,16 @@ function App() {
                 path="/complete-invite-by-login"
                 element={<AcceptInviteByLogin />}
               />
+              {/* register valuation firm user */}
+              <Route
+                path="/complete-valuer-user-registration-register"
+                element={<AcceptValuationUserInviteSignup />}
+              />
+              <Route
+                path="/complete-valuer-user-registration-login"
+                element={<AcceptInviteByLogin />}
+              />
+              {/* close register valauation firm user */}
             </Route>
             <Route element={<ProtectedRoutes />}>
               <Route element={<Layout />}>

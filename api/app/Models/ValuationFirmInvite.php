@@ -16,6 +16,7 @@ class ValuationFirmInvite extends Model
      'valauaion_firm_name',
      'vrb_number',
      'isk_number',
-     'director_name'
+     'director_name',
+     'invite_instruction'
     ];
 }

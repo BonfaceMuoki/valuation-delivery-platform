@@ -23,8 +23,12 @@ return new class extends Migration
             $table->string("personal_email")->nullable();
             $table->string("isk_number")->nullable();
             $table->string("vrb_number")->nullable();
-            $table->string("invite_instruction");
+            $table->string("invite_instruction")->nullable();
             $table->integer("status")->default(0);
+
+            $table->string("registration_url");
+            $table->string("login_url");
+
             $table->unsignedBigInteger("role_id");
             $table->timestamps();
 

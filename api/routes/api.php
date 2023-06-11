@@ -27,6 +27,8 @@ Route::group([
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/all-users', [AuthController::class, 'allUsers']);
     Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/register-valuer-user', [AuthController::class, 'registerValuerUser']);
+    
     Route::post('/register-accesor', [AuthController::class, 'registerAccesor']);
     Route::post('/invite-tenant', [AuthController::class, 'inviteTenant']);
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -35,6 +37,8 @@ Route::group([
     Route::get('/owner-details', [AuthController::class, 'userDetails']);
 
     Route::get('/retrieve-valuer-invite-details', [AuthController::class, 'retrieveValuerInviteDetails']);
+    Route::get('/retrieve-valuer-user-invite-details', [AuthController::class, 'retrieveValuerUserInviteDetails']);
+   
     Route::get('/retrieve-accessor-invite-details', [AuthController::class, 'retrieveAccesorInviteDetails']);
     
 
@@ -82,6 +86,9 @@ Route::group([
     
     Route::post('/update-personal-information', [ValuerController::class, 'updatePersonalInfromation']);
     Route::post('/update-company-information', [ValuerController::class, 'updateCompanyInfromation']);
+    Route::post('/send-user-invite', [ValuerController::class, 'sendUserInvite']);
+
+    
 });
 
 Route::group([

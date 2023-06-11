@@ -90,7 +90,7 @@ const blockUser = (row)=>{
     {
       headerName: "Role",
       flex: 1,
-      valueGetter: (params) => params.row.roles.map((role) => role.name).join(', ') 
+      valueGetter: (params) => params.row.roles.map((role) => role.name)
     },
     {
       field: 'actions',

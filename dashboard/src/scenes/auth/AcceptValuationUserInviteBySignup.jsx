@@ -22,12 +22,12 @@ import { Link } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { useSearchParams,useLocation } from 'react-router-dom';
 
-import { useGetAccesorInviteDetailsQuery } from 'features/retrieveAccesorInviteSlice';
+import { useGetValuerUserInviteDetailsQuery } from 'features/retrieveValuerInviteSlice';
 import * as yup from "yup";
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import "../../assets/scss/validation.css"
-import { useRegisterAccesorMutation } from 'features/rgisterAccesorOrgSlice';
+import { useRegisterUploaderUserMutation } from 'features/registerUploaderCompanySlice';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "primereact/resources/themes/bootstrap4-dark-blue/theme.css";
@@ -43,7 +43,7 @@ export const LinkItem = styled(Link)`
   }
 `;
 
-function AcceptAccesorInviteSignup() {
+function AcceptValuationUserInviteSignup() {
 
   const toastMessage = (message, type) => {
     if (type == "success") {
@@ -67,13 +67,15 @@ function AcceptAccesorInviteSignup() {
   const isNonMobile = useMediaQuery("(min-width: 600px)");
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const {data:retrieved,isError,error} = useGetAccesorInviteDetailsQuery(params.get("token"));
+  const {data:retrievedUserInvite,isError,error} = useGetValuerUserInviteDetailsQuery(params.get("token"));
   const [backendValErrors,setBackendValErrors]=useState({});
-  const [registerAccesor,{isLoading:loadingValuer}] = useRegisterAccesorMutation();
+  const [registerValuerUser,{isLoading:loadingValuer}] = useRegisterUploaderUserMutation();
 
   const schema = yup.object().shape({
    company_name: yup.string().required("Company Name is required"),
    full_name: yup.string().required("Your name is required"),
+   vrb_number: yup.string(),
+   isk_number: yup.string(),
    phone_number: yup.string().required("Phone number is required"),
    password: yup.string().required("Please provide password").matches(
     /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@#$%^&+=!])(?!.*\s).{6,}$/,
@@ -88,42 +90,54 @@ function AcceptAccesorInviteSignup() {
   });
 
 useEffect(() => {
-  if (!loadingInviteDetails && retrieved) {
-    setInviteValue("company_name",retrieved?.accessor_name);
-    setInviteValue("full_name",retrieved?.contact_person_name);
-    setInviteValue("email",retrieved?.invite_email);
-    setInviteValue("phone_number",retrieved?.contact_person_phone);
+  if (!loadingInviteDetails && retrievedUserInvite) {
+    setInviteValue("company_name",retrievedUserInvite?.organization_name);
+    setInviteValue("full_name",retrievedUserInvite?.full_name);
+    setInviteValue("email",retrievedUserInvite?.personal_email);
+    setInviteValue("vrb_number",retrievedUserInvite?.vrb_number);
+    setInviteValue("isk_number",retrievedUserInvite?.isk_number);
+    setInviteValue("phone_number",retrievedUserInvite?.personal_phone);
+
     
+
   }
-}, [retrieved, loadingInviteDetails, setInviteValue,]);
+}, [retrievedUserInvite, loadingInviteDetails, setInviteValue,]);
 
 const submitRegister = async (data)=>{
     const formdata= new FormData();
     formdata.append("company_name",data.company_name);
     formdata.append("email",data.email);
-    formdata.append("organization_phone",data.phone_number);
+    formdata.append("phone",data.phone_number);
+    formdata.append("vrb_number",data.vrb_number);
+    formdata.append("isk_number",data.isk_number);
     formdata.append("password",data.password);
     formdata.append("password_confirmation",data.confirm_password);
     formdata.append("company_email",data.email);
-    formdata.append("register_as","Report Accessor Admin");
+    formdata.append("register_as",retrievedUserInvite.role_id);
+    formdata.append("organization",retrievedUserInvite.organization_id);
     formdata.append("full_name",data.full_name);
-    const result = await registerAccesor(formdata);
+    formdata.append("invite_token",retrievedUserInvite.invite_token);
+    const result = await registerValuerUser(formdata);
     console.log(result);
     if ('error' in result) {
 
       toastMessage(result.error.data.message, "error");
       if('backendvalerrors' in result.error.data){
+
         setBackendValErrors(result.error.data.backendvalerrors);
         console.log(backendValErrors['email']);
 
-      }  
+      }
+    
+
+
     } else {
       toastMessage(result.data.message, "success");
 
     }
 
 }
-if(!retrieved){
+if(!retrievedUserInvite){
   return (  <Box display={'flex'} flexDirection={'column'}
   width={isNonMobile ? "50%" : "80%"}
   sx={{
@@ -140,7 +154,7 @@ if(!retrieved){
   )
 }
 
-if(Object.keys(retrieved).length === 0){
+if(Object.keys(retrievedUserInvite).length === 0){
  
   return (  <Box display={'flex'} flexDirection={'column'}
   width={isNonMobile ? "50%" : "80%"}
@@ -168,7 +182,7 @@ if(Object.keys(retrieved).length === 0){
           }}  >
         <form onSubmit={handleSubmitRegisterValuer(submitRegister)} >
           <Typography variant='h5' sx={{ mb: 2, fontWeight: 'bold' }} align='center'  >ACCEPT INVITE BY ACCOUNT CREATION.</Typography>
-          <Typography variant='p' sx={{ mb: 4 }} align='center'>Creating Report Accesor Account</Typography>
+          <Typography variant='p' sx={{ mb: 4 }} align='center'>Creating A Valuation company Account</Typography>
           <Typography sx={{ ml: 1 }}>Your Full Names</Typography>         
           <TextField placeholder='Full Names' sx={{ m: 1 }} id="outlined-basic" fullWidth {...acceptInviteRegister("full_name")} disabled />
           <span sx={{ ml: 1 }} className='errorSpan'>{acceptInviteerrors.full_name?.message}</span>
@@ -179,7 +193,20 @@ if(Object.keys(retrieved).length === 0){
           <Typography sx={{ ml: 1 }}>Company Name</Typography>
           <TextField placeholder='Company Name' sx={{ m: 1 }} id="outlined-basic" fullWidth {...acceptInviteRegister("company_name")} disabled />
           <span sx={{ ml: 1 }} className='errorSpan'>{acceptInviteerrors.company_name?.message}</span>
-     
+          <Grid container direction={isNonMobile ? 'row' : 'column'} >
+            <Grid item md={6} sm={12} sx={{mb:1}}>
+            <Typography sx={{ ml: 1 }}>VRB Number</Typography>
+          <TextField placeholder='Directors VRB Number'  sx={{ pl:1 }} fullWidth id="outlined-basic" {...acceptInviteRegister("vrb_number")}  />
+          <span sx={{ ml: 1 }} className='errorSpan'>{acceptInviteerrors.vrb_number?.message}</span>
+          <span sx={{ ml: 1 }} className='errorSpan'>{backendValErrors?.vrb_number}</span>
+            </Grid>
+            <Grid item md={6} sm={12} sx={{mb:1}}>
+            <Typography sx={{ ml: 1 }}>ISK Number</Typography>
+          <TextField placeholder='ISK Number'  sx={{ pl:1 }} fullWidth id="outlined-basic" {...acceptInviteRegister("isk_number")}  />
+          <span sx={{ ml: 1 }} className='errorSpan'>{acceptInviteerrors.isk_number?.message}</span>
+          <span sx={{ ml: 1 }} className='errorSpan'>{backendValErrors?.isk_number}</span>
+            </Grid>
+          </Grid>
           <Typography sx={{ ml: 1 }}>Contact Phone Number</Typography>
           <TextField placeholder='Contact Phone Number'  sx={{ pl:1, mb:1 }} id="outlined-basic" {...acceptInviteRegister("phone_number")} disabled   fullWidth/>
           <span sx={{ ml: 1 }} className='errorSpan'>{acceptInviteerrors.phone_number?.message}</span>
@@ -219,4 +246,4 @@ if(Object.keys(retrieved).length === 0){
 
 }
 
-export default AcceptAccesorInviteSignup;
+export default AcceptValuationUserInviteSignup;

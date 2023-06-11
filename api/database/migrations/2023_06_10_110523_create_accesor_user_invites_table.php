@@ -21,9 +21,14 @@ return new class extends Migration
             $table->string("invite_token");
             $table->string("personal_phone")->nullable();
             $table->string("personal_email")->nullable();
-            $table->string("invite_instruction");
+            $table->string("invite_instruction")->nullable();;
             $table->integer("status")->default(0);
             $table->unsignedBigInteger("role_id");
+
+            $table->string("registration_url");
+            $table->string("login_url");
+
+            
             $table->timestamps();
             $table->foreign("role_id")->references("id")->on("roles")->onDelete("cascade");
             $table->foreign("report_consumer_id")->references("id")->on("report_consumers")->onDelete("cascade");

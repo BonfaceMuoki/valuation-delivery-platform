@@ -1,10 +1,10 @@
 import { apiSlice } from "./apiSlice";
 
-export const addPermissionSlice = apiSlice.injectEndpoints({
+export const sendValuationFirmUserInvite = apiSlice.injectEndpoints({
     endpoints: bulder => ({
-        addPermission: bulder.mutation({
+        sendValuationFirmUserInvite: bulder.mutation({
             query: (formData) => ({
-                url: `/api/admin/add-permissions`,
+                url: `/api/uploader/send-user-invite`,
                 method: 'POST',
                 body: formData,
                 headers: {
@@ -15,5 +15,5 @@ export const addPermissionSlice = apiSlice.injectEndpoints({
     })
 })
 
-export const { useAddPermissionMutation} = addPermissionSlice;
+export const { useSendValuationFirmUserInviteMutation} = sendValuationFirmUserInvite;
 

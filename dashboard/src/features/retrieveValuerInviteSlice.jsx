@@ -4,6 +4,17 @@ import { useSelector } from "react-redux";
 export const retrieveValuerInviteSliceApi = apiSlice.injectEndpoints({
    
     endpoints: builder => ({
+      
+        getValuerUserInviteDetails: builder.query({
+            query: (invite_token) => ({
+                url: `/api/auth/retrieve-valuer-user-invite-details?invite_token=${invite_token}`,
+                method: 'GET',
+                headers: {
+                    'Accept': 'Application/json'
+                  }          
+            })
+           
+        }),
         getValuerInviteDetails: builder.query({
             query: (invite_token) => ({
                 url: `/api/auth/retrieve-valuer-invite-details?invite_token=${invite_token}`,
@@ -18,5 +29,5 @@ export const retrieveValuerInviteSliceApi = apiSlice.injectEndpoints({
 })
 
 export const {
-    useGetValuerInviteDetailsQuery
+    useGetValuerUserInviteDetailsQuery,useGetValuerInviteDetailsQuery
 } = retrieveValuerInviteSliceApi ;

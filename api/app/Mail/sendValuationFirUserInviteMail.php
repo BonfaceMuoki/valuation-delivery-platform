@@ -12,17 +12,19 @@ use Illuminate\Queue\SerializesModels;
 class sendValuationFirUserInviteMail extends Mailable
 {
     use Queueable, SerializesModels;
-    public $token,$registration_url,$login_url;
+    public $token,$registration_url,$login_url, $invited_by,$invitee_details;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($token,$registration_url,$login_url)
+    public function __construct($token,$registration_url,$login_url,$invited_by,$invitee_details)
     {
       $this->token=$token;
       $this->registration_url=$registration_url;
       $this->login_url=$login_url; 
+      $this->invited_by=$invited_by; 
+      $this->invitee_details=$invitee_details; 
         //
     }
 
@@ -34,7 +36,7 @@ class sendValuationFirUserInviteMail extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: 'Send Valuation Fir User Invite Mail',
+            subject: 'Send Valuation Firm User Invite Mail',
         );
     }
 
@@ -46,11 +48,13 @@ class sendValuationFirUserInviteMail extends Mailable
     public function content()
     {
         return new Content(
-            view: 'Email.valuationfirms.invitevaluationfirm',
+            view: 'Email.valuationfirms.invitevaluationfirmuser',
             with: [
                 'token' => $this->token,
                 'rgistrationcallbackurl' => $this->registration_url,
                 'logincallback' => $this->login_url,
+                'invitee_name' => $this->invitee_details['name'],
+                'invted_by' => $this->invited_by['full_name'],
             ],
         );
     }

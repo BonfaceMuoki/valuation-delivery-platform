@@ -19,7 +19,7 @@ class AdminController extends Controller
     public function __construct()
     {
         $this->middleware('auth:api');
-        $this->middleware("Admin");
+        $this->middleware("Admin")->except(['getAllRoles']);
 
     }
     public function deleteRole($id){
@@ -184,6 +184,13 @@ class AdminController extends Controller
             $roles=Role::with("permissions")->get();            
             return response()->json($roles, 201);
             
+        } else if($user->hasPermissionTo(Permission::where("slug", "view valuation firm roles")->first())) {
+
+            $roles=Role::with("permissions")->where('name', 'LIKE', '%uploader%')->get();       
+
+            return response()->json($roles, 201);
+
+
         } else {
 
             return response()->json(['message' => 'Permission Denied'], 401);
