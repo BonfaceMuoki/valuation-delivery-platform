@@ -51,8 +51,6 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        $image = $request->file('image');
-
 
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
@@ -61,10 +59,16 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
-        if (!$token = auth()->attempt($validator->validated())) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+        $isactive = User::where("is_active", 1)->where("email", $request->email)->first();
+        if ($isactive != null) {
+            if (!$token = auth()->attempt($validator->validated())) {
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+            return $this->createNewToken($token);
+        } else {
+             return response()->json(['message'=>'Your account is not active'],403);
         }
-        return $this->createNewToken($token);
+
     }
     /**
      * Register a User.
@@ -357,6 +361,28 @@ public function registerAccesor(Request $request){
     public function userProfile()
     {
         return response()->json(auth()->user());
+    }
+    public function userProfileDetails(Request $request)
+    {
+        $user=User::where("id",$request->user_id)->first();
+        if($user!=null){
+          
+                $role=  $user->roles()->first(["id", "name","name as role_name"]);   
+                $userid=['user_id'=>$request->user_id];  
+                return response()->json([
+                    'user' => array_merge($user->toArray(),$role->toArray(),$userid),
+                    'role' => $role,
+                    'user_id' => $user,
+                    'roles' => $user->roles()->get(["id", "name"]),
+                    'permissions' => array_merge($role->permissions()->get(['id','slug as name'])->toArray())
+                ]);
+    
+        }else{
+            return response()->json(['message'=>'user not found'],404);
+          
+        }
+
+   
     }
     /**
      * Get the token array structure.

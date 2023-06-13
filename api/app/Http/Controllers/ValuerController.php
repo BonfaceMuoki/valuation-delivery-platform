@@ -19,12 +19,17 @@ use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
 use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Writer\ValidationException;
 use App\Mail\sendValuationFirUserInviteMail;
+use App\Mail\sendReportAccessMail;
+
+use Mockery\Exception;
 
 use setasign\Fpdi\Fpdi;
 use DB;
 use Mail;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Ramsey\Uuid\Uuid;
+use App\Models\ReportUser;
 
 class ValuerController extends Controller
 {
@@ -64,32 +69,71 @@ class ValuerController extends Controller
                 if ($validator->fails()) {
                     return response()->json($validator->errors()->toJson(), 400);
                 }
-                $orgdetails = $user->UploaderOrganization()->first();
-                $datatosave=$request->except(['report_pdf','valuation_data']);
-                $file = $request->file("report_pdf");
-                $fileName = time() . rand(1, 99) . '.' . $file->extension();
-                $file->move(public_path('reports'), $fileName);
-               
-                $datatosave['report_uploading_user']=$user->id;
-                $datatosave['valuation_date']= date('Y-m-d', strtotime($request->valuation_date));
-                $datatosave['upload_link']=$fileName;
-                $datatosave['report_uploading_from']=$orgdetails->id;
-                $datatosave['approving_director']=0;
-                $datatosave['receiving_company_read_code']=9999;
-                $datatosave['unique_random_code']=999;
-                $datatosave['receiving_company_id']=$request->post('receiving_company_id');
-                $lastrow=(ValuationReport::latest()->first()) ? (ValuationReport::latest()->first()): ['id'=>1];
-                $datatosave['id']=$lastrow['id']+1;
-                $qrcode=$this->generateQRCode($orgdetails,$datatosave);
-                $datatosave['qr_code']= $qrcode;                
-                $reportd=ValuationReport::create($datatosave);
-                //append qr code
-                $filePath = public_path("reports/".$fileName);
-                $outputFilePath = public_path("reports/".$fileName."_signed.pdf");
-                $this->appendQRCODE($filePath, $outputFilePath,$qrcode);
-                //append qr code
-                //generate qr code
-                return response()->json(['reportdetails'=>$reportd]);
+                try{
+                    DB::beginTransaction();
+                    $orgdetails = $user->UploaderOrganization()->wherePivot("status",1)->first();
+                    if($orgdetails==null){
+                        return response()->json(['message'=>"Unauthorized"], 403);
+                    }
+                    $datatosave=$request->except(['report_pdf','valuation_data']);
+                    $file = $request->file("report_pdf");
+                    $fileName = time() . rand(1, 99) . '.' . $file->extension();
+                    $file->move(public_path('reports'), $fileName);
+                   
+                    $datatosave['report_uploading_user']=$user->id;
+                    $datatosave['valuation_date']= date('Y-m-d', strtotime($request->valuation_date));
+                    $datatosave['upload_link']=$fileName;
+                    $datatosave['report_uploading_from']=$orgdetails->id;
+                    $datatosave['approving_director']=0;
+                    $datatosave['receiving_company_read_code']=9999;
+                    $datatosave['unique_random_code']=999;
+                    $datatosave['receiving_company_id']=$request->post('receiving_company_id');
+                    $lastrow=(ValuationReport::latest()->first()) ? (ValuationReport::latest()->first()): ['id'=>1];
+                    $datatosave['id']=$lastrow['id']+1;
+                    $qrcode=$this->generateQRCode($orgdetails,$datatosave);
+                    $datatosave['qr_code']= $qrcode;                
+                    $reportd=ValuationReport::create($datatosave);
+                    //append qr code
+                    $filePath = public_path("reports/".$fileName);
+                    $outputFilePath = public_path("reports/".$fileName."_signed.pdf");
+                    $this->appendQRCODE($filePath, $outputFilePath,$qrcode);
+                    //append qr code
+                    //generate qr code
+                    //create users
+                    $url=url("/");
+                    $upurl=['url_path'=>$url.'/'.$outputFilePath];
+                    $index=0;
+                    $reportusersmails=$request->report_users_email;
+                    $reportusersphones=$request->report_users_phone;
+                    $reportusersnames=$request->report_users_name;
+                     foreach($reportusersmails as $reportusermail){
+                        //generate code
+                        $accessCode = Str::random(8);
+                        // while (ReportUser::where('access_code', $accessCode)->exists()) {
+                        //     $accessCode = Str::random(8);
+                        // }
+                        //generate code
+                        Mail::to($reportusermail)->send(new sendReportAccessMail($reportusersnames[$index],
+                         $reportusermail,$reportusersphones[$index],$accessCode,array_merge($reportd->toArray(),$upurl),$orgdetails));
+                         $index=$index+1;
+    
+                     }      
+    
+                    //close create users
+                    DB::commit();
+                    return response()->json([
+                        'message' => 'Report send successfully',
+                        'report_details' => $reportd,
+                    ], 201);
+
+                }catch(Exception $ex){
+                    DB::rollBack();
+                    return response()->json([
+                        'message'=>'Failed'.$ex->getMessage(),
+                        ''
+                    ], 400);
+                }
+
             } else {
                 return response()->json(['message' => 'unauthorized access'], 401);
             }
@@ -202,7 +246,7 @@ class ValuerController extends Controller
    public function  retriveValuerOrgDetails(){
     $user = auth()->user();    
     try {       
-        return response()->json($user->UploaderOrganization()->first()
+        return response()->json($user->UploaderOrganization()->wherePivot("status",1)->first()
            , 201);
      
     } catch (\Exception $exception) {
@@ -218,7 +262,7 @@ class ValuerController extends Controller
         $user = auth()->user();   
         $role=auth()->user()->roles()->first(["id", "name","name as role_name"]);
         $id=$user->id;  
-        $companyinfo=$user->  UploaderOrganization()->first();
+        $companyinfo=$user->  UploaderOrganization()->wherePivot("status",1)->first();
         $userid=['user_id'=>auth()->user()->id];
             try {
                 DB::beginTransaction();  
@@ -251,7 +295,7 @@ class ValuerController extends Controller
     public function sendUserInvite(Request $request){
         $user = auth()->user();   
         $role=auth()->user()->roles()->first(["id", "name","name as role_name"]);
-        $companyinfo=$user->  UploaderOrganization()->first();
+        $companyinfo=$user->  UploaderOrganization()->wherePivot("status",1)->first();
         $userid=['user_id'=>auth()->user()->id];
             try {
                 $validator = Validator::make($request->all(), [
@@ -270,7 +314,7 @@ class ValuerController extends Controller
                 $user = auth()->user(); 
                 DB::beginTransaction();  
                 //send mail
-                $organization=$user->UploaderOrganization()->first();
+                $organization=$user->UploaderOrganization()->wherePivot("status",1)->first();
                 $this->sendUserInviteMail($request->all(),$organization);
                 //send mail                                
                 DB::commit();
@@ -318,5 +362,37 @@ class ValuerController extends Controller
             'created_at' => Carbon::now()
         ]);
     }
- 
+ public function blockUser(Request $request){
+    $user=auth()->user();
+    if ($user->hasPermissionTo(Permission::where("slug", 'block valuer user')->first())) { 
+      
+       try{
+        DB::beginTransaction();  
+        //block user
+        $userinfo=User::where("id",$request->user)->first();
+        $org=$user->UploaderOrganization()->first();
+        User::where("id",$request->user)->update(['is_active'=>$request->status]);
+        $userinfo->UploaderOrganization()->updateExistingPivot($org->id, ['status' => $request->status]);
+        //block user                               
+        DB::commit();
+        $blocked= ($request->status) ? "Unblocked":"Blocked";           
+        return response()->json([
+            'message' => $blocked,
+            'data' => $request->all()
+        ], 201);
+     
+    } catch (\Exception $exception) {
+        DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
+        return response()->json([
+            'message' => 'Failed.'.$exception->getMessage().'.Please contact admin.',
+            'error' => $exception,
+            'payload' => $request->all()
+        ], 400);
+    
+       }
+
+    }else{
+        return response()->json(['message'=>'Forbidden access'],403);
+    }
+ }
 }

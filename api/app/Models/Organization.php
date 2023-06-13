@@ -20,6 +20,10 @@ class Organization extends Model
   ];
     public function users()
     {
-      return $this->belongsToMany(User::class, 'organization_users')->with("roles");
+      return $this->belongsToMany(User::class, 'organization_users')->with("roles")->withPivot('status');
+    }
+    public function ReportConsumerusers()
+    {
+      return $this->belongsToMany(User::class, 'report_consumer_users')->with("roles")->withPivot('status');
     }
 }

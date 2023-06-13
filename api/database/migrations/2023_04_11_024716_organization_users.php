@@ -18,6 +18,7 @@ return new class extends Migration
         //
         $table->unsignedBigInteger('user_id');
         $table->unsignedBigInteger('organization_id');
+        $table->enum('status', ['1', '0'])->default('1');
         //FOREIGN KEY
         $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('cascade');

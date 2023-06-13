@@ -34,11 +34,10 @@ Route::group([
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/refresh', [AuthController::class, 'refresh']);
     Route::get('/user-profile', [AuthController::class, 'userProfile']);
-    Route::get('/owner-details', [AuthController::class, 'userDetails']);
+    Route::get('/user-information', [AuthController::class, 'userProfileDetails']);
 
     Route::get('/retrieve-valuer-invite-details', [AuthController::class, 'retrieveValuerInviteDetails']);
-    Route::get('/retrieve-valuer-user-invite-details', [AuthController::class, 'retrieveValuerUserInviteDetails']);
-   
+    Route::get('/retrieve-valuer-user-invite-details', [AuthController::class, 'retrieveValuerUserInviteDetails']);   
     Route::get('/retrieve-accessor-invite-details', [AuthController::class, 'retrieveAccesorInviteDetails']);
     
 
@@ -87,6 +86,9 @@ Route::group([
     Route::post('/update-personal-information', [ValuerController::class, 'updatePersonalInfromation']);
     Route::post('/update-company-information', [ValuerController::class, 'updateCompanyInfromation']);
     Route::post('/send-user-invite', [ValuerController::class, 'sendUserInvite']);
+
+    Route::post('/block-user', [ValuerController::class, 'blockUser']);
+    
 
     
 });

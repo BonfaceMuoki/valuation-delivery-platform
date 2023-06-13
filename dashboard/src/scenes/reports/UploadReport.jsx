@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Autocomplete, MenuItem } from '@mui/material';
 
-import { Button as BTNMUI, Box, useTheme, useMediaQuery, TextField, Typography, TextareaAutosize, Input, Modal } from '@mui/material';
+import { Button as BTNMUI, Box, useTheme, useMediaQuery, TextField, Typography, TextareaAutosize, Input, Modal, Grid } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { UploadOutlined, InboxOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
@@ -35,13 +35,29 @@ const style = {
     zIndex: 10,
     position: "absolute"
 };
+const stylemobile = {
+    position: 'absolute',
+    top: '5%',
+    left: '0.5%',
+    right: '0.5%',
+    transform: 'translate(-25%, -25%,-25%)',
+    width: "99%",
+    bgcolor: 'background.paper',
+    border: '2px solid #000',
+    boxShadow: 24,
+    p: 4,
+    zIndex: 10,
+    position: "absolute"
+};
 
 function UploadReport() {
-    const permissions = useSelector(selectCurrentPermissions); 
-    const {refetch} =  useGetValuationReportsQuery();
+    const theme = useTheme();
+  const isNonMobile = useMediaQuery("(min-width: 1200px)");
+    const permissions = useSelector(selectCurrentPermissions);
+    const { refetch } = useGetValuationReportsQuery();
     const [uploadReport, { isLoading: isUploading }] = useUploadValuationReportMutation();
     const dispatch = useDispatch();
-    const [existingAccessors,setExistingAccessors] = useState();
+    const [existingAccessors, setExistingAccessors] = useState();
     const {
         data: accesorslist,
         isLoading,
@@ -49,10 +65,10 @@ function UploadReport() {
         isError,
         error
     } = useGetAccesorsListQuery();
-    
-  useEffect(()=>{
-setExistingAccessors(accesorslist);
-  },[accesorslist]);
+
+    useEffect(() => {
+        setExistingAccessors(accesorslist);
+    }, [accesorslist]);
 
     const schema = yup.object().shape({
         market_value: yup
@@ -91,6 +107,7 @@ setExistingAccessors(accesorslist);
 
             })
 
+
     });
 
     const { register, handleSubmit, formState: { errors }, control } = useForm({
@@ -118,33 +135,48 @@ setExistingAccessors(accesorslist);
     //     setOptions(accesorslist?.accesors);
     // }, []);
     const onSubmit = (data) => {
-    console.log(data);
-    const formData= new FormData();
-    formData.append("report_description",data.report_description);
-    formData.append("market_value",data.market_value);
-    formData.append("forced_market_value",data.forced_market_value);
-    formData.append("property_lr",data.property_lr);
-    formData.append("valuation_date",data.valuation_date);
-    formData.append("encumberrence_details",data.encuberence_details);
-    formData.append("receiving_company_id",data.recipient[0].id);
-    formData.append("report_pdf",data.file[0]);
-    const response=uploadReport(formData);
-    console.log(response);
-    if(response.data.originalStatus==200){
-        setTimeout(()=>{
-            window.location.reload(false);
-        }, 500);
-    }
-
- };
-
-    return (
+        console.log(data);
+        const formData = new FormData();
+        formData.append("report_description", data.report_description);
+        formData.append("market_value", data.market_value);
+        formData.append("forced_market_value", data.forced_market_value);
+        formData.append("property_lr", data.property_lr);
+        formData.append("valuation_date", data.valuation_date);
+        formData.append("encumberrence_details", data.encuberence_details);
+        formData.append("receiving_company_id", data.recipient[0].id);
+        formData.append("report_pdf", data.file[0]);
         
+        reportUsersFields.map((field,key)=>{
+            formData.append("report_users_name[]", data.report_user_name[key]);
+            formData.append("report_users_phone[]", data.report_user_phone[key]);
+            formData.append("report_users_email[]", data.report_user_email[key]);
+        })
+        const response=uploadReport(formData);
+        console.log(response);
+        if(response.data.originalStatus==200){
+            setTimeout(()=>{
+                window.location.reload(false);
+            }, 500);
+        }
+
+    };
+
+    const [reportUsersFields, setReportUsersFields] = useState([{ formFildName: "name" }]);
+    const addReportUser = () => {
+        setReportUsersFields([...reportUsersFields, { formFildName: "name" }]);
+    }
+    const handleRemoveReprtUser = (index) => {
+        const values = [...reportUsersFields];
+        values.splice(index, 1);
+        setReportUsersFields(values);
+    };
+    return (
+
         <Box>
-     {
-        (permissions.find(p => p.name ==="upload report"))?  <Button icon={<UploadOutlined />} onClick={handleOpen}>Upload New Report</Button> : ""
-     }
-           {/* <Button icon={<UploadOutlined />} onClick={handleOpen}>Upload New Report</Button> */}
+            {
+                (permissions.find(p => p.name === "upload report")) ? <Button icon={<UploadOutlined />} onClick={handleOpen}>Upload New Report</Button> : ""
+            }
+            {/* <Button icon={<UploadOutlined />} onClick={handleOpen}>Upload New Report</Button> */}
             <Modal
                 open={open}
                 onClose={handleClose}
@@ -152,10 +184,10 @@ setExistingAccessors(accesorslist);
                 aria-describedby="modal-modal-description"
                 style={{ overflow: 'scroll' }}
             >
-                <Box sx={style}>
+                <Box sx={isNonMobile ? style : stylemobile}>
                     <form className="form" onSubmit={handleSubmit(onSubmit)}>
-                        <Row gutter={16}>
-                            <Col span={isNonMediumScreens ? 12 : 24} justify="center">
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} sm={6} md={6} >
                                 <Typography sx={{ ml: 1, mt: 3 }}>Recipient</Typography>
                                 <Controller
                                     name="recipient"
@@ -174,7 +206,7 @@ setExistingAccessors(accesorslist);
                                             isOptionEqualToValue={(option, value) => option.id === value.id}
                                             id="days-autocomplete"
                                             onChange={(event, value) => field.onChange(value)}
-                                            
+
                                             renderInput={(params) => (
                                                 <TextField
                                                     id="receipient"
@@ -191,8 +223,8 @@ setExistingAccessors(accesorslist);
 
                                 />
                                 <span className='errorSpan' >{errors.recipient?.message}</span>
-                            </Col>
-                            <Col className="gutter-row" span={isNonMediumScreens ? 12 : 24} justify="center">
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={6} >
                                 <Typography sx={{ ml: 1, mt: 3 }}>Property LR</Typography>
                                 <Controller
                                     control={control}
@@ -206,10 +238,76 @@ setExistingAccessors(accesorslist);
                                     )}
                                 />
 
-                            </Col>
-                        </Row>
-                        <Row gutter={16} >
-                            <Col className="gutter-row" span={isNonMediumScreens ? 12 : 24} justify="center">
+                            </Grid>
+                        </Grid>
+                        {/* users to consume */}
+                        <Box style={{
+                            border: '1px solid lightgrey',
+                            padding: '20px',
+                            marginTop: '15px'
+                        }}>
+                            <Grid container spacing={2}>
+                                <Grid item xs={12} sm={6} md={6} >
+                                    <Typography sx={{ ml: 1, mt: 3 }}>Add Users within the organization to access the report</Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6} md={6} justifyContent="right" display="flex" alignItems="right" >
+                                    <BTNMUI onClick={() => addReportUser()} variant='contained' sx={{ ml: 1, mt: 3, width: "60px", height: "60px", borderRadius: '100%', backgroundColor: "blue", color: "white" }} >+</BTNMUI>
+
+                                </Grid>
+                            </Grid>
+                            {
+                                reportUsersFields &&
+                                reportUsersFields.map((field, index) => {
+                                    return (
+                                        <Box>
+                                            <Grid container spacing={2}>
+
+                                                <Grid item xs={12} sm={4} md={4} >
+
+                                                    <Typography sx={{ ml: 1, mt: 3 }}>Name</Typography>
+
+                                                    <div>
+                                                        <TextField  
+                                                        {...register(`report_user_name[${index}]`)} 
+                                                        autoComplete="off" fullWidth  required
+                                                        />
+                                                        <span className='errorSpan' >{errors.market_value?.message}</span>
+                                                    </div>
+
+                                                </Grid>
+                                                <Grid item xs={12} sm={4} md={4} >
+                                                    <Typography sx={{ ml: 1, mt: 3 }}>Email</Typography>
+
+                                                    <div>
+                                                        <TextField type='email' {...register(`report_user_email[${index}]`)} autoComplete="off"  required fullWidth />
+                                                        <span className='errorSpan' >{errors.market_value?.message}</span>
+                                                    </div>
+
+                                                </Grid>
+                                                <Grid item xs={12} sm={3} md={3} >
+                                                    <Typography sx={{ ml: 1, mt: 3 }}>Phone</Typography>
+
+                                                    <div>
+                                                        <TextField   {...register(`report_user_phone[${index}]`)} autoComplete="off" required fullWidth />
+                                                        <span className='errorSpan' >{errors.market_value?.message}</span>
+                                                    </div>
+
+                                                </Grid>
+                                                <Grid item xs={12} sm={1} md={1} display="flex" justifyContent="center" alignItems="center">
+
+                                                    <BTNMUI onClick={() => handleRemoveReprtUser(index)} variant='contained' sx={{ ml: 1, mt: 5, width: "60px", height: "60px", borderRadius: '100%', backgroundColor: "red", color: "white" }} >X</BTNMUI>
+                                                </Grid>
+                                            </Grid>
+                                        </Box>
+                                    );
+                                })
+                            }
+
+
+                        </Box>
+                        {/* close users to consume */}
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} sm={6} md={6} >
                                 <Typography sx={{ ml: 1, mt: 3 }}>Market Value</Typography>
                                 <Controller
                                     control={control}
@@ -217,13 +315,13 @@ setExistingAccessors(accesorslist);
                                     defaultValue=""
                                     render={({ field }) => (
                                         <div>
-                                            <TextField  {...field} autoComplete="off"  fullWidth />
+                                            <TextField  {...field} autoComplete="off" fullWidth />
                                             <span className='errorSpan' >{errors.market_value?.message}</span>
                                         </div>
                                     )}
                                 />
-                            </Col>
-                            <Col className="gutter-row" span={isNonMediumScreens ? 12 : 24} justify="center">
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={6} >
                                 <Typography sx={{ ml: 1, mt: 3 }}>Forced Market Value</Typography>
                                 <Controller
                                     control={control}
@@ -231,15 +329,15 @@ setExistingAccessors(accesorslist);
                                     defaultValue=""
                                     render={({ field }) => (
                                         <div>
-                                            <TextField  {...field} autoComplete="off"  fullWidth />
+                                            <TextField  {...field} autoComplete="off" fullWidth />
                                             <span className='errorSpan' >{errors.forced_market_value?.message}</span>
                                         </div>
                                     )}
                                 />
-                            </Col>
-                        </Row>
-                        <Row gutter={16}>
-                            <Col span={isNonMediumScreens ? 24 : 24} justify="center">
+                            </Grid>
+                        </Grid>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} sm={12} md={12} >
                                 <Typography sx={{ ml: 1, mt: 3 }}>Encuberence Details</Typography>
                                 <Controller
                                     control={control}
@@ -256,11 +354,11 @@ setExistingAccessors(accesorslist);
                                     )}
                                 />
 
-                            </Col>
-                        </Row>
-                        <Row gutter={16}>
-                            <Col span={isNonMediumScreens ? 24 : 24} justify="center">
-                                <Typography sx={{ ml: 1, mt: 3 }}>Report Description</Typography>
+                            </Grid>
+                        </Grid>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} sm={12} md={12} >
+                                <Typography sx={{ ml: 1, mt: 3 }}>Property Description</Typography>
                                 <Controller
                                     control={control}
                                     name="report_description"
@@ -276,10 +374,10 @@ setExistingAccessors(accesorslist);
                                     )}
                                 />
 
-                            </Col>
-                        </Row>
-                        <Row gutter={16}>
-                            <Col span={isNonMediumScreens ? 12 : 24} >
+                            </Grid>
+                        </Grid>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} sm={6} md={6} >
                                 <Typography sx={{ ml: 1, mt: 3 }}>Valuation Date</Typography>
 
                                 <LocalizationProvider dateAdapter={AdapterDayjs} fullWidth>
@@ -300,8 +398,8 @@ setExistingAccessors(accesorslist);
 
 
                                 <span className='errorSpan' ><br></br>{errors.valuation_date?.message}</span>
-                            </Col>
-                            <Col span={isNonMediumScreens ? 12 : 24} justify="center">
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={6} >
                                 <label htmlFor="upload-photo">
                                     <input
                                         style={{ display: 'none' }}
@@ -314,27 +412,27 @@ setExistingAccessors(accesorslist);
                                     />
                                     <Typography sx={{ ml: 1, mt: 3 }}>Report Document(Only PDF)</Typography>
 
-                                    <BTNMUI variant="outlined" sx={{ mt: 0, textAlign: "left", height: 70, width: 200 }} color="secondary" component="span" >
+                                    <BTNMUI variant="outlined" sx={{ mt: 0, textAlign: "left", height: 70, width: "100%" }} color="secondary" component="span" >
                                         <UploadOutlined sx={{ fontSize: "55px" }} />
                                     </BTNMUI><br />
                                     {(uploadedFile != "") ? <span sx={{ mt: 3, fontSize: "25px" }} className='successSpan'>{uploadedFile}</span> : ""}
                                 </label>
                                 <span className='errorSpan' ><br></br>{errors.file?.message}</span>
-                            </Col>
-                        </Row>
-                        <Row gutter={16} >
-                            <Col className="gutter-row" span={isNonMediumScreens ? 12 : 12} justify="center">
+                            </Grid>
+                        </Grid>
+                        <Grid container spacing={2}>
+                            <Grid item xs={12} sm={6} md={6} >
 
-                            </Col>
-                            <Col className="gutter-row" span={isNonMediumScreens ? 24 : 24} justify="center">
+                            </Grid>
+                            <Grid item xs={12} sm={6} md={6} >
                                 <BTNMUI type="submit" variant="contained" sx={{ mt: 3, height: 50, backgroundColor: "blue", color: "white" }} fullWidth>Send</BTNMUI>
 
-                            </Col>
-                        </Row>
+                            </Grid>
+                        </Grid>
                     </form>
                 </Box>
             </Modal>
-            
+
         </Box>
 
     )

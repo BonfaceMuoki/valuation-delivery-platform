@@ -25,6 +25,7 @@ class User extends Authenticatable implements JWTSubject
         'vrb_number',
         'email',
         'password',
+        'is_active'
     ];
 
     /**
@@ -61,10 +62,10 @@ class User extends Authenticatable implements JWTSubject
 
  
     public function UploaderOrganization(){
-      return $this->belongsToMany(Organization::class,"organization_users","user_id","organization_id");
+      return $this->belongsToMany(Organization::class,"organization_users","user_id","organization_id")->withPivot("status");
     }
     public function AccessorOrganization(){
-        return $this->belongsToMany(ReportConsumer::class,"report_consumer_users","user_id","report_consumer_id");
+        return $this->belongsToMany(ReportConsumer::class,"report_consumer_users","user_id","report_consumer_id")->withPivot("status");
     }
 
     }

@@ -49,21 +49,16 @@
                                     <td style="padding:0 35px;">
                                         <p
                                             style="color:#1e1e2d; font-weight:500; margin:0;font-size:32px;font-family:'Rubik',sans-serif;text-align:left;">
-                                            Hello {{$invitee_name}}, </p>
+                                            Hello {{$recipientname}}, </p>
 
                                         <p style="color:#455056; font-size:15px;line-height:24px; margin:0; text-align:left">
-                                            You have been invited by your colleaque {{$invted_by}} to set up an account on valdel.</p>
+                                           A new valuation report has been uploaded by {{$valuerdetails->organization_name}}.</p>
 
-                                        <p style="text-align:left;">To join your community simply click the button below. For assistance kindly
-                                            contact your management. If you have an account just click the other link to
-                                            login. Thank you.
-                                        </p>
-                                        <a href="{{$rgistrationcallbackurl}}?token={{$token}}"
+                                        <p style="text-align:left;">Your access code is:- <b>{{$accessCode}}</b>.</p>
+                                        <p style="text-align:left;">Kindly use the link below to access the report.</p>
+                                        <a href="{{$reportdetails['url_path']}}"
                                             style="background:#986B37;text-decoration:none !important; font-weight:500; margin-top:35px; color:#fff;text-transform:uppercase; font-size:14px;padding:10px 24px;display:inline-block;border-radius:50px;">
-                                            proceed to create an account</a>
-                                        <a href="{{$logincallback}}?token={{$token}}"
-                                            style="background:#986B37;text-decoration:none !important; font-weight:500; margin-top:35px; color:#fff;text-transform:uppercase; font-size:14px;padding:10px 24px;display:inline-block;border-radius:50px;">
-                                            proceed to Login</a>
+                                            Access Report</a>
                                     </td>
                                 </tr>
                                 <tr>

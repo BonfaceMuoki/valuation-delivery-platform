@@ -49,11 +49,11 @@ function Valuationreportactions({ params }) {
 
     return (
         <div>
-            <a href="#" >
+            {/* <a href="#" >
                 <Button variant='contained' onClick={() => handledownload(params.id, 0)}>Unsigned</Button>
-            </a> &nbsp;&nbsp;&nbsp;
+            </a> &nbsp;&nbsp;&nbsp; */}
             <a href="#">
-                <Button variant='contained' onClick={() => handledownload(params.id, 1)}>Signed</Button>
+                <Button variant='contained' sx={{backgroundColor:theme.palette.background.alt}} onClick={() => handledownload(params.id, 1)}>Download Signed Report</Button>
             </a>
         </div>
     )
