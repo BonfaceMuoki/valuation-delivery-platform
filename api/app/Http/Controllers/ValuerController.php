@@ -99,6 +99,7 @@ class ValuerController extends Controller
                     $this->appendQRCODE($filePath, $outputFilePath,$qrcode);
                     //append qr code
                     //generate qr code
+                    
                     //create users
                     $url=url("/");
                     $upurl=['url_path'=>$url.'/'.$outputFilePath];
@@ -109,10 +110,13 @@ class ValuerController extends Controller
                      foreach($reportusersmails as $reportusermail){
                         //generate code
                         $accessCode = Str::random(8);
-                        // while (ReportUser::where('access_code', $accessCode)->exists()) {
-                        //     $accessCode = Str::random(8);
-                        // }
-                        //generate code
+                      
+                        $reportuser['name']=$reportusersnames[$index];
+                        $reportuser['phone']=$reportusersphones[$index];
+                        $reportuser['email']=$reportusermail;
+                        $reportuser['access_code']=$accessCode;
+                        $reportuser['valuation_report_id']=$reportd->id;
+                        ReportUser::create($reportuser);
                         Mail::to($reportusermail)->send(new sendReportAccessMail($reportusersnames[$index],
                          $reportusermail,$reportusersphones[$index],$accessCode,array_merge($reportd->toArray(),$upurl),$orgdetails));
                          $index=$index+1;

@@ -21,6 +21,12 @@ import { setfetchvaluationreports } from 'scenes/auth/authSlice';
 import { useGetValuationReportsQuery } from 'features/ValuationReportsSlice';
 import { useSelector } from "react-redux"
 import { selectCurrentPermissions } from 'scenes/auth/authSlice';
+
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import "primereact/resources/themes/bootstrap4-dark-blue/theme.css";
+import "primereact/resources/primereact.min.css";
+
 const style = {
     position: 'absolute',
     top: '5%',
@@ -51,6 +57,22 @@ const stylemobile = {
 };
 
 function UploadReport() {
+
+    const toastMessage = (message, type) => {
+        if (type == "success") {
+          toast.success(message, {
+            position: toast.POSITION.TOP_RIGHT
+          });
+        } else if (type == "error") {
+          toast.error(message, {
+            position: toast.POSITION.TOP_RIGHT
+          });
+        } else if (type == "warning") {
+          toast.warning(message, {
+            position: toast.POSITION.TOP_RIGHT
+          });
+        }
+      }
     const theme = useTheme();
   const isNonMobile = useMediaQuery("(min-width: 1200px)");
     const permissions = useSelector(selectCurrentPermissions);
@@ -134,7 +156,7 @@ function UploadReport() {
     //     // make API call or update state to fetch options with IDs
     //     setOptions(accesorslist?.accesors);
     // }, []);
-    const onSubmit = (data) => {
+    const onSubmit = async (data) => {
         console.log(data);
         const formData = new FormData();
         formData.append("report_description", data.report_description);
@@ -151,14 +173,20 @@ function UploadReport() {
             formData.append("report_users_phone[]", data.report_user_phone[key]);
             formData.append("report_users_email[]", data.report_user_email[key]);
         })
-        const response=uploadReport(formData);
-        console.log(response);
-        if(response.data.originalStatus==200){
+        const result=await uploadReport(formData);
+        console.log(result);
+        if ('error' in result) {
+            toastMessage(result.error.data.message, "error");
+            if ('backendvalerrors' in result.error.data) {
+              // setBackendValErrors(result.error.data.backendvalerrors);
+            }
+          } else {
+            toastMessage(result.data.message, "success");
             setTimeout(()=>{
                 window.location.reload(false);
             }, 500);
-        }
-
+          }
+     
     };
 
     const [reportUsersFields, setReportUsersFields] = useState([{ formFildName: "name" }]);

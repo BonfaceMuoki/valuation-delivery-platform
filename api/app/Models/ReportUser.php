@@ -10,7 +10,7 @@ class ReportUser extends Model
     use HasFactory;
     protected $fillable=[
         'name',
-        'phone',,
+        'phone',
         'email',
         'access_code',
         'valuation_report_id',
