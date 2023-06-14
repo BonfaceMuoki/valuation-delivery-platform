@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PasswordResetRequestController;
 use App\Http\Controllers\HomeController;
-
+use App\Http\Controllers\PaymentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,3 +19,9 @@ Route::get('/', [HomeController::class, 'home']);
 
 
 Route::get('/reset-password', [PasswordResetRequestController::class, 'resetPasswordForm']);
+Route::group([
+    'prefix' => 'mpesa-payments'
+], function ($router) {
+    Route::get('/generate-token', [PaymentController::class, 'generateToken']);
+    Route::get('/initiate-stk-push', [PaymentController::class, 'intiateSTKpush']);
+});

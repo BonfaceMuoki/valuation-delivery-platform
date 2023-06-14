@@ -47,6 +47,7 @@ function App() {
             <Route element={<AuthLayout />}>
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/payments" element={<Signup />} />
               <Route
                 path="/complete-invite-by-registering"
                 element={<AcceptInviteSignup />}
