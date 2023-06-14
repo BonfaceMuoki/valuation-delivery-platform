@@ -21,12 +21,7 @@ use App\Http\Controllers\ValuerController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::group([
-    'middleware' => 'api',
-    'prefix' => 'mpesa-payments'
-], function ($router) {
-    Route::get('/generate-token', [PaymentController::class, 'generateToken']);
-});
+
 Route::group([
     'middleware' => 'api',
     'prefix' => 'auth'
