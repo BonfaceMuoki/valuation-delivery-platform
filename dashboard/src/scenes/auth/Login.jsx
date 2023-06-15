@@ -113,14 +113,23 @@ function Login() {
           variant='contained'
           sx={{ m: 2, backgroundColor: theme.palette.primary[700], width: '100%' }}
           size='large' >Login</Button>
-        <Grid container direction={isNonMobile ? 'row' : 'column'} sx={{ m: 2 }} >
-          <Grid item md={6} >
-            <Link to={'/signup'} >Create Account</Link>
-          </Grid>
-          <Grid item md={6}>
-            <Link to={'/forgot-password'}>Forgot password</Link>
+                  <Grid container direction={isNonMobile ? 'row' : 'column'} sx={{ m: 2 }} >
+        <Grid item md={12} display="flex" justifyContent="center" alignItems="center">
+            <Link to={'/forgot-password'}>Forgot your password ?</Link>
           </Grid>
         </Grid>
+        <Grid container direction={isNonMobile ? 'row' : 'column'} sx={{ m: 2 }} >
+          <Grid item md={6} >
+            <Link to={'/request-valuer-access'} >Request Valuer access </Link>
+          </Grid>
+          <Grid item md={6} >
+            <Link to={'/request-accesor-access'} >Request Lender or Court Access</Link>
+          </Grid>
+
+        </Grid>
+
+
+          
       </form>
     </Box>
 

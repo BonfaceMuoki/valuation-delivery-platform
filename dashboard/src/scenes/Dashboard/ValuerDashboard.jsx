@@ -4,21 +4,19 @@ import FlexBetween from 'components/FlexBetween';
 import { Button as BTNMUI, Box, useTheme, useMediaQuery, TextField, Typography, TextareaAutosize,Input,Modal } from '@mui/material';
 import Header from 'components/Header';
 import StatBox from 'components/StatBox';
-import { Email } from '@mui/icons-material';
+import { Email, CalendarMonthOutlined, CorporateFareOutlined, DocumentScannerOutlined } from '@mui/icons-material';
 import ReportsTable from '../reports/ReportsTable';
 import UploadReport from 'scenes/reports/UploadReport';
+import { useGetValuerDashboardDetailsQuery } from 'features/retrieveValuerDashboardSlice';
 
 
 
 
-function ValuerDashboard() {
-  
+function ValuerDashboard() {  
   const theme = useTheme();
-
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
-
-
-
+  const {data:valuerdashboard,isLoading:loadingdashboard}=useGetValuerDashboardDetailsQuery();
+  console.log(valuerdashboard);
   return (
     <Box m={isNonMediumScreens ? "1.5rem 1.5rem 0rem" : "1.5rem 1.5rem 0rem"}
 
@@ -41,33 +39,33 @@ function ValuerDashboard() {
         {/* row 1 */}
         <StatBox
           title="Total Reports"
-          value="10"
-          increase="+14%"
+          value={valuerdashboard?.allreports}
+          increase=""
           description="Since First Day"
           icon={
-            <Email
+            <DocumentScannerOutlined
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }
         />
         <StatBox
           title="Total Reports"
-          value="10"
-          increase="+14%"
+          value={valuerdashboard?.thismonthreports}
+          increase=""
           description="This Month"
           icon={
-            <Email
+            <CalendarMonthOutlined
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }
         />
         <StatBox
-          title="Accesors served"
-          value="10"
-          increase="+14%"
-          description="Since last month"
+          title="Clients served"
+          value={valuerdashboard?.servedaccesors}
+          increase=""
+          description="Since First Day"
           icon={
-            <Email
+            <CorporateFareOutlined
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }

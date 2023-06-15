@@ -284,6 +284,7 @@ function UploaderUsersList() {
 
           <Box
             sx={{
+              ml:10,
               width: "95%",
               height: "100px",
               padding: "3px",
@@ -537,7 +538,17 @@ function UploaderUsersList() {
           </form>
         </Box>
       </Modal>
-      <Box sx={{ mt: 10, ml: 10, mr: 10, height: "650px;" }} >
+      
+      <Box
+        gridColumn="span 12"
+        gridRow="span 5"
+        backgroundColor={theme.palette.background.alt}
+        p="5rem"
+        borderRadius="0.55rem"
+        width="95%"
+        height="650px"
+        sx={{ml:2.5,mr:2.5,mt:5}}
+      >
 
         <DataGrid
           loading={isLoading || !users}

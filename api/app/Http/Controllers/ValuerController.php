@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Organization;
 use App\Models\ValuationReport;
+use Cron\MonthField;
 use Illuminate\Http\Request;
 use App\Models\Permission;
 use App\Models\User;
@@ -20,6 +21,7 @@ use Endroid\QrCode\Writer\PngWriter;
 use Endroid\QrCode\Writer\ValidationException;
 use App\Mail\sendValuationFirUserInviteMail;
 use App\Mail\sendReportAccessMail;
+use Carbon\Carbon;
 
 use Mockery\Exception;
 
@@ -27,7 +29,6 @@ use setasign\Fpdi\Fpdi;
 use DB;
 use Mail;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
 use Ramsey\Uuid\Uuid;
 use App\Models\ReportUser;
 
@@ -40,6 +41,25 @@ class ValuerController extends Controller
         $this->middleware('auth:api', ['except' => ['generateQRCode']]);
 
 
+    }
+    public function ValuerDashboardSummary(Request $request){
+
+        $user=auth()->user();
+        $currentMonth = Carbon::now()->month;
+        $currentYear = Carbon::now()->year;
+        $organization = $user->UploaderOrganization()->first();
+        //total reports
+        $allreports=ValuationReport::where("report_uploading_from",$organization->id)->count();
+        //close total reports
+        // total report this Month reports
+        $thismonthsreports=ValuationReport::where("report_uploading_from",$organization->id)->whereMonth('created_at', $currentMonth)
+        ->whereYear('created_at', $currentYear)->count();
+        // close report this months reports
+        // $accesors open served
+        $servedaccesors=ValuationReport::where("report_uploading_from",$organization->id)->distinct("receiving_company_id")->count();
+        // $accesors close served
+        return response()->json(['allreports' => $allreports,'thismonthreports'=>$thismonthsreports,"servedaccesors"=>$servedaccesors], 200);
+        
     }
     public function uploadValuationReport(Request $request){
         

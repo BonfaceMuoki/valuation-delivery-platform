@@ -191,6 +191,12 @@ class AdminController extends Controller
             return response()->json($roles, 201);
 
 
+        }else if($user->hasPermissionTo(Permission::where("slug", "view accesor firm roles")->first())) {
+
+            $roles=Role::with("permissions")->where('name', 'LIKE', '%accessor%')->get();       
+            return response()->json($roles, 201);
+
+
         } else {
 
             return response()->json(['message' => 'Permission Denied'], 401);

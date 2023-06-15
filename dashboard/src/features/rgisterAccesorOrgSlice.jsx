@@ -11,9 +11,19 @@ export const registerAccesorOrgSlice = apiSlice.injectEndpoints({
                     'Accept': 'Application/json'
                 }
             }),
+        }),
+        registerAccesorUser: bulder.mutation({
+            query: (formData) => ({
+                url: `/api/auth/register-accesor-user`,
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'Application/json'
+                }
+            }),
         })
     })
 })
 
-export const { useRegisterAccesorMutation} = registerAccesorOrgSlice;
+export const { useRegisterAccesorMutation,useRegisterAccesorUserMutation} = registerAccesorOrgSlice;
 

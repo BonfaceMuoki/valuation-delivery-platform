@@ -20,6 +20,7 @@ use Illuminate\Http\Response;
 use App\Models\ValuationFirmInvite;
 use App\Models\ValuerfirmUserInvite;
 use App\Models\AccesorInvite;
+use App\Models\AccesorUserInvite;
 class AuthController extends Controller
 {
 
@@ -40,7 +41,9 @@ class AuthController extends Controller
                 'registerAccesor',
                 'retrieveValuerInviteDetails',
                 'retrieveAccesorInviteDetails',
-                'retrieveValuerUserInviteDetails'
+                'retrieveValuerUserInviteDetails',
+                'retrieveAccesorUserInviteDetails',
+                'registerAccesorUser'
             ]
         ]);
     }
@@ -174,6 +177,48 @@ class AuthController extends Controller
                 'message' => 'Account has been created successfully',
                 'user' => $user,
                 'roles' => $user->roles()->get()
+            ], 201);
+
+
+        } catch (\Exception $exp) {
+            DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
+            return response()->json([
+                'message' => 'Account has not been created successfully '.$exp->getMessage(),
+                
+            ], 400);
+
+        }
+
+    }
+    public function registerAccesorUser(Request $request){
+        $validator = Validator::make($request->all(), [
+            'full_name' => 'required|string|between:2,100',
+            'email' => 'required|string|between:2,100|unique:users',
+            'password' => ['required', Password::min(6)->letters()->mixedCase()->numbers()->symbols()->uncompromised()],
+            'password_confirmation' => 'required|same:password'
+        ]);
+        if ($validator->fails()) {
+            return response()->json(["message"=>"Unprocessable data","backendvalerrors"=>$validator->errors()], 400);
+        }
+        $user = [];
+        try {
+            DB::beginTransaction();
+
+            $user = User::create(
+                [
+                    'full_name' => $request->full_name,
+                    'email' => $request->email,
+                    'password' => bcrypt($request->password)
+                ]
+            );
+            $accesor_role = Role::where('id', $request->register_as)->first();
+            $user->roles()->attach($accesor_role);
+            $organization=ReportConsumer::where("id",$request->organization)->first();
+            $organization->users()->attach($user);
+            AccesorUserInvite::where("invite_token",$request->invite_token)->update(['status'=>1]);
+            DB::commit();
+            return response()->json([
+                'message' => 'Account has been created successfully',
             ], 201);
 
 
@@ -501,7 +546,9 @@ public function registerAccesor(Request $request){
 
     }
     public function retrieveValuerUserInviteDetails(Request $request){
-     $details=ValuerfirmUserInvite::where("invite_token",$request->invite_token)->join("organizations","organizations.id","=","valuerfirm_user_invites.organization_id")->where("valuerfirm_user_invites.status",0)->first();
+     $details=ValuerfirmUserInvite::where("invite_token",$request->invite_token)
+     ->join("organizations","organizations.id","=","valuerfirm_user_invites.organization_id")
+     ->where("valuerfirm_user_invites.status",0)->first();
      return response()->json($details,200);
     }
     public function retrieveAccesorInviteDetails(Request $request){
@@ -509,5 +556,11 @@ public function registerAccesor(Request $request){
         $detailss= AccesorInvite::where("invite_token",$request->invite_token)->first();
         return response()->json($detailss,200); 
         
+    }
+    public function retrieveAccesorUserInviteDetails(Request $request){
+        $details=AccesorUserInvite::where("invite_token",$request->invite_token)
+        ->join("report_consumers","report_consumers.id","=","accesor_user_invites.report_consumer_id")
+        ->where("accesor_user_invites.status",0)->first();
+        return response()->json($details,200);
     }
 }

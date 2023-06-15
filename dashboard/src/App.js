@@ -34,6 +34,7 @@ import UploaderUsersList from "scenes/users/UploaderUserList";
 import ProfilePage from "scenes/users/ProfilePage";
 import AccesorProfilePage from "scenes/users/AccesorProfilePage";
 import AcceptValuationUserInviteSignup from "scenes/auth/AcceptValuationUserInviteBySignup";
+import AcceptAccesorUserInviteSignup from "scenes/auth/AcceptAccesorUserInviteSignup";
 
 function App() {
   const mode = useSelector((state) => state.auth.mode);
@@ -69,7 +70,14 @@ function App() {
                 path="/complete-valuer-user-registration-login"
                 element={<AcceptInviteByLogin />}
               />
-              {/* close register valauation firm user */}
+              {/* close register accesor firm user */}
+                           {/* register valuation firm user */}
+                           <Route
+                path="/complete-accesor-user-registration-register"
+                element={<AcceptAccesorUserInviteSignup />}
+              />
+       
+              {/* close register accesor firm user */}
             </Route>
             <Route element={<ProtectedRoutes />}>
               <Route element={<Layout />}>

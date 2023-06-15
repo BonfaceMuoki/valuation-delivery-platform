@@ -1,6 +1,6 @@
 import React,{useState} from 'react'
 import { DataGrid } from '@mui/x-data-grid'
-import { Box, Button } from '@mui/material';
+import { Box, Button,useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import FlexBetween from 'components/FlexBetween';
@@ -36,6 +36,7 @@ const style = {
 };
 
 function UsersList() {
+  const theme = useTheme();
 
 const viewUserDEtails = (row) =>{
 
@@ -108,7 +109,15 @@ const blockUser = (row)=>{
   return (
     
     <BlockUI blocked={blocked}>
-       <Box sx={{ mt: 10, ml: 10, mr: 10, height: "650px;" }} >
+       <Box
+        gridColumn="span 12"
+        gridRow="span 5"
+        backgroundColor={theme.palette.background.alt}
+        p="1rem"
+        borderRadius="0.55rem"
+        width="100%"
+        height="650px"
+      >
            
             <DataGrid
                 loading={isLoading || !users}

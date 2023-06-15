@@ -16,7 +16,7 @@ import "primereact/resources/primereact.min.css";
 import { BlockUI } from 'primereact/blockui';
 
 import ValuationFirmActions from './ValuationFirmActions';
-import { useMediaQuery } from '@mui/material';
+import { useMediaQuery,useTheme } from '@mui/material';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
@@ -38,6 +38,7 @@ const style = {
 };
 
 function AccesorValuationFirms(row) {
+    const theme = useTheme();
     const [blocked, setBlocked] = useState(false);
     const viewValuationFirmDetails = (row)=>{
 
@@ -274,7 +275,11 @@ function AccesorValuationFirms(row) {
             </Modal>
 
 
-            <Box sx={{ mt: 10, ml: 10, mr: 10, height: "650px;" }} >
+            <Box
+             sx={{ mt: 10, ml: 10, mr: 10, height: "650px;",p:"5rem;" }}
+             backgroundColor={theme.palette.background.alt}
+
+              >
                 {isFetching && <span>Is refetching</span>}
                 {/* {isLoading&& <span>Is refetching</span>} */}
                 <DataGrid

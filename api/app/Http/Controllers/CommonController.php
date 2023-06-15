@@ -43,8 +43,13 @@ class CommonController extends Controller
                                     
         }
         else if ($user->hasPermissionTo(Permission::where("slug", 'view accesors users only')->first())) {
-
-            $users=User::with("roles")->get();
+            $org=$user->AccessorOrganization()->wherePivot("status",1)->first();
+            $orgid=$org->id;
+            $users = User::with("AccessorOrganization")
+                ->with("roles")
+                ->whereHas("AccessorOrganization", function ($query) use ($orgid) {
+                    $query->where("report_consumer_id", $orgid);
+                })->get();
             return response($users,200);
             
         }

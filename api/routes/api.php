@@ -28,8 +28,8 @@ Route::group([
 ], function ($router) {
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/all-users', [AuthController::class, 'allUsers']);
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/register-valuer-user', [AuthController::class, 'registerValuerUser']);
+    Route::post('/register', [AuthController::class, 'register']);   
+    Route::post('/register-accesor-user', [AuthController::class, 'registerAccesorUser']);
     
     Route::post('/register-accesor', [AuthController::class, 'registerAccesor']);
     Route::post('/invite-tenant', [AuthController::class, 'inviteTenant']);
@@ -39,7 +39,8 @@ Route::group([
     Route::get('/user-information', [AuthController::class, 'userProfileDetails']);
 
     Route::get('/retrieve-valuer-invite-details', [AuthController::class, 'retrieveValuerInviteDetails']);
-    Route::get('/retrieve-valuer-user-invite-details', [AuthController::class, 'retrieveValuerUserInviteDetails']);   
+    Route::get('/retrieve-valuer-user-invite-details', [AuthController::class, 'retrieveValuerUserInviteDetails']);
+    Route::get('/retrieve-accessor-user-invite-details', [AuthController::class, 'retrieveAccesorUserInviteDetails']);   
     Route::get('/retrieve-accessor-invite-details', [AuthController::class, 'retrieveAccesorInviteDetails']);
     
 
@@ -84,15 +85,11 @@ Route::group([
     Route::get('/addimage', [ValuerController::class, 'writeToPDF']);
     Route::get('/generate-qr-report', [ValuerController::class, 'generateQRCode']);
     Route::get('/retrieve-valuer-org-details', [ValuerController::class, 'retriveValuerOrgDetails']);
-    
+    Route::get('/get-dashboard', [ValuerController::class, 'ValuerDashboardSummary']);    
     Route::post('/update-personal-information', [ValuerController::class, 'updatePersonalInfromation']);
     Route::post('/update-company-information', [ValuerController::class, 'updateCompanyInfromation']);
     Route::post('/send-user-invite', [ValuerController::class, 'sendUserInvite']);
-
     Route::post('/block-user', [ValuerController::class, 'blockUser']);
-    
-
-    
 });
 
 Route::group([
@@ -102,6 +99,8 @@ Route::group([
     Route::get('/retrieve-accesor-org-details', [AccesorController::class, 'retriveAccesorOrgDetails']);
     Route::post('/update-personal-information', [AccesorController::class, 'updatePersonalInfromation']);
     Route::post('/update-company-information', [AccesorController::class, 'updateCompanyInfromation']);
+    Route::get('/get-dashboard', [AccesorController::class, 'AccesorDashboardSummary']);   
+    Route::post('/send-user-invite', [AccesorController::class, 'sendUserInvite']);
 });
 
 Route::post('/reset-password-request', [PasswordResetRequestController::class, 'sendPasswordResetEmail']);

@@ -4,9 +4,10 @@ import FlexBetween from 'components/FlexBetween';
 import { Button as BTNMUI, Box, useTheme, useMediaQuery, TextField, Typography, TextareaAutosize,Input,Modal } from '@mui/material';
 import Header from 'components/Header';
 import StatBox from 'components/StatBox';
-import { Email } from '@mui/icons-material';
+import { CalendarViewDayRounded, CorporateFareOutlined, DocumentScannerOutlined, Email } from '@mui/icons-material';
 import ReportsTable from '../reports/ReportsTable';
 import UploadReport from 'scenes/reports/UploadReport';
+import { useGetAccesorDashboardDetailsQuery } from 'features/retrieveAccesorDashboardSlice';
 
 
 
@@ -16,6 +17,7 @@ function AccesorDashboard() {
   const theme = useTheme();
 
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
+  const {data:accesordashbaord, isLoading} = useGetAccesorDashboardDetailsQuery();
 
 
 
@@ -37,36 +39,41 @@ function AccesorDashboard() {
           "& > div": { gridColumn: isNonMediumScreens ? undefined : "span 12" },
         }}
       >
+         {/* return response()->json([
+          'allreports' => $allreports,
+          'thismonthreports'=>$thismonthsreports,
+          "servedaccesors"=>$servedaccesors], 200); */}
+   
         {/* row 1 */}
         <StatBox
           title="Total Reports"
-          value="10"
-          increase="+14%"
+          value={accesordashbaord?.allreports}
+          increase=""
           description="Since First Day"
           icon={
-            <Email
+            <DocumentScannerOutlined
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }
         />
         <StatBox
           title="Total Reports"
-          value="10"
-          increase="+14%"
+          value={accesordashbaord?.thismonthreports}
+          increase=""
           description="This Month"
           icon={
-            <Email
+            <CalendarViewDayRounded
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }
         />
         <StatBox
           title="Accesors served"
-          value="10"
-          increase="+14%"
+          value={accesordashbaord?.servedaccesors}
+          increase=""
           description="Since last month"
           icon={
-            <Email
+            <CorporateFareOutlined
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }

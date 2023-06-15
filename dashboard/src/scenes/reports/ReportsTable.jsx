@@ -7,12 +7,14 @@ import { istofetchvaluationreports } from 'scenes/auth/authSlice';
 import Valuationreportactions from 'scenes/reports/Valuationreportactions';
 import { DownloadDoneOutlined, UpcomingOutlined } from '@mui/icons-material';
 
+import { Box,useTheme } from '@mui/material';
+
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 
 function ReportsTable () {
-    
+  const theme = useTheme();  
   const toastMessage = (message,type)=>{
     if(type=="success"){
       toast.success(message, {
@@ -72,7 +74,17 @@ function ReportsTable () {
     isError &&   toastMessage("Error while fetching","error");
     isError && console.log(error);
     return (
-        <div style={{ height: 650, width: '100%' }}>
+        <Box
+        gridColumn="span 12"
+        gridRow="span 5"
+        backgroundColor={theme.palette.background.alt}
+        p="5rem"
+        borderRadius="0.55rem"
+        width="100%"
+        height="650px"
+
+      >
+    
             
             {isFetching&& <span>Is refetching</span>}
             {/* {isLoading&& <span>Is refetching</span>} */}
@@ -87,7 +99,7 @@ function ReportsTable () {
                   }}
                   pageSizeOptions={[5, 10, 25]}
             />
-        </div>
+        </Box>
     )
 }
 
