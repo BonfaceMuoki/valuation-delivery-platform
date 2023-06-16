@@ -13,6 +13,7 @@ import "../../assets/scss/auth.css"
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { useDispatch, useSelector } from "react-redux";
+import ReCAPTCHA from "react-google-recaptcha";
 
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -25,9 +26,8 @@ import '@pnotify/mobile/dist/PNotifyMobile.css';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import { ToastContainer, toast } from 'react-toastify';
-import { useLoginMutation } from './authApiSlice';
-import { setCredentials } from './authSlice'; 
-import ReCAPTCHA from "react-google-recaptcha";
+import { useSendForgotPasswordMutation } from './authApiSlice';
+import { ArrowForwardOutlined } from '@mui/icons-material';
 
 // 👇 Styled React Route Dom Link Component
 export const LinkItem = styled(Link)`
@@ -41,10 +41,10 @@ export const LinkItem = styled(Link)`
 defaultModules.set(PNotifyMobile, {});
 
 
-function Login() {
+function ForgotPassword() {
 
   const SITE_KEY = process.env.REACT_APP_reCAPTCHA_SITE_KEY;
-  const SECRET_KEY = process.env.REACT_APP_reCAPTCHA_SECRET_KEY;
+  const frontendbaseurl = process.env.REACT_APP_FRONT_BASE_URL;
   const captchaRef = useRef(null);
   const dispatch = useDispatch();
   const [checked, setChecked] = useState(true);
@@ -52,35 +52,27 @@ function Login() {
   const isNonMobile = useMediaQuery("(min-width: 600px)");
   // const { data } = useGetUsersQuery();
   const schema = yup.object().shape({
-    email: yup.string().required("Please provide your Username/Email"),
-    password: yup.string().required("Please provide your Password.")
+    email: yup.string().required("Please provide your Username/Email")
   });
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
   });
   const [open, setOpen] = React.useState(false);
 
-  const [login, { isLoading }] = useLoginMutation();
+  const [resetPassword, { isLoading }] = useSendForgotPasswordMutation();
   const navigate = useNavigate();
 
   const  submitLoginForm = async (data) => {
     // setOpen(true);
     // setOpen(false);
-    let formData= new FormData();   
+    let formData= new FormData();
+    const token = captchaRef.current.getValue();
     let email=data.email;
     let password = data.password;
-    let recaptcha_token =  captchaRef.current.getValue();
-    const userData = await login({ email, password,recaptcha_token }).unwrap()
-    dispatch(setCredentials({ ...userData, email }));
-    console.log(userData.role.name);
-    if(userData.role.name==="Super Admin"){
-      navigate('/admin-dashboard')
-    }else if(userData.role.name==="Report Uploader"||userData.role.name==="Report Uploader Admin"){
-      navigate('/valuer-dashboard')
-    }else if(userData.role.name==="Report Accesor"||userData.role.name==="Report Accessor Admin"){
-      navigate('/accessor-dashboard')
-    }
-    
+    let recaptcha_token = token;
+    let reset_link=`${frontendbaseurl}/reset-user-password`;
+    const userData = await resetPassword({ email, password,recaptcha_token,reset_link }).unwrap()
+   
     
  
   }
@@ -103,29 +95,21 @@ function Login() {
 
       > <CircularProgress color="inherit" />  </Backdrop>
       <form className='form' name="loginform" onSubmit={handleSubmit(submitLoginForm)}>
-        <Typography variant='h2' sx={{ mb: 2, fontWeight: 'bold' }} align='center'  >LOGIN</Typography>
-        <Typography sx={{ ml: 2 }}>Username</Typography>
+        <Typography variant='h2' sx={{ mb: 2, fontWeight: 'bold' }} align='center'  >RESET ACCOUNT PASSWORD</Typography>
+        <Typography sx={{ ml: 2 }}>Your Login Email</Typography>
         <Typography sx={{ ml: 2 }} className="errorp">{errors.email?.message}</Typography>
-        <TextField placeholder='Username' sx={{ m: 2 }} id="outlined-basic" fullWidth {...register("email")} />
-        <Typography sx={{ ml: 2 }} >Password</Typography>
-        <Typography sx={{ ml: 2 }} className="errorp">{errors.password?.message}</Typography>
-        <TextField type='password' placeholder='Password' sx={{ m: 2 }} id="outlined-basic" fullWidth {...register("password")} />
+        <TextField placeholder='Email' sx={{ m: 2 }} id="outlined-basic" fullWidth {...register("email")} />
         <ReCAPTCHA
           className="recaptcha"
           sitekey={SITE_KEY}
           ref={captchaRef}
         />
-
         <Button
           type="submit"
           variant='contained'
           sx={{ m: 2, backgroundColor: theme.palette.primary[700], width: '100%' }}
-          size='large' >Login</Button>
-                  <Grid container direction={isNonMobile ? 'row' : 'column'} sx={{ m: 2 }} >
-        <Grid item md={12} display="flex" justifyContent="center" alignItems="center">
-            <Link to={'/forgot-password'}>Forgot your password ?</Link>
-          </Grid>
-        </Grid>
+          size='large' >Send Reset Link</Button>
+              
         <Grid container direction={isNonMobile ? 'row' : 'column'} sx={{ m: 2 }} >
           <Grid item md={6} >
             <Link to={'/request-valuer-access'} >Request Valuer access </Link>
@@ -135,7 +119,14 @@ function Login() {
           </Grid>
 
         </Grid>
-
+        <Grid container direction={isNonMobile ? 'row' : 'column'} sx={{ m: 2 }} >
+        <Grid item md={12} display="flex" justifyContent="center">
+           <p>Remembered Password ?</p>
+          </Grid>
+          <Grid item md={12} display="flex" justifyContent="center">
+            <Link to={'/login'} >Please proceed to Login </Link><ArrowForwardOutlined/>
+          </Grid>
+        </Grid>
 
           
       </form>
@@ -144,4 +135,4 @@ function Login() {
   )
 }
 
-export default Login
+export default ForgotPassword

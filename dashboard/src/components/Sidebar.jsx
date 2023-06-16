@@ -132,6 +132,17 @@ const navItemsadmin = [
     routeName: "/valuation-firms"
   },
   {
+    text: "Valuation Requests",
+    icon: <ApartmentOutlined />,
+    routeName: "/valuation-firm-requests"
+  }
+  ,
+  {
+    text: "Clients Requests",
+    icon: <ApartmentOutlined />,
+    routeName: "/clients-requests"
+  },
+  {
     text: "Consumers",
     icon: <ApartmentOutlined />,
     routeName: "/report-consumers"

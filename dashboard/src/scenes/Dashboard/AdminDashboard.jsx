@@ -4,9 +4,10 @@ import FlexBetween from 'components/FlexBetween';
 import { Button as BTNMUI, Box, useTheme, useMediaQuery, TextField, Typography, TextareaAutosize,Input,Modal } from '@mui/material';
 import Header from 'components/Header';
 import StatBox from 'components/StatBox';
-import { Email } from '@mui/icons-material';
+import { CasesOutlined, CommentBankOutlined, CorporateFareSharp, Email, MoneyOutlined } from '@mui/icons-material';
 import ReportsTable from '../reports/ReportsTable';
 import UploadReport from 'scenes/reports/UploadReport';
+import { useGetAdminDashboardDetailsQuery } from 'features/retrieveAdminDashboardSlice';
 
 
 
@@ -15,6 +16,7 @@ function AdminDashboard() {
   
   const theme = useTheme();
   const isNonMediumScreens = useMediaQuery("(min-width: 1200px)");
+  const {data:adminDashboard,isLoading:loadingdashboard}=useGetAdminDashboardDetailsQuery();
   return (
     <Box m={isNonMediumScreens ? "1.5rem 1.5rem 0rem" : "1.5rem 1.5rem 0rem"}
     >
@@ -34,34 +36,34 @@ function AdminDashboard() {
       >
         {/* row 1 */}
         <StatBox
-          title="Total Reports"
-          value="10"
-          increase="+14%"
+          title="Total Valuers"
+          value={adminDashboard?.allvaluers}
+          increase=""
           description="Since First Day"
           icon={
-            <Email
+            <MoneyOutlined
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }
         />
         <StatBox
-          title="Total Reports"
-          value="10"
-          increase="+14%"
+          title="Total Lenders / Courts"
+          value={adminDashboard?.allaccesors}
+          increase=""
           description="This Month"
           icon={
-            <Email
+            <CasesOutlined
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }
         />
         <StatBox
-          title="Accesors served"
-          value="10"
-          increase="+14%"
-          description="Since last month"
+          title="System Access Requests"
+          value={adminDashboard?.allaccesors}
+          increase=""
+          description="Valuer / Courts / Lenders"
           icon={
-            <Email
+            <CorporateFareSharp
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
             />
           }

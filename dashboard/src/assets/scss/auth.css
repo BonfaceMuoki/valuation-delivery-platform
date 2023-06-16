@@ -18,3 +18,15 @@
 .custom-shape-divider-top-1680960483 .shape-fill {
     fill: #FFFFFF;
 }
+.recaptcha {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+}
+
+.recaptcha > * {
+    margin-top: "20px";
+    float: right;
+    right: 0;
+    margin: -2px -2px -10px;/*remove borders*/ 
+}

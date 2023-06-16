@@ -11,6 +11,7 @@ import Unauthorized from "scenes/auth/Unauthorized";
 
 import Login from "./scenes/auth/Login";
 import Signup from "./scenes/auth/Signup";
+import  SignupAccesor from "./scenes/auth/SignupAccesor";
 import ProtectedRoutes from "scenes/auth/routes/ProtectedRoutes";
 import AuthorizeRoute from "scenes/auth/routes/AuthorizeRoute";
 import AdminDashboard from "scenes/Dashboard/AdminDashboard";
@@ -35,6 +36,9 @@ import ProfilePage from "scenes/users/ProfilePage";
 import AccesorProfilePage from "scenes/users/AccesorProfilePage";
 import AcceptValuationUserInviteSignup from "scenes/auth/AcceptValuationUserInviteBySignup";
 import AcceptAccesorUserInviteSignup from "scenes/auth/AcceptAccesorUserInviteSignup";
+import ForgotPassword from "scenes/auth/ForgotPassword";
+import ResetPassword from "scenes/auth/ResetPassword";
+import ValuationFirmRequests from "scenes/organizations/ValuationFirmRequests";
 
 function App() {
   const mode = useSelector((state) => state.auth.mode);
@@ -47,7 +51,11 @@ function App() {
           <Routes>
             <Route element={<AuthLayout />}>
               <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
+              <Route path="/request-valuer-access" element={<Signup />} />
+              <Route path="/request-accesor-access" element={<SignupAccesor />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-user-password" element={<ResetPassword />} />
+              
               <Route path="/payments" element={<Signup />} />
               <Route
                 path="/complete-invite-by-registering"
@@ -100,6 +108,24 @@ function App() {
                 >
                   <Route path="/admin-dashboard" element={<AdminDashboard />} />
                 </Route>
+
+                <Route
+                  element={
+                    <AuthorizeRoute checkpermission="view super admin dashbaord" />
+                  }
+                >
+                  <Route path="/valuation-firm-requests" element={<ValuationFirmRequests />} />
+                </Route>
+
+                <Route
+                  element={
+                    <AuthorizeRoute checkpermission="view super admin dashbaord" />
+                  }
+                >
+                  <Route path="/clients-requests" element={<ValuationFirmRequests />} />
+                </Route>
+
+                
                 <Route
                   element={
                     <AuthorizeRoute checkpermission="view all reports" />

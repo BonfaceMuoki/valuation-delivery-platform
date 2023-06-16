@@ -21,9 +21,19 @@ export const registerUploaderCompanySlice = apiSlice.injectEndpoints({
                     'Accept': 'Application/json'
                 }
             }),
-        })
+        }),
+        requestUploaderAccess: bulder.mutation({
+            query: (formData) => ({
+                url: `/api/auth/request-valuer-access`,
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'Application/json'
+                }
+            }),
+        }),
     })
 })
 
-export const { useRegisterUploaderUserMutation,useRegisterUploaderMutation} = registerUploaderCompanySlice;
+export const { useRegisterUploaderUserMutation,useRegisterUploaderMutation,useRequestUploaderAccessMutation} = registerUploaderCompanySlice;
 
