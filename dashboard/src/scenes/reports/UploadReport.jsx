@@ -198,13 +198,15 @@ function UploadReport() {
         values.splice(index, 1);
         setReportUsersFields(values);
     };
+    console.log("Cuurent permissions");
+    console.log(permissions);
     return (
 
         <Box>
             {
                 (permissions.find(p => p.name === "upload report")) ? <Button icon={<UploadOutlined />} onClick={handleOpen}>Upload New Report</Button> : ""
             }
-            {/* <Button icon={<UploadOutlined />} onClick={handleOpen}>Upload New Report</Button> */}
+          
             <Modal
                 open={open}
                 onClose={handleClose}

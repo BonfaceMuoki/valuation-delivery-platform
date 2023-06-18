@@ -113,10 +113,11 @@ const blockUser = (row)=>{
         gridColumn="span 12"
         gridRow="span 5"
         backgroundColor={theme.palette.background.alt}
-        p="1rem"
+        p="5rem"
         borderRadius="0.55rem"
-        width="100%"
+        width="95%"
         height="650px"
+        sx={{ml:2.5,mr:2.5,mt:5}}
       >
            
             <DataGrid

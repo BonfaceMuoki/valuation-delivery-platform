@@ -8,6 +8,7 @@ import { CasesOutlined, CommentBankOutlined, CorporateFareSharp, Email, MoneyOut
 import ReportsTable from '../reports/ReportsTable';
 import UploadReport from 'scenes/reports/UploadReport';
 import { useGetAdminDashboardDetailsQuery } from 'features/retrieveAdminDashboardSlice';
+import ValuationFirmRequests from 'scenes/organizations/ValuationFirmRequests';
 
 
 
@@ -77,7 +78,7 @@ function AdminDashboard() {
           borderRadius="0.55rem"
           width="100%"
         >
-          <ReportsTable />
+         <ValuationFirmRequests/>
         </Box>
 
       </Box>
