@@ -13,7 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import "primereact/resources/themes/bootstrap4-dark-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import { BlockUI } from 'primereact/blockui';
-import { useArchiveUploaderRegistrationRequestMutation, useRequestUploaderRegistrationStatusQuery } from 'features/registerUploaderCompanySlice';
+import { useArchiveAccesorRegistrationRequestMutation, useRequestAccesorRegistrationStatusQuery } from 'features/rgisterAccesorOrgSlice';
 
 import ValuationFirmActions from './ValuationFirmActions';
 import { useMediaQuery } from '@mui/material';
@@ -25,7 +25,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { useGetValuationFirmsQuery } from 'features/valuationFirmsSlice';
 import { useInviteUploaderMutation } from 'features/inviteUploaderSlice';
 import CircularProgress from '@mui/material/CircularProgress';
-import { useApproveValuationFirmRequestMutation, useGetValuationFirmRequestsQuery, useRejectValuationFirmRequestMutation } from 'features/valuationFirmRequestsSlice';
+import { useApproveAccesorRequestMutation, useGetAccesorRequestsQuery, useRejectAccesorRequestMutation } from 'features/accesorRequestsSlice';
 import { useTheme } from '@emotion/react';
 
 const style = {
@@ -39,7 +39,7 @@ const style = {
     p: 4,
 };
 
-function ValuationFirmRequests(row) {
+function AccesorRegistrationRequests(row) {
     const toastMessage = (message, type) => {
         if (type == "success") {
             toast.success(message, {
@@ -55,12 +55,12 @@ function ValuationFirmRequests(row) {
             });
         }
     }
-    const [acceptValuationAccessRequest, { isLoading: sendingUploaderInvite }] = useApproveValuationFirmRequestMutation();
-    const [rejectValuationFirmRequest, { isloading: sendingReject }] = useRejectValuationFirmRequestMutation();
+    const [acceptAccesorAccessRequest, { isLoading: sendingUploaderInvite }] = useApproveAccesorRequestMutation();
+    const [rejectValuationFirmRequest, { isloading: sendingReject }] = useRejectAccesorRequestMutation();
     const [blocked, setBlocked] = useState(false);
     const acceptRequest = (row) => {
         confirmDialog({
-            message: `Are you sure you want to accept registration for ${row.valauaion_firm_name}?. This will send aan email to them to set up an admin account which will allow them access the system..`,
+            message: `Are you sure you want to accept registration for ${row.institution_name}?. This will send aan email to them to set up an admin account which will allow them access the system..`,
             header: 'Delete Confirmation',
             icon: 'pi pi-info-circle',
             acceptClassName: 'p-button-danger',
@@ -72,9 +72,9 @@ function ValuationFirmRequests(row) {
     const acceptAcceptingRegistartion = async (data) => {
         const formData = new FormData();
         formData.append("request_id", data);
-        formData.append("login_url", `${frontendbaseurl}/complete-invite-by-login`);
-        formData.append("registration_url", `${frontendbaseurl}/complete-invite-by-registering`);
-        const result = await acceptValuationAccessRequest(formData);
+        formData.append("login_url", `${frontendbaseurl}/complete-accesor-invite-by-login`);
+        formData.append("registration_url", `${frontendbaseurl}/complete-accesor-invite-by-registering`);
+        const result = await acceptAccesorAccessRequest(formData);
         if ('error' in result) {
             toastMessage(result.error.data.message, "error");
             if ('backendvalerrors' in result.error.data) {
@@ -120,7 +120,7 @@ function ValuationFirmRequests(row) {
     //intialize edit form
     ///intialize edit form
     const [regOrgDetails,setRegOrgDetails]=useState();
-    const {data:requestregdetails,isLoading:isLoadingRequestDetails}=  useRequestUploaderRegistrationStatusQuery(activeRequest);
+    const {data:requestregdetails,isLoading:isLoadingRequestDetails}=  useRequestAccesorRegistrationStatusQuery(activeRequest);
     useEffect(()=>{
       if(requestregdetails?.orgdetails){
         setRegOrgDetails(requestregdetails?.orgdetails);
@@ -134,7 +134,7 @@ function ValuationFirmRequests(row) {
         setActiveRequest(row.id);
         setOpenRequestDetailsModal(true);
      }
-     const [archiveRequestt]=useArchiveUploaderRegistrationRequestMutation();
+     const [archiveRequestt]=useArchiveAccesorRegistrationRequestMutation();
      const archiveRequest = async(row)=>{
         const formData= new FormData();
         formData.append("invite",row.id);
@@ -153,12 +153,12 @@ function ValuationFirmRequests(row) {
     const columns = [
         {
             headerName: 'Name',
-            field: 'valauaion_firm_name',
+            field: 'institution_name',
             flex: 1
         },
         {
             headerName: 'Phone',
-            field: 'invite_phone',
+            field: 'contact_person_phone',
             flex: 1
         },
         {
@@ -167,13 +167,8 @@ function ValuationFirmRequests(row) {
             flex: 1
         },
         {
-            headerName: 'VRB',
-            field: 'vrb_number',
-            flex: 1
-        },
-        {
-            headerName: 'ISK NUmber',
-            field: 'isk_number',
+            headerName: 'Type',
+            field: 'type',
             flex: 1
         }
         ,
@@ -213,7 +208,7 @@ function ValuationFirmRequests(row) {
         isSuccess,
         isError,
         error
-    } = useGetValuationFirmRequestsQuery();
+    } = useGetAccesorRequestsQuery();
     const theme = useTheme();
     const [openRejectNoteModal, setOpenRejectNotModal] = useState(false);
     const handleCloseRejectModal = () => {
@@ -275,7 +270,7 @@ function ValuationFirmRequests(row) {
             </Modal>
             {/* close modal details valuation firm  */}
             <FlexBetween sx={{ ml: 5 }}>
-                <Header sx={{ ml: 30 }} title="Valuation Firm Requests" subtitle="List of Valuation Firm Requests" />
+                <Header sx={{ ml: 30 }} title="Lenders & Courts" subtitle="List of Access Requests" />
             </FlexBetween>
             {/* modal invite valuation firm */}
             <Modal
@@ -321,4 +316,4 @@ function ValuationFirmRequests(row) {
     )
 }
 
-export default ValuationFirmRequests
+export default AccesorRegistrationRequests

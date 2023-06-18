@@ -2,7 +2,9 @@
 namespace App\Http\Controllers;
 
 use App\Mail\SendTenantEmail;
+use App\Models\ClientRegistrationRequests;
 use App\Models\ReportConsumer;
+use App\Models\ValuationFirmRegistrationRequests;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
@@ -21,6 +23,9 @@ use App\Models\ValuationFirmInvite;
 use App\Models\ValuerfirmUserInvite;
 use App\Models\AccesorInvite;
 use App\Models\AccesorUserInvite;
+use Illuminate\Support\Facades\Http;
+use App\Models\PasswordReset;
+use App\Mail\SendPasswordResetMail;
 class AuthController extends Controller
 {
 
@@ -43,35 +48,272 @@ class AuthController extends Controller
                 'retrieveAccesorInviteDetails',
                 'retrieveValuerUserInviteDetails',
                 'retrieveAccesorUserInviteDetails',
-                'registerAccesorUser'
+                'registerAccesorUser',
+                'requestValuerAccess',
+                'requestAccesorAccess',
+                'SendAccountPasswordResetLink',
+                'verifyResetToken',
+                'ResetPassword'
             ]
         ]);
+    }
+    public function VarifyRecaptchaToken($request){
+        $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+            'secret' => env('GOOGLE_SITE_KEY'),
+            'response' => $request->recaptcha_token,
+        ]);
+        return $response;
     }
     /**
      * Get a JWT via given credentials.
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function login(Request $request)
-    {
+  
+     public function requestValuerAccess(Request $request){
+        $validator = Validator::make($request->all(), [
+            'login_email' => 'required|email|unique:valuation_firm_registration_requests,invite_email',
+            'recaptcha_token' => 'required|string',
+            'phone_number' => 'required|string',
+            'directors_isk_numer' => 'required|string|unique:valuation_firm_registration_requests,isk_number',
+            'directors_vrb_numer' => 'required|string|unique:valuation_firm_registration_requests,vrb_number',
+            'full_names'=>'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+       $response=$this->VarifyRecaptchaToken($request);
 
+        if ($response->successful()) {
+            $data = $response->json();
+            // Process the response data
+            if ($data['success']) {               
+                // reCAPTCHA validation passed
+                $requesaccess['invite_email']=$request->login_email;
+                $requesaccess['invite_phone']=$request->phone_number;
+                $requesaccess['isk_number']=$request->directors_isk_numer;
+                $requesaccess['vrb_number']=$request->directors_vrb_numer;
+                $requesaccess['valauaion_firm_name']=$request->company_name;
+                $requesaccess['director_name']=$request->full_names;
+                $invite = ValuationFirmRegistrationRequests::create( $requesaccess);
+                if($invite){
+                    return response()->json(['message'=>"Request send succefully. You will get an email to the email you provided once the approval has been made." ], 201);
+                }else{
+                    return response()->json(['message'=>"Failed.Please contact admin" ], 422);            
+                }                
+                // Proceed with your desired logic
+            } else {
+                $statusCode = $response->status();
+                return response()->json(['message'=>"Failed. Invalid recaptcha code." ], 422);
+                // reCAPTCHA validation failed
+                // Handle the validation failure
+            }
+        } else {
+            // Request to Google reCAPTCHA API failed
+            $statusCode = $response->status();
+            return response()->json(['message'=>"Failed. Invalid recaptcha code." ], 422);
+            // Handle the error
+        }
+        
+     }
+
+
+     public function requestAccesorAccess(Request $request){
+        $validator = Validator::make($request->all(), [
+            'login_email' => 'required|email|unique:valuation_firm_registration_requests,invite_email',
+            'recaptcha_token' => 'required|string',
+            'phone_number' => 'required|string',
+            'full_names'=>'required',
+            'institution_name'=>'required'
+        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+       $response=$this->VarifyRecaptchaToken($request);
+
+        if ($response->successful()) {
+            $data = $response->json();
+            // return response()->json(['message'=>"Failed. Invalid recaptcha code.". json_encode($data) ], 422);
+            // Process the response data
+            if ($data['success']) {               
+                // reCAPTCHA validation passed
+                try{
+                    DB::beginTransaction();
+                    $requesaccess['invite_email']=$request->login_email;
+                    $requesaccess['contact_person_phone']=$request->phone_number;
+                    $requesaccess['contact_person_name']=$request->full_names;
+                    $requesaccess['institution_name']=$request->institution_name;                
+                    $invite = ClientRegistrationRequests::create( $requesaccess);
+                    DB::commit();
+                    if($invite){
+                        return response()->json(['message'=>"Request send succefully. You will get an email to the email you provided once the approval has been made." ], 201);
+                    }else{
+                        return response()->json(['message'=>"Failed.Please contact admin" ], 422);            
+                    } 
+
+
+                }catch(Exception $exp){
+                    DB::rollBack();
+                    return response()->json(['message'=>"Failed.".$exp->getMessage() ], 422);
+                }
+               
+                // Proceed with your desired logic
+            } else {
+                $statusCode = $response->status();
+                return response()->json(['message'=>"Failed. Invalid recaptcha code.".$statusCode ], 422);
+                // reCAPTCHA validation failed
+                // Handle the validation failure
+            }
+        } else {
+            // Request to Google reCAPTCHA API failed
+            $statusCode = $response->status();
+            return response()->json(['message'=>"Failed. Invalid recaptcha code." ], 422);
+            // Handle the error
+        }
+        
+     }
+     public function verifyResetToken(Request $request){
+        $verified=PasswordReset::where("token",$request->reset_token)->first();
+        if($verified!=null){
+            return response()->json($verified,200);
+        }else{
+            return response()->json($verified,404);
+        }
+     }
+     public function ResetPassword(Request $request){
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
-            'password' => 'required|string|min:6',
+            'password' => 'required',
+            'reset_token' => 'required|exists:password_resets,token',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['backenderrors'=>$validator->errors()], 422);
+        }
+        try {
+            DB::beginTransaction();
+            //update user
+            User::where("email", $request->email)->update(['password' => bcrypt($request->password)]);             
+            //update user
+            DB::commit();
+            return response()->json(['message' => 'Password updated successfully.'], 201);
+        } catch (Exception $exp) {
+            DB::rollBack();
+            return response()->json(['message' => 'Failed.' . $exp->getMessage()], 422);
+        }
+     
+
+     }
+    public function login(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required',
         ]);
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
         $isactive = User::where("is_active", 1)->where("email", $request->email)->first();
         if ($isactive != null) {
-            if (!$token = auth()->attempt($validator->validated())) {
-                return response()->json(['error' => 'Unauthorized'], 401);
+            //verify token
+            $response = $this->VarifyRecaptchaToken($request);
+            if ($response->successful()) {
+                $data = $response->json();
+                // Process the response data
+                if ($data['success']) {
+                    if ($isactive != null) {
+                        if (!$token = auth()->attempt($validator->validated())) {
+                            return response()->json(['error' => 'Unauthorized'], 401);
+                        }
+                        return $this->createNewToken($token);
+                    } else {
+                        return response()->json(['message' => 'Your account is not active'], 403);
+                    }
+                } else {
+                    $statusCode = $response->status();
+                    return response()->json(['message' => "Failed. Invalid recaptcha code."], 422);
+                    // reCAPTCHA validation failed
+                    // Handle the validation failure
+                }
+
+            } else {
+
+                // Request to Google reCAPTCHA API failed
+                $statusCode = $response->status();
+                return response()->json(['message' => "Failed. Invalid recaptcha code.".$response], 422);
+                // Handle the error
             }
-            return $this->createNewToken($token);
-        } else {
-             return response()->json(['message'=>'Your account is not active'],403);
         }
 
+
+
+    }
+    public function generatePasswordResetToken($request)
+    {
+        $token = Str::random(80);
+        return $token;
+    }
+
+    public function SendAccountPasswordResetLink(Request $request){
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'recaptcha_token' => 'required',
+            'reset_link' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+        try{
+            DB::beginTransaction();
+            $isactive = User::where("is_active", 1)->where("email", $request->email)->first();
+            if ($isactive != null) {
+                //verify token
+                $response=$this->VarifyRecaptchaToken($request);
+                if ($response->successful()) {
+                    $data = $response->json();
+                    // Process the response data
+                    if ($data['success']) {               
+                        // reCAPTCHA validation passed
+                         //send reset mail
+                        $token=$this->generatePasswordResetToken($request);
+                        $saverequest['email']=$request->email;
+                        $saverequest['token']=$token;   
+                        $mailsend= Mail::to($request['email'])->send(new SendPasswordResetMail($token,$isactive,$request->reset_link));           
+                       //send reset mail
+                        $passwordreset = PasswordReset::insert($saverequest);
+                        DB::commit();
+                        if($passwordreset){
+                            return response()->json(['message'=>"Request send succefully. We have send you a reset Link on your email." ], 201);
+                        }else{
+                            return response()->json(['message'=>"Failed.Please contact admin" ], 422);            
+                        }                
+                        // Proceed with your desired logic
+                    } else {
+                        $statusCode = $response->status();
+                        return response()->json(['message'=>"Failed. Invalid recaptcha code." ], 422);
+                        // reCAPTCHA validation failed
+                        // Handle the validation failure
+                    }
+                } else {
+                    
+                    // Request to Google reCAPTCHA API failed
+                    $statusCode = $response->status();
+                    return response()->json(['message'=>"Failed. Invalid recaptcha code." ], 422);
+                    // Handle the error
+                }
+    
+                //verify token
+               
+            } else {
+                 return response()->json(['message'=>'Your account does not exist or it has been deactivated.Please contact admin'],403);
+            }  
+        }catch(Exception $exp){
+            DB::rollBack();
+            return response()->json(
+                [
+                    'message'=>'Failed.'.$exp->getMessage()
+                ], 422); 
+        }
+   
     }
     /**
      * Register a User.
@@ -203,7 +445,6 @@ class AuthController extends Controller
         $user = [];
         try {
             DB::beginTransaction();
-
             $user = User::create(
                 [
                     'full_name' => $request->full_name,
@@ -220,8 +461,6 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'Account has been created successfully',
             ], 201);
-
-
         } catch (\Exception $exp) {
             DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
             return response()->json([
@@ -541,7 +780,7 @@ public function registerAccesor(Request $request){
 
     public function retrieveValuerInviteDetails(Request $request){
 
-       $detailss= ValuationFirmInvite::where("invite_token",$request->invite_token)->where("status",0)->first();
+       $detailss= ValuationFirmInvite::where("invite_token",$request->invite_token)->where("completed",0)->first();
        return response()->json($detailss,200);
 
     }

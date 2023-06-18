@@ -19,7 +19,9 @@ return new class extends Migration
             $table->string('accessor_name');
             $table->string('contact_person_name');
             $table->string('contact_person_phone');
-            $table->string('type')->default("Court");  
+            $table->string('institution_name');
+            $table->string('type')->default("Court"); 
+            $table->enum('status',['Requested','Approved','Rejected','Registered']);  
             $table->timestamps();
         });
     }

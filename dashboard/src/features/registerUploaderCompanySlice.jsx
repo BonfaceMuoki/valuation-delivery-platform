@@ -32,8 +32,27 @@ export const registerUploaderCompanySlice = apiSlice.injectEndpoints({
                 }
             }),
         }),
+        requestUploaderRegistrationStatus: bulder.query({
+            query: (request) => ({
+                url: `/api/admin/get-Valuer-request-registration-status?req=${request}`,
+                method: 'GET',
+                headers: {
+                    'Accept': 'Application/json'
+                }
+            }),
+        }),
+        archiveUploaderRegistrationRequest: bulder.mutation({
+            query: (formdata) => ({
+                url: `/api/admin/archive-valuer-registration-request`,
+                method: 'POST',
+                body:formdata,
+                headers: {
+                    'Accept': 'Application/json'
+                }
+            }),
+        }),
     })
 })
 
-export const { useRegisterUploaderUserMutation,useRegisterUploaderMutation,useRequestUploaderAccessMutation} = registerUploaderCompanySlice;
+export const {useArchiveUploaderRegistrationRequestMutation,useRegisterUploaderUserMutation,useRegisterUploaderMutation,useRequestUploaderAccessMutation,useRequestUploaderRegistrationStatusQuery} = registerUploaderCompanySlice;
 

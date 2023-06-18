@@ -21,9 +21,37 @@ export const registerAccesorOrgSlice = apiSlice.injectEndpoints({
                     'Accept': 'Application/json'
                 }
             }),
+        }),requestAccesorAccess: bulder.mutation({
+            query: (formData) => ({
+                url: `/api/auth/request-accesor-access`,
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'Application/json'
+                }
+            }),
+        }),
+        requestAccesorRegistrationStatus: bulder.query({
+            query: (request) => ({
+                url: `/api/admin/get-accesor-request-registration-status?req=${request}`,
+                method: 'GET',
+                headers: {
+                    'Accept': 'Application/json'
+                }
+            }),
+        }),
+        archiveAccesorRegistrationRequest: bulder.mutation({
+            query: (formdata) => ({
+                url: `/api/admin/archive-accesor-registration-request`,
+                method: 'POST',
+                body:formdata,
+                headers: {
+                    'Accept': 'Application/json'
+                }
+            }),
         })
     })
 })
 
-export const { useRegisterAccesorMutation,useRegisterAccesorUserMutation} = registerAccesorOrgSlice;
+export const {useArchiveAccesorRegistrationRequestMutation,useRequestAccesorAccessMutation,useRequestAccesorRegistrationStatusQuery,useRegisterAccesorMutation,useRegisterAccesorUserMutation} = registerAccesorOrgSlice;
 

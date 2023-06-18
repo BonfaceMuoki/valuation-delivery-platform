@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('valuation_firm_registration_requests', function (Blueprint $table) {
+        Schema::create('archive_valuer_access_requests', function (Blueprint $table) {
             $table->id();
             $table->string('invite_email');
             $table->string('invite_phone');
@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('vrb_number');
             $table->string('isk_number');           
             $table->string('director_name');
-            $table->enum('status',['Requested','Approved','Rejected','Registered']);   
+            $table->enum('status',['Requested','Approved','Rejected','Registered'])->default('Requested');   
             $table->timestamps();
         });
     }
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('valuation_firm_registration_requests');
+        Schema::dropIfExists('archive_valuer_access_requests');
     }
 };

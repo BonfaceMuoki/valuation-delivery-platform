@@ -39,6 +39,7 @@ import AcceptAccesorUserInviteSignup from "scenes/auth/AcceptAccesorUserInviteSi
 import ForgotPassword from "scenes/auth/ForgotPassword";
 import ResetPassword from "scenes/auth/ResetPassword";
 import ValuationFirmRequests from "scenes/organizations/ValuationFirmRequests";
+import AccesorRegistrationRequests from "scenes/organizations/AccesorRegistrationRequests";
 
 function App() {
   const mode = useSelector((state) => state.auth.mode);
@@ -122,7 +123,7 @@ function App() {
                     <AuthorizeRoute checkpermission="view super admin dashbaord" />
                   }
                 >
-                  <Route path="/clients-requests" element={<ValuationFirmRequests />} />
+                  <Route path="/clients-requests" element={<AccesorRegistrationRequests />} />
                 </Route>
 
                 

@@ -2,17 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AccesorInvite;
+use App\Models\ArchiveClientRegistartionRequest;
+use App\Models\ArchiveValuerAccessRequest;
+use App\Models\ClientRegistrationRequests;
+use App\Models\Organization;
+use App\Models\ReportConsumer;
+use App\Models\ValuationFirmInvite;
+use App\Models\ValuationFirmRegistrationRequests;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Models\Role;
 use App\Models\Permission;
 use DB;
 use Mail;
+use Symfony\Component\HttpFoundation\Test\Constraint\RequestAttributeValueSame;
 use Validator;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Mail\SendValuationFirmInviteMail;
 use App\Mail\SendAccesorInviteMail;
+use App\Mail\SendCompanyRegistrationRequestDeclineMail;
+
+use Mockery\Exception;
+
 class AdminController extends Controller
 {
     //
@@ -21,6 +34,11 @@ class AdminController extends Controller
         $this->middleware('auth:api');
         $this->middleware("Admin")->except(['getAllRoles']);
 
+    }
+    public function getDashboard(Request $request){
+     $valuationfirms=Organization::count();
+     $accesors=ReportConsumer::count();
+     return response()->json(['allvaluers' => $valuationfirms,'allaccesors'=>$accesors], 200);     
     }
     public function deleteRole($id){
         $user = auth()->user();
@@ -363,5 +381,273 @@ class AdminController extends Controller
         ]);
     }
     //close send accesor invite
+    public function getValuationAccessRequests(Request $request){
+      $allrequests= ValuationFirmRegistrationRequests::all();
+      return response()->json($allrequests,200);
+    }
+   
+    public function acceptValuationAccessRequest(Request $request){
+        try{
+            DB::beginTransaction();
+            $requestde = ValuationFirmRegistrationRequests::where("id",$request->request_id)->first();
+            $exist = Organization::where("organization_email", )
+                ->where("directors_vrb",$requestde->vrb_number)
+                ->where("isk_number",$requestde->isk_number)
+                ->first();
+                if($exist==null){
+                    //check if invite is already send
+                   $invitesend=ValuationFirmInvite::where("invite_email",$requestde->invite_email)
+                    ->where("vrb_number",$requestde->vrb_number)
+                    ->where("isk_number",$requestde->isk_number)
+                    ->count();
+                    if($invitesend>0){
+                        return response()->json([
+                            'message' => 'Invite already Sent.'
+                        ], Response::HTTP_OK); 
+                    }else{
 
+                        //close if invite is alredy is send
+                    $request['company_name']=$requestde['valauaion_firm_name'];
+                    $request['isk_number']=$requestde->isk_number;
+                    $request['vrb_number']=$requestde->vrb_number;
+                    $request['directors_name']=$requestde->director_name;
+                    $request['email']=$requestde->invite_email;
+                    $request['registration_url']=$request->registration_url;
+                    $request['login_url']=$request->login_url;
+                    $this->sendValuationInviteMail($request);
+                    //update status
+                    ValuationFirmRegistrationRequests::where("id",$request->request_id)->update(['status'=>'Approved']);
+                    DB::commit();
+                    return response()->json([
+                        'message' => 'Check your inbox, we have sent a link to reset email.'
+                    ], Response::HTTP_OK); 
+
+
+                    }
+                     
+                    //close update status
+                }else{
+
+                    return response()->json([
+                        'message' => 'The rquest has already been approved.'
+                    ], Response::HTTP_OK); 
+                }          
+               
+           
+
+        }catch(Exception $exp){
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Failed.'.$exp->getMessage()
+            ],500);
+        }
+        
+
+    }
+    public function archiveValuationAccessRequest(Request $request){
+        try{
+            DB::beginTransaction();
+            $requestde = ValuationFirmRegistrationRequests::where("id",$request->invite)->first()->toArray(); 
+            unset($requestde['id']);
+            ArchiveValuerAccessRequest::create($requestde);
+            ValuationFirmRegistrationRequests::where("id",$request->invite)->delete();
+            DB::commit();
+            return response()->json([
+               'message' => 'Your request has been processed successfully.'
+            ], Response::HTTP_OK); 
+                    //close update status
+        }catch(Exception $exp){
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Failed.'.$exp->getMessage()
+            ],500);
+        }
+    }
+    public function rejectValuationAccessRequest(Request $request){
+        try{
+            DB::beginTransaction();
+            $requestde = ValuationFirmRegistrationRequests::where("id",$request->invite)->first();
+            $exist = Organization::where("organization_email", )
+                ->where("directors_vrb",$requestde->vrb_number)
+                ->where("isk_number",$requestde->isk_number)
+                ->first();
+                if($exist==null){
+                   //send email notification
+                   Mail::to($requestde->invite_email)->send(new SendCompanyRegistrationRequestDeclineMail($request->reason,$requestde));
+                   //send notification                   
+                    //update status
+                    ValuationFirmRegistrationRequests::where("id",$request->invite)->update(['status'=>'Rejected']);
+                    DB::commit();
+                    return response()->json([
+                        'message' => 'Your request has been processed successfully.'
+                    ], Response::HTTP_OK); 
+                    //close update status
+                }else{
+
+                    return response()->json([
+                        'message' => 'The rquest has already been approved.'
+                    ], Response::HTTP_OK); 
+                }          
+               
+           
+
+        }catch(Exception $exp){
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Failed.'.$exp->getMessage()
+            ],500);
+        }
+        
+
+    }
+    public function getAccesorAccessRequests(Request $request){
+        $allrequests= ClientRegistrationRequests::all();
+        return response()->json($allrequests,200);
+      }
+
+      public function getValuerRequestRegistrationStatus(Request $request){
+        $requestde = ValuationFirmRegistrationRequests::where("id",$request->req)->first();
+        $found = Organization::where("organization_email", $requestde->invite_email)
+        ->where("directors_vrb",$requestde->vrb_number)
+        ->where("isk_number",$requestde->isk_number)
+        ->count();
+        if($found > 0){
+
+            $exist = Organization::where("organization_email",$requestde->invite_email )
+            ->where("directors_vrb",$requestde->vrb_number)
+            ->where("isk_number",$requestde->isk_number)
+            ->first();
+            return response()->json(['orgdetails'=>$exist,'request'=>$request->req,'requestdetails'=> $requestde],200);
+        }else{
+            return response()->json(['orgdetails'=>[],'message'=>'Not found','request'=>$request->req,'requestdetails'=> $requestde],200);
+        }
+      }
+
+
+    //   accesor RequestAttributeValueSame
+    public function acceptAccesorAccessRequest(Request $request){
+        try{
+            DB::beginTransaction();
+            $requestde = ClientRegistrationRequests::where("id",$request->request_id)->first();
+            $exist = ReportConsumer::where("organization_email", $requestde->invite_email)->first();
+                if($exist==null){
+                    //check if invite is already send
+                   $invitesend=AccesorInvite::where("invite_email",$requestde->invite_email)
+                    ->count();
+                    if($invitesend>0){
+                        return response()->json([
+                            'message' => 'Invite already Sent.'
+                        ], Response::HTTP_OK); 
+                    }else{
+
+                        //close if invite is alredy is send
+                    $requestacc['accesor_name']=$requestde['institution_name'];
+                    $requestacc['contact_person_phone']=$requestde->contact_person_phone;
+                    $requestacc['contact_person_name']=$requestde->invite_email;
+                    $requestacc['email']=$requestde->invite_email;
+                    $requestacc['registration_url']=$request->registration_url;
+                    $requestacc['login_url']=$request->login_url;
+                    $this->sendAccesorInviteEMail($requestacc);
+                    //update status
+                    ClientRegistrationRequests::where("id",$request->request_id)->update(['status'=>'Approved']);
+                    DB::commit();
+                    return response()->json([
+                        'message' => 'Check your inbox, we have sent a link to reset email.'
+                    ], Response::HTTP_OK); 
+
+
+                    }
+                     
+                    //close update status
+                }else{
+
+                    return response()->json([
+                        'message' => 'The rquest has already been approved.'
+                    ], Response::HTTP_OK); 
+                }          
+               
+           
+
+        }catch(Exception $exp){
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Failed.'.$exp->getMessage()
+            ],500);
+        }
+        
+
+    }
+    public function archiveAccesorAccessRequest(Request $request){
+        try{
+            DB::beginTransaction();
+            $requestde = ClientRegistrationRequests::where("id",$request->invite)->first()->toArray(); 
+            unset($requestde['id']);
+            ArchiveClientRegistartionRequest::create($requestde);
+            ClientRegistrationRequests::where("id",$request->invite)->delete();
+            DB::commit();
+            return response()->json([
+               'message' => 'Your request has been processed successfully.'
+            ], Response::HTTP_OK); 
+                    //close update status
+        }catch(Exception $exp){
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Failed.'.$exp->getMessage()
+            ],500);
+        }
+    }
+    public function rejectAccesorAccessRequest(Request $request){
+        try{
+            DB::beginTransaction();
+            $requestde = ClientRegistrationRequests::where("id",$request->invite)->first();
+            $exist = ReportConsumer::where("organization_email", )
+                ->where("directors_vrb",$requestde->vrb_number)
+                ->where("isk_number",$requestde->isk_number)
+                ->first();
+                if($exist==null){
+                   //send email notification
+                   Mail::to($requestde->invite_email)->send(new SendCompanyRegistrationRequestDeclineMail($request->reason,$requestde));
+                   //send notification                   
+                    //update status
+                    ClientRegistrationRequests::where("id",$request->invite)->update(['status'=>'Rejected']);
+                    DB::commit();
+                    return response()->json([
+                        'message' => 'Your request has been processed successfully.'
+                    ], Response::HTTP_OK); 
+                    //close update status
+                }else{
+
+                    return response()->json([
+                        'message' => 'The rquest has already been approved.'
+                    ], Response::HTTP_OK); 
+                }          
+               
+           
+
+        }catch(Exception $exp){
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Failed.'.$exp->getMessage()
+            ],500);
+        }
+        
+
+    }
+      public function getAccesorRequestRegistrationStatus(Request $request){
+        $requestde = ClientRegistrationRequests::where("id",$request->req)->first();
+        $found = ReportConsumer::where("organization_email", $requestde->invite_email)
+        ->count();
+        if($found > 0){
+
+            $exist = ReportConsumer::where("organization_email",$requestde->invite_email )
+            ->where("directors_vrb",$requestde->vrb_number)
+            ->where("isk_number",$requestde->isk_number)
+            ->first();
+            return response()->json(['orgdetails'=>$exist,'request'=>$request->req,'requestdetails'=> $requestde],200);
+        }else{
+            return response()->json(['orgdetails'=>[],'message'=>'Not found','request'=>$request->req,'requestdetails'=> $requestde],200);
+        }
+      }
+
+    //  close accesor requests 
 }

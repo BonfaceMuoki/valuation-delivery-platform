@@ -5,13 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ClientRegistrationRequests extends Model
+class ArchiveValuerAccessRequest extends Model
 {
     use HasFactory;
     protected $fillable=[
         'invite_email',
-        'contact_person_name',
-        'contact_person_phone',
-        'institution_name'
-    ];
+        'invite_phone',
+        'isk_number',
+        'vrb_number',
+        'valauaion_firm_name',
+        'director_name',
+      ];
 }

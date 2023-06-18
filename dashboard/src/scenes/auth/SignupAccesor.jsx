@@ -26,7 +26,7 @@ import * as yup from "yup";
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import "../../assets/scss/validation.css"
-import { useRequestUploaderAccessMutation } from 'features/registerUploaderCompanySlice';
+import { useRequestAccesorAccessMutation } from 'features/rgisterAccesorOrgSlice';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import "primereact/resources/themes/bootstrap4-dark-blue/theme.css";
@@ -71,13 +71,13 @@ function SignupAccesor() {
   const theme = useTheme();
   const isNonMobile = useMediaQuery("(min-width: 600px)");
   //register form
-  const [requestValuerAccess,{isLOading:isSubmitting}]=useRequestUploaderAccessMutation();
+  const [requestAccesorAccess,{isLOading:isSubmitting}]=useRequestAccesorAccessMutation();
   const [backendValErrors, setBackendValErrors] = useState({});
   const schema = yup.object().shape({
     full_names: yup.string().required("Directors name is required"),
     login_email: yup.string().required("Login Email is required"),
     phone_number: yup.string().required("Contact Phone number is required"),
-    company_name: yup.string().required("Company Name is required"),
+    institution_name: yup.string().required("Company Name is required"),
   });
   const { register: registerValuerRequestForm, isLoading: isSubmittingForm, reset:resetRequestForm ,handleSubmit: handleSubmitRequestValuerAccess, formState: { errors: requestvalueraccesserrors } } = useForm({
     resolver: yupResolver(schema)
@@ -88,11 +88,10 @@ function SignupAccesor() {
     const token = captchaRef.current.getValue();
     formData.append("recaptcha_token",token);
     formData.append("full_names",data.full_names);
-    formData.append("company_name",data.company_name);
-   
+    formData.append("institution_name",data.institution_name);
     formData.append("login_email",data.login_email);
     formData.append("phone_number",data.phone_number);
-    const result= await requestValuerAccess(formData);
+    const result= await requestAccesorAccess(formData);
     if ('error' in result) {
       toastMessage(result.error.data.message, "error");
       if('backendvalerrors' in result.error.data){
@@ -134,8 +133,8 @@ function SignupAccesor() {
         <span sx={{ ml: 1 }} className='errorSpan'>{requestvalueraccesserrors.login_email?.message}</span>
         <span sx={{ ml: 1 }} className='errorSpan'>{backendValErrors?.email}</span>
         <Typography sx={{ ml: 1 }}>Lender / Court Name</Typography>
-        <TextField placeholder='Court / Lender Name' sx={{ m: 1 }} id="outlined-basic" fullWidth   {...registerValuerRequestForm("company_name")} />
-        <span sx={{ ml: 1 }} className='errorSpan'>{requestvalueraccesserrors.company_name?.message}</span>
+        <TextField placeholder='Court / Lender Name' sx={{ m: 1 }} id="outlined-basic" fullWidth   {...registerValuerRequestForm("institution_name")} />
+        <span sx={{ ml: 1 }} className='errorSpan'>{requestvalueraccesserrors.institution_name?.message}</span>
         <span sx={{ ml: 1 }} className='errorSpan'>{backendValErrors?.company_name}</span>
         
         <Typography sx={{ ml: 1 }}>Contact Phone Number</Typography>

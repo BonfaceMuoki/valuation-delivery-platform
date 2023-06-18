@@ -25,6 +25,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import { useGetValuationFirmsQuery } from 'features/valuationFirmsSlice';
 import { useInviteUploaderMutation } from 'features/inviteUploaderSlice';
 import CircularProgress from '@mui/material/CircularProgress';
+import { useTheme } from '@emotion/react';
 
 const style = {
     position: 'absolute',
@@ -190,6 +191,7 @@ function ValuationFirms(row) {
         }
     
     }
+    const theme = useTheme();
     return (
 
         <BlockUI blocked={blocked}>
@@ -288,7 +290,7 @@ function ValuationFirms(row) {
             </Modal>
 
 
-            <Box sx={{ mt: 10, ml: 10, mr: 10, height: "650px;" }} >
+            <Box sx={{ mt: 10, ml: 10, mr: 10, height: "650px;" , backgroundColor: theme.palette.background.alt,padding:10  }} >
                 {isFetching && <span>Is refetching</span>}
                 {/* {isLoading&& <span>Is refetching</span>} */}
                 <DataGrid

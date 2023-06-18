@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { DataGrid } from '@mui/x-data-grid'
-import { Box, Button, ButtonBase, TextField, Grid, Divider } from '@mui/material';
+import { Box, Button, ButtonBase, TextField, Grid, Divider,useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
 import FlexBetween from 'components/FlexBetween';
@@ -149,7 +149,7 @@ function ReportConsumers(row) {
         }
 
     }
-
+    const theme = useTheme();
     return (
     <BlockUI blocked={blocked}>
         <ConfirmDialog />
@@ -217,7 +217,7 @@ function ReportConsumers(row) {
                 </form>
             </Box>
         </Modal>
-        <Box sx={{ mt: 10, ml: 10, mr: 10, height: "650px;" }} >
+        <Box sx={{ mt: 10, ml: 10, mr: 10, height: "650px;", backgroundColor: theme.palette.background.alt,padding:10 }} >
 
             <DataGrid
                 loading={isLoading || !firms}
