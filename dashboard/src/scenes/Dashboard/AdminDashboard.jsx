@@ -69,7 +69,7 @@ function AdminDashboard() {
             />
           }
         />
-        {/* row 2 */}
+        {/* row  2 2 */}
         <Box
           gridColumn="span 12"
           gridRow="span 5"
