@@ -18,10 +18,19 @@ jobs:
 
       - name: List local folders
         run: find . -type d
-        
+
+      - name: Check if API directory exists
+        id: check_api_dir
+        run: |
+          if [ -d "api" ]; then
+            echo "::set-output name=exists::true"
+          else
+            echo "::set-output name=exists::false"
+          fi
+
       - name: Create API directory
         run: mkdir api
-
+        if: steps.check_api_dir.outputs.exists == 'false'
       - name: Create .env file
         run: |
           echo "GOOGLE_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}" > api/.env
