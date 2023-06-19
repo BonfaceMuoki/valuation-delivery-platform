@@ -8,11 +8,9 @@ jobs:
     steps:
       - name: Testing-Initiaion
         run: echo "Testing work flow intiation!"
-      - name: creating-common-env
-        uses: SpicyPizza/create-envfile@v1.3
-        with:
-          envkey_GOOGLE_SITE_KEY: ${{ secrets.GOOGLE_SITE_KEY }}
-          file_name: api/.env
-          fail_on_empty: fals
+      - name: Create .env file
+        run: |
+          echo "GOOGLE_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}" > api/.env
+          echo "GOOGLE_SECRET_KEY=${{ secrets.GOOGLE_SECRET_KEY }}" >> api/.env
       - name: Display .env contents
         run: cat api/.env
