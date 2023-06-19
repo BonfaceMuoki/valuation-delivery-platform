@@ -10,9 +10,7 @@ jobs:
         run: echo "Testing work flow intiation!"
       - name: Display repository folders and files
         run: ls -R
-      - name: Create .env file
-        run: |
-          echo "GOOGLE_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}" > api/.env
-          echo "GOOGLE_SECRET_KEY=${{ secrets.GOOGLE_SECRET_KEY }}" >> api/.env
       - name: Display .env contents
-        run: cat .env
+        run: cd api
+      - name: Display .env contents
+        run: ls
