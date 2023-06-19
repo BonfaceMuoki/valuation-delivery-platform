@@ -13,6 +13,6 @@ jobs:
       - name: Testing-Initiation
         run: echo "Testing workflow initiation!"
       - name: Copy env.example to .env in api
-        run: cp api/env.example api/.env
+        run: cp api/.env.example api/.env
       - name: Display  api .env contents
         run: cat api/.env
