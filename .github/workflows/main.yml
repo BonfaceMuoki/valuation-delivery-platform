@@ -12,7 +12,7 @@ jobs:
         run: ls -d /home/runner/work/_temp/*/
       - name: Create .env file
         run: |
-          echo "GOOGLE_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}" >> api/.env
-          echo "GOOGLE_SECRET_KEY=${{ secrets.GOOGLE_SECRET_KEY }}" >> api/.env
+          echo "GOOGLE_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}" >> ../api/.env
+          echo "GOOGLE_SECRET_KEY=${{ secrets.GOOGLE_SECRET_KEY }}" >> ../api/.env
       - name: Display .env contents
         run: cat .env
