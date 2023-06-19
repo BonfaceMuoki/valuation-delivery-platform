@@ -1,20 +1,28 @@
 name: autodeploy
-'on':
-  - push
+on:
+  push:
+    branches:
+      - main
+
 jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+
     steps:
-      - name: Testing-Initiaion
-        run: echo "Testing work flow intiation!"
+      - name: Testing-Initiation
+        run: echo "Testing workflow initiation!"
+
       - name: Set working directory
         run: cd ${{ github.workspace }}
+
       - name: List local folders
         run: find . -type d
+
       - name: Create .env file
         run: |
           echo "GOOGLE_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}" > api/.env
           echo "GOOGLE_SECRET_KEY=${{ secrets.GOOGLE_SECRET_KEY }}" >> api/.env
+
       - name: Display .env contents
         run: cat api/.env
