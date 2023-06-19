@@ -9,7 +9,7 @@ jobs:
       - name: Testing-Initiaion
         run: echo "Testing work flow intiation!"
       - name: List local folders
-        run: ls -d */
+        run: find . -type d
       - name: Display .env contents
         run: cd api
       - name: Display .env contents
