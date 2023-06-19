@@ -18,6 +18,9 @@ jobs:
 
       - name: List local folders
         run: find . -type d
+        
+      - name: Create API directory
+        run: mkdir api
 
       - name: Create .env file
         run: |
