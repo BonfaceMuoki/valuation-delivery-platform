@@ -12,9 +12,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Testing-Initiation
         run: echo "Testing workflow initiation!"
-      - name: Create .env file
-        run: |
-          echo "GOOGLE_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}" > api/.env
-          echo "GOOGLE_SECRET_KEY=${{ secrets.GOOGLE_SECRET_KEY }}" >> api/.env
-      - name: Display .env contents
+      - name: Copy env.example to .env in api
+        run: cp api/env.example api/.env
+      - name: Display  api .env contents
         run: cat api/.env
