@@ -1,1 +1,5 @@
 dashboard/node_modules/
+node_modules/
+.env
+api/.env
+dashboard/.env
