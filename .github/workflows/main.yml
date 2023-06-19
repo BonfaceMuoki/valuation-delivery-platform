@@ -13,4 +13,4 @@ jobs:
           echo "GOOGLE_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}" >> .env
           echo "GOOGLE_SECRET_KEY=${{ secrets.GOOGLE_SECRET_KEY }}" >> .env
       - name: Display .env contents
-        run: cat api/.env
+        run: cat .env
