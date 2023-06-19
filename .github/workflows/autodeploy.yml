@@ -16,18 +16,18 @@ jobs:
         run: cp api/.env.prod api/.env
       - name: Assign value in .env
         run: |
-          sed -i 's/APP_NAME=.*/APP_NAME=${{ secrets.APP_NAME }}/' /var/www/html/api/.env
-          sed -i 's/APP_ENV=.*/APP_ENV=${{ secrets.APP_ENV }}/' /var/www/html/api/.env
-          sed -i 's/APP_KEY=.*/APP_KEY=${{ secrets.APP_KEY }}/' /var/www/html/api/.env
-          sed -i 's/APP_DEBUG=.*/APP_DEBUG=${{ secrets.APP_DEBUG }}/' /var/www/html/api/.env
-          sed -i 's/APP_URL=.*/APP_URL=${{ secrets.APP_URL }}/' /var/www/html/api/.env
-          sed -i 's/DB_CONNECTION=.*/DB_CONNECTION=${{ secrets.DB_CONNECTION }}/' /var/www/html/api/.env
-          sed -i 's/DB_HOST=.*/DB_HOST=${{ secrets.DB_HOST }}/' /var/www/html/api/.env
-          sed -i 's/DB_PORT=.*/DB_PORT=${{ secrets.DB_PORT }}/' /var/www/html/api/.env
-          sed -i 's/DB_DATABASE=.*/DB_DATABASE=${{ secrets.DB_DATABASE }}/' /var/www/html/api/.env
-          sed -i 's/DB_USERNAME=.*/DB_USERNAME=${{ secrets.DB_USERNAME }}/' /var/www/html/api/.env
-          sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=${{ secrets.DB_PASSWORD }}/' /var/www/html/api/.env
-          sed -i 's/DB_USERNAME=.*/DB_USERNAME=${{ secrets.GOOGLE_SITE_KEY }}/' /var/www/html/api/.env
+          sed -i 's/APP_NAME=.*/APP_NAME=${{ secrets.APP_NAME }}/' api/.env
+          sed -i 's/APP_ENV=.*/APP_ENV=${{ secrets.APP_ENV }}/' api/.env
+          sed -i 's/APP_KEY=.*/APP_KEY=${{ secrets.APP_KEY }}/' api/.env
+          sed -i 's/APP_DEBUG=.*/APP_DEBUG=${{ secrets.APP_DEBUG }}/' api/.env
+          sed -i 's/APP_URL=.*/APP_URL=${{ secrets.APP_URL }}/' api/.env
+          sed -i 's/DB_CONNECTION=.*/DB_CONNECTION=${{ secrets.DB_CONNECTION }}/' api/.env
+          sed -i 's/DB_HOST=.*/DB_HOST=${{ secrets.DB_HOST }}/' api/.env
+          sed -i 's/DB_PORT=.*/DB_PORT=${{ secrets.DB_PORT }}/' api/.env
+          sed -i 's/DB_DATABASE=.*/DB_DATABASE=${{ secrets.DB_DATABASE }}/' api/.env
+          sed -i 's/DB_USERNAME=.*/DB_USERNAME=${{ secrets.DB_USERNAME }}/' api/.env
+          sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=${{ secrets.DB_PASSWORD }}/' api/.env
+          sed -i 's/DB_USERNAME=.*/DB_USERNAME=${{ secrets.GOOGLE_SITE_KEY }}/' api/.env
       - name: Display  api .env contents
         run: cat api/.env
       - name: executing remote ssh commands using password
