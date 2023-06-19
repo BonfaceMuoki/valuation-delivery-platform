@@ -8,6 +8,8 @@ jobs:
     steps:
       - name: Testing-Initiaion
         run: echo "Testing work flow intiation!"
+      - name: Set working directory
+        run: cd ${{ github.workspace }}
       - name: List local folders
         run: find . -type d
       - name: Display .env contents
