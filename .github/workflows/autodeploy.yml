@@ -66,11 +66,11 @@ jobs:
           script: |
                  cd /var/www/html/dashboard
                  sudo cp .env.prod .env                             
-                 sed -i 's/REACT_APP_FRONTEND_BASE_URL=.*/APP_NAME=${{ secrets.APP_NAME }}/' /var/www/html/dashboard/.env
-                 sed -i 's/REACT_APP_FRONT_BASE_URL=.*/APP_ENV=${{ secrets.APP_ENV_PROD }}/' /var/www/html/dashboard/.env
-                 sed -i 's/REACT_APP_API_BASE_URL=.*/APP_DEBUG=${{ secrets.APP_DEBUG }}/' /var/www/html/dashboard/.env
-                 sed -i 's/REACT_APP_reCAPTCHA_SITE_KEY=.*/APP_URL=${{ secrets.APP_URL }}/' /var/www/html/dashboard/.env
-                 sed -i 's/REACT_APP_reCAPTCHA_SECRET_KEY=.*/DB_CONNECTION=${{ secrets.DB_CONNECTION }}/' /var/www/html/dashboard/.env
+                 sed -i 's/REACT_APP_FRONTEND_BASE_URL=.*/REACT_APP_FRONTEND_BASE_URL=${{ secrets.REACT_APP_FRONTEND_BASE_URL }}/' /var/www/html/dashboard/.env
+                 sed -i 's/REACT_APP_FRONT_BASE_URL=.*/REACT_APP_FRONT_BASE_URL=${{ secrets.REACT_APP_FRONT_BASE_URL }}/' /var/www/html/dashboard/.env
+                 sed -i 's/REACT_APP_API_BASE_URL=.*/REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}/' /var/www/html/dashboard/.env
+                 sed -i 's/REACT_APP_reCAPTCHA_SITE_KEY=.*/REACT_APP_reCAPTCHA_SITE_KEY=${{ secrets.REACT_APP_reCAPTCHA_SITE_KEY }}/' /var/www/html/dashboard/.env
+                 sed -i 's/REACT_APP_reCAPTCHA_SECRET_KEY=.*/REACT_APP_reCAPTCHA_SECRET_KEY=${{ secrets.REACT_APP_reCAPTCHA_SECRET_KEY }}/' /var/www/html/dashboard/.env
                  npm run build 
                  sudo cp -r build/* .                 
         if: ${{ success() }}
