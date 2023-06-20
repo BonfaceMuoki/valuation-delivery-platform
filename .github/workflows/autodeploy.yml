@@ -42,7 +42,7 @@ jobs:
                  sed -i 's/DB_DATABASE=.*/DB_DATABASE=${{ secrets.DB_DATABASE }}/' /var/www/html/api/.env
                  sed -i 's/DB_USERNAME=.*/DB_USERNAME=${{ secrets.DB_USERNAME }}/' /var/www/html/api/.env
                  sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=${{ secrets.DB_PASSWORD }}/' /var/www/html/api/.env
-                 sed -i 's/DB_USERNAME=.*/DB_USERNAME=${{ secrets.GOOGLE_SITE_KEY }}/' /var/www/html/api/.env
+                 sed -i 's/GOOGLE_SITE_KEY=.*/GOOGLE_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}/' /var/www/html/api/.env
                  php artisan key:generate
                  php artisan migrate --force
                  php artisan db:seed
