@@ -33,8 +33,7 @@ jobs:
                  sudo cp .env.prod .env
                  composer install --no-interaction --prefer-dist --optimize-autoloader                
                  sed -i 's/APP_NAME=.*/APP_NAME=${{ secrets.APP_NAME }}/' /var/www/html/api/.env
-                 sed -i 's/APP_ENV=.*/APP_ENV=${{ secrets.APP_ENV }}/' /var/www/html/api/.env
-                 sed -i 's/APP_KEY=.*/APP_KEY=${{ secrets.APP_KEY }}/' /var/www/html/api/.env
+                 sed -i 's/APP_ENV=.*/APP_ENV=${{ secrets.APP_ENV_PROD }}/' /var/www/html/api/.env
                  sed -i 's/APP_DEBUG=.*/APP_DEBUG=${{ secrets.APP_DEBUG }}/' /var/www/html/api/.env
                  sed -i 's/APP_URL=.*/APP_URL=${{ secrets.APP_URL }}/' /var/www/html/api/.env
                  sed -i 's/DB_CONNECTION=.*/DB_CONNECTION=${{ secrets.DB_CONNECTION }}/' /var/www/html/api/.env
@@ -44,6 +43,7 @@ jobs:
                  sed -i 's/DB_USERNAME=.*/DB_USERNAME=${{ secrets.DB_USERNAME }}/' /var/www/html/api/.env
                  sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=${{ secrets.DB_PASSWORD }}/' /var/www/html/api/.env
                  sed -i 's/DB_USERNAME=.*/DB_USERNAME=${{ secrets.GOOGLE_SITE_KEY }}/' /var/www/html/api/.env
+                 php artisan key:generate
                  php artisan migrate --force
                  php artisan db:seed
                  php artisan optimize
