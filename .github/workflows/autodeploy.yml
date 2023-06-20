@@ -71,7 +71,7 @@ jobs:
                  sed -i 's/REACT_APP_API_BASE_URL=.*/REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}/' /var/www/html/dashboard/.env
                  sed -i 's/REACT_APP_reCAPTCHA_SITE_KEY=.*/REACT_APP_reCAPTCHA_SITE_KEY=${{ secrets.REACT_APP_reCAPTCHA_SITE_KEY }}/' /var/www/html/dashboard/.env
                  sed -i 's/REACT_APP_reCAPTCHA_SECRET_KEY=.*/REACT_APP_reCAPTCHA_SECRET_KEY=${{ secrets.REACT_APP_reCAPTCHA_SECRET_KEY }}/' /var/www/html/dashboard/.env
-                 npm run build 
+                 npm run build
                  sudo cp -r build/* .
                  
 
