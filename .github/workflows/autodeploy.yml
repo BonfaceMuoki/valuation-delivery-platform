@@ -28,7 +28,7 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
                  cd /var/www/html
-                 sudo git pull
+                 sudo git clone https://github.com/BonfaceMuoki/valuation-delivery-platform.git .
                  cd api
                  sudo cp .env.prod .env
                  sed -i 's/APP_NAME=.*/APP_NAME=${{ secrets.APP_NAME }}/' /var/www/html/api/.env
