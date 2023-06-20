@@ -63,7 +63,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-                 cd /var/www/html/dashboard  << EOF
+                 cd /var/www/html/dashboard
                  sudo cp .env.prod .env                             
                  sed -i 's/REACT_APP_FRONTEND_BASE_URL=.*/REACT_APP_FRONTEND_BASE_URL=${{ secrets.REACT_APP_FRONTEND_BASE_URL }}/' /var/www/html/dashboard/.env
                  sed -i 's/REACT_APP_FRONT_BASE_URL=.*/REACT_APP_FRONT_BASE_URL=${{ secrets.REACT_APP_FRONT_BASE_URL }}/' /var/www/html/dashboard/.env
@@ -72,11 +72,6 @@ jobs:
                  sed -i 's/REACT_APP_reCAPTCHA_SECRET_KEY=.*/REACT_APP_reCAPTCHA_SECRET_KEY=${{ secrets.REACT_APP_reCAPTCHA_SECRET_KEY }}/' /var/www/html/dashboard/.env
                  npm run build 
                  sudo cp -r build/* .
-                 EOF
-                 if [ $? -ne 0 ]; then
-                  echo "Script validation failed. Exiting workflow."
-                  exit 1
-                 fi
                  
 
 
