@@ -51,6 +51,7 @@ jobs:
                  php artisan jwt:secret --force
                  php artisan optimize
                  php artisan key:generate
+                 php artisan config:cache
                  echo api deployed
 
 
