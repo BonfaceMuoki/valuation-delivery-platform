@@ -45,12 +45,12 @@ jobs:
                  sed -i 's/GOOGLE_SITE_KEY=.*/GOOGLE_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}/' /var/www/html/api/.env
                  chmod -R 777 storage
                  chmod -R 777 public/reportqr_codes
-                 chmod -R 777 public/reports
-                 php artisan key:generate
+                 chmod -R 777 public/reports               
                  php artisan migrate --force
                  php artisan db:seed
                  php artisan jwt:secret --force
                  php artisan optimize
+                 php artisan key:generate
                  echo api deployed
 
 
