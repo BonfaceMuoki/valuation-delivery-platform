@@ -14,14 +14,13 @@ jobs:
         run: echo "Testing workflow initiation!"
       - name: Copy env.example to .env in api
         run: cp api/.env.example api/.env
-        if: ${{ success() }}
+
       - name: Assign value in .env
         run: |
           sed -i 's/GOOGLE_SITE_KEY=.*/GOOGLE_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}/' api/.env
-        if: ${{ success() }}
+
       - name: Display  api .env contents
         run: cat api/.env
-        if: ${{ success() }}
       - name: Deploying API
         uses: appleboy/ssh-action@master
         with:
@@ -55,7 +54,7 @@ jobs:
                  php artisan optimize
                  php artisan key:generate
                  php artisan config:cache
-        if: ${{ success() }}
+
       - name: Deploying Dashboard
         uses: appleboy/ssh-action@master
         with:
@@ -64,7 +63,7 @@ jobs:
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
           script: |
-                 cd /var/www/html/dashboard
+                 cd /var/www/html/dashboard  << EOF
                  sudo cp .env.prod .env                             
                  sed -i 's/REACT_APP_FRONTEND_BASE_URL=.*/REACT_APP_FRONTEND_BASE_URL=${{ secrets.REACT_APP_FRONTEND_BASE_URL }}/' /var/www/html/dashboard/.env
                  sed -i 's/REACT_APP_FRONT_BASE_URL=.*/REACT_APP_FRONT_BASE_URL=${{ secrets.REACT_APP_FRONT_BASE_URL }}/' /var/www/html/dashboard/.env
@@ -72,8 +71,12 @@ jobs:
                  sed -i 's/REACT_APP_reCAPTCHA_SITE_KEY=.*/REACT_APP_reCAPTCHA_SITE_KEY=${{ secrets.REACT_APP_reCAPTCHA_SITE_KEY }}/' /var/www/html/dashboard/.env
                  sed -i 's/REACT_APP_reCAPTCHA_SECRET_KEY=.*/REACT_APP_reCAPTCHA_SECRET_KEY=${{ secrets.REACT_APP_reCAPTCHA_SECRET_KEY }}/' /var/www/html/dashboard/.env
                  npm run build 
-                 sudo cp -r build/* .                 
-        if: ${{ success() }}
+                 sudo cp -r build/* .
+                 EOF
+                 if [ $? -ne 0 ]; then
+                  echo "Script validation failed. Exiting workflow."
+                  exit 1
+                 fi
                  
 
 
