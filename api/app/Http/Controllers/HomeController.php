@@ -8,6 +8,6 @@ class HomeController extends Controller
 {
     //
     public function home(){
-        echo "Hello hello";
+        echo "API IS ok";
     }
 }
