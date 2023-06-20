@@ -28,8 +28,6 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
                  cd /var/www/html
-                 sudo rm -R api
-                 sudo rm -R dashboard
                  sudo git clone https://github.com/BonfaceMuoki/valuation-delivery-platform.git .
                  cd api
                  sudo cp .env.prod .env
