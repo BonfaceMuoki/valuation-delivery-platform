@@ -415,7 +415,7 @@ class AdminController extends Controller
                     $request['email']=$requestde->invite_email;
                     $request['registration_url']=$request->registration_url;
                     $request['login_url']=$request->login_url;
-                    $request['invite_phone']=$request->invite_phone;
+                    $request['invite_phone']=$requestde->invite_phone;
                     
                     $this->sendValuationInviteMail($request);
                     //update status
