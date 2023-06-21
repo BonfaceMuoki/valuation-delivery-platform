@@ -104,7 +104,7 @@ class AuthController extends Controller
                 // Proceed with your desired logic
             } else {
                 $statusCode = $response->status();
-                return response()->json(['message'=>"Failed. Invalid recaptcha code.".json_encode($data),'secret'=>env('GOOGLE_SITE_KEY') ], 422);
+                return response()->json(['message'=>"Failed. Invalid recaptcha code.".json_encode($data),'secret'=>env('GOOGLE_SITE_KEY'),'app_name'=>env('APP_NAME') ], 422);
                 // reCAPTCHA validation failed
                 // Handle the validation failure
             }
