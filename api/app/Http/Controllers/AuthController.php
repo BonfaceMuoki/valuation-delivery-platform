@@ -104,7 +104,7 @@ class AuthController extends Controller
                 // Proceed with your desired logic
             } else {
                 $statusCode = $response->status();
-                return response()->json(['message'=>"Failed. Invalid recaptcha code.".json_encode($data),'secret'=>env('GOOGLE_SITE_KEY'),'app_name'=>env('APP_NAME') ], 422);
+                return response()->json(['message'=>"Failed. Invalid recaptcha code."], 422);
                 // reCAPTCHA validation failed
                 // Handle the validation failure
             }
@@ -327,8 +327,6 @@ class AuthController extends Controller
             'register_as' => 'required|in:Super Admin,Report Uploader,Uploaders Accesser,Report Uploader Admin,Valuation Firm Director',
             'full_name' => 'required|string|between:2,100',
             'email' => 'required|string|between:2,100|unique:users',
-            'isk_number' => 'required|string|unique:organizations',
-            'vrb_number' => 'required|unique:organizations,directors_vrb|unique:users',
             'password' => ['required', Password::min(6)->letters()->mixedCase()->numbers()->symbols()->uncompromised()],
             'password_confirmation' => 'required|same:password'
         ]);
