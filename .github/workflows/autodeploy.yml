@@ -44,6 +44,13 @@ jobs:
                  sed -i 's/DB_DATABASE=.*/DB_DATABASE=${{ secrets.DB_DATABASE }}/' /var/www/html/api/.env
                  sed -i 's/DB_USERNAME=.*/DB_USERNAME=${{ secrets.DB_USERNAME }}/' /var/www/html/api/.env
                  sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=${{ secrets.DB_PASSWORD }}/' /var/www/html/api/.env
+                 sed -i 's/MAIL_MAILER=.*/MAIL_MAILER=${{ secrets.MAIL_MAILER }}/' /var/www/html/api/.env
+                 sed -i 's/MAIL_HOST=.*/MAIL_HOST=${{ secrets.MAIL_HOST }}/' /var/www/html/api/.env
+                 sed -i 's/MAIL_PORT=.*/MAIL_PORT=${{ secrets.MAIL_PORT }}/' /var/www/html/api/.env
+                 sed -i 's/MAIL_USERNAME=.*/MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}/' /var/www/html/api/.env
+                 sed -i 's/MAIL_PASSWORD=.*/MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}/' /var/www/html/api/.env
+                 sed -i 's/MAIL_ENCRYPTION=.*/MAIL_ENCRYPTION=${{ secrets.MAIL_ENCRYPTION }}/' /var/www/html/api/.env
+                 sed -i 's/MAIL_FROM_ADDRESS=.*/MAIL_FROM_ADDRESS=${{ secrets.MAIL_FROM_ADDRESS }}/' /var/www/html/api/.env
                  sed -i 's/GOOGLE_SITE_KEY=.*/GOOGLE_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}/' /var/www/html/api/.env
                  chmod -R 777 storage
                  chmod -R 777 public/reportqr_codes
@@ -66,6 +73,6 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
                 cd /var/www/html/dashboard
-                sudo mv build/* .  
+                sudo cp build/* .  
 
 
