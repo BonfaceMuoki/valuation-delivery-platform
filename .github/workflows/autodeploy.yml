@@ -73,6 +73,6 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
                 cd /var/www/html/dashboard
-                sudo cp build/* .  
+                sudo cp -r build/* .  
 
 
