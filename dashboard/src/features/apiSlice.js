@@ -3,7 +3,7 @@ import { setCredentials, logOut } from '../scenes/auth/authSlice'
 import { Navigate,useNavigate } from 'react-router-dom'
 
 const baseQuery = fetchBaseQuery({
-    baseUrl: 'http://localhost:8001',
+    baseUrl: process.env.REACT_APP_API_BASE_URL,
     prepareHeaders: (headers, { getState }) => {
         const token = getState().auth.token
         console.log("Sending request");
