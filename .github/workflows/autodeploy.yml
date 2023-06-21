@@ -30,7 +30,7 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
                  cd /var/www/html
-                 sudo git clone https://github.com/BonfaceMuoki/valuation-delivery-platform .
+                 sudo git pull
                  cd api
                  sudo cp .env.prod .env
                  composer install --no-interaction --prefer-dist --optimize-autoloader                
