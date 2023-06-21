@@ -212,7 +212,7 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
-        $isactive = User::where("is_active", 1)->where("email", $request->email)->first();
+        $isactive = User::where("is_active", '1')->where("email", $request->email)->first();
         if ($isactive != null) {
             //verify token
             $response = $this->VarifyRecaptchaToken($request);
@@ -242,6 +242,9 @@ class AuthController extends Controller
                 return response()->json(['message' => "Failed. Invalid recaptcha code.".$response], 422);
                 // Handle the error
             }
+        }else {           
+            return response()->json(['message' => "Inactive account."], 403);
+            // Handle the error
         }
 
 

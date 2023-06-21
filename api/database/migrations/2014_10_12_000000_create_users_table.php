@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('vrb_number')->nullable();
             $table->string('isk_number')->nullable();
             $table->string('profile_pic')->nullable();
-            $table->enum('is_active',['1','0'])->default("0");                        
+            $table->enum('is_active',['1','0'])->default('1');                        
             $table->rememberToken();
             $table->timestamps();
             });
