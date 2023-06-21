@@ -53,7 +53,8 @@ jobs:
                  php artisan jwt:secret --force
                  php artisan optimize
                  php artisan key:generate
-                 php artisan config:cache      
+                 php artisan config:cache
+                 php artisan config:clear      
       - name: Deploying Dashboard build copy
         uses: appleboy/ssh-action@master
         with:
