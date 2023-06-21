@@ -49,9 +49,9 @@ jobs:
                  chmod -R 777 public/reportqr_codes
                  chmod -R 777 public/reports               
                  php artisan migrate --force
-                 php artisan db:seed --class=Database\Seeders\DatabaseSeeder
-                 php artisan db:seed --class=Database\Seeders\RoleSeeder
-                 php artisan db:seed --class=Database\Seeders\PermissionSeeder
+                 php artisan db:seed --class=DatabaseSeeder
+                 php artisan db:seed --class=RoleSeeder
+                 php artisan db:seed --class=PermissionSeeder
                  php artisan jwt:secret --force
                  php artisan optimize
                  php artisan key:generate
