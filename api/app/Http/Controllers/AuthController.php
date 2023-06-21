@@ -230,7 +230,7 @@ class AuthController extends Controller
                     }
                 } else {
                     $statusCode = $response->status();
-                    return response()->json(['message' => "Failed. Invalid recaptcha code."], 422);
+                    return response()->json(['message' => "Failed.  Invalid recaptcha code."], 422);
                     // reCAPTCHA validation failed
                     // Handle the validation failure
                 }
