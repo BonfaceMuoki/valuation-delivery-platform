@@ -64,12 +64,14 @@ class PermissionSeeder extends Seeder
          $role=Role::where('slug','super admin')->first();
           //admin role
         foreach ($permissions as $permission) {
+
             $createdpermission=Permission::create([
                 'name' => $permission['name'],
                 'slug' => strtolower( $permission['name'])
             ]);
             $role->permissions()->attach($createdpermission);
-            }
+            
+        }
             //assign admin all permissions
             //assign admin all permissions
 

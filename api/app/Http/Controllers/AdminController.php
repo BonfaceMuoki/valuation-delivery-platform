@@ -309,6 +309,7 @@ class AdminController extends Controller
     {
         DB::table('valuation_firm_invites')->insert([
             'valauaion_firm_name' => $request['company_name'],
+            'invite_phone' => $request['invite_phone'],
             'isk_number' => $request['isk_number'],
             'vrb_number' => $request['vrb_number'],
             'director_name' => $request['directors_name'],
@@ -390,7 +391,7 @@ class AdminController extends Controller
         try{
             DB::beginTransaction();
             $requestde = ValuationFirmRegistrationRequests::where("id",$request->request_id)->first();
-            $exist = Organization::where("organization_email", )
+            $exist = Organization::where("organization_email",$requestde->invite_email)
                 ->where("directors_vrb",$requestde->vrb_number)
                 ->where("isk_number",$requestde->isk_number)
                 ->first();
@@ -414,6 +415,8 @@ class AdminController extends Controller
                     $request['email']=$requestde->invite_email;
                     $request['registration_url']=$request->registration_url;
                     $request['login_url']=$request->login_url;
+                    $request['invite_phone']=$request->invite_phone;
+                    
                     $this->sendValuationInviteMail($request);
                     //update status
                     ValuationFirmRegistrationRequests::where("id",$request->request_id)->update(['status'=>'Approved']);
