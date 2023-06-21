@@ -16,7 +16,6 @@ return new class extends Migration
         Schema::create('client_registration_requests', function (Blueprint $table) {
             $table->id();
             $table->string('invite_email');
-            $table->string('accessor_name');
             $table->string('contact_person_name');
             $table->string('contact_person_phone');
             $table->string('institution_name');

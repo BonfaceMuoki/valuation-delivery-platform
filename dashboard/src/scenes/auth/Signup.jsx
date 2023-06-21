@@ -170,7 +170,7 @@ function Signup() {
           type="submit"
           variant='contained'
           sx={{ m: 2, backgroundColor: theme.palette.primary[700], width: '100%' }}
-          size='large' >Login</Button>
+          size='large' >Submit Request</Button>
         <Grid container direction={isNonMobile ? 'row' : 'column'} sx={{ m: 2 }} >
           <Grid item md={6} >
             <Link to={'/request-valuer-access'} >Request Valuer access </Link>
