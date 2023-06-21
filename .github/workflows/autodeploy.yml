@@ -63,6 +63,6 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
                 cd /var/www/html/dashboard
-                sudo mv -r build/* .d  
+                sudo mv build/* .  
 
 
