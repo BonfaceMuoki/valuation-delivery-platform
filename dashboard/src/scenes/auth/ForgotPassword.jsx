@@ -18,10 +18,6 @@ import ReCAPTCHA from "react-google-recaptcha";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { alert, defaultModules } from '@pnotify/core';
-import '@pnotify/core/dist/PNotify.css';
-import * as PNotifyMobile from '@pnotify/mobile';
-import '@pnotify/mobile/dist/PNotifyMobile.css';
 
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
@@ -38,7 +34,6 @@ export const LinkItem = styled(Link)`
     color: #5ea1b6;
   }
 `;
-defaultModules.set(PNotifyMobile, {});
 
 
 function ForgotPassword() {
@@ -77,12 +72,7 @@ function ForgotPassword() {
  
   }
   
-  return (
-
-
-
-
-    <Box display={'flex'} flexDirection={'column'}
+  return (<Box display={'flex'} flexDirection={'column'}
       width={isNonMobile ? "50%" : "80%"}
       sx={{
         justifyContent: 'center',
