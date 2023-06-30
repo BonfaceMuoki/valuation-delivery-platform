@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\sendReportApprovalMail;
 use App\Models\Organization;
+use App\Models\ReportSignatories;
 use App\Models\ValuationReport;
 use Cron\MonthField;
 use Illuminate\Http\Request;
@@ -131,6 +133,121 @@ class ValuerController extends Controller
                         //generate code
                         $accessCode = Str::random(8);
                       
+                        $reportuser['name']=$reportusersnames[$index];
+                        $reportuser['phone']=$reportusersphones[$index];
+                        $reportuser['email']=$reportusermail;
+                        $reportuser['access_code']=$accessCode;
+                        $reportuser['valuation_report_id']=$reportd->id;
+                        ReportUser::create($reportuser);
+                        Mail::to($reportusermail)->send(new sendReportAccessMail($reportusersnames[$index],
+                         $reportusermail,$reportusersphones[$index],$accessCode,array_merge($reportd->toArray(),$upurl),$orgdetails));
+                         $index=$index+1;
+    
+                     }      
+    
+                    //close create users
+                    DB::commit();
+                    return response()->json([
+                        'message' => 'Report send successfully',
+                        'report_details' => $reportd,
+                    ], 201);
+
+                }catch(Exception $ex){
+                    DB::rollBack();
+                    return response()->json([
+                        'message'=>'Failed'.$ex->getMessage(),
+                        ''
+                    ], 400);
+                }
+
+            } else {
+                return response()->json(['message' => 'unauthorized access'], 401);
+            }
+        } else {
+            return response()->json(['message' => 'Please login'], 401);
+        }
+    }
+
+    public function uploadReportV2(Request $request)
+    {
+
+
+        if (auth()->user()) {
+            $user = auth()->user();
+            if ($user->hasPermissionTo(Permission::where("slug", "upload report")->first())) {
+                $validator = Validator::make($request->all(), [
+                    'report_description' => 'required|string',
+                    'market_value' => 'required|integer',
+                    'forced_market_value' => 'required|integer',
+                    'property_lr' => 'required|string',
+                    'valuation_date' => 'required|string',
+                    'receiving_company_id' => 'required|string',
+                    'report_pdf' => 'required|mimes:pdf|max:2048',
+                ]);
+                if ($validator->fails()) {
+                    return response()->json($validator->errors()->toJson(), 400);
+                }
+                try{
+                    DB::beginTransaction();
+                    $orgdetails = $user->UploaderOrganization()->wherePivot("status",1)->first();
+                    if($orgdetails==null){
+                        return response()->json(['message'=>"Unauthorized"], 403);
+                    }
+                    $datatosave=$request->except(['report_pdf','valuation_data']);
+                    $file = $request->file("report_pdf");
+                    $fileName = time() . rand(1, 99) . '.' . $file->extension();
+                    $file->move(public_path('reports'), $fileName);                   
+                    $datatosave['report_uploading_user']=$user->id;
+                    $datatosave['valuation_date']= date('Y-m-d', strtotime($request->valuation_date));
+                    $datatosave['upload_link']=$fileName;
+                    $datatosave['report_uploading_from']=$orgdetails->id;
+                    $datatosave['approving_director']=0;
+                    $datatosave['receiving_company_read_code']=9999;
+                    $datatosave['unique_random_code']=999;
+                    $datatosave['receiving_company_id']=$request->post('receiving_company_id');
+                    $lastrow=(ValuationReport::latest()->first()) ? (ValuationReport::latest()->first()): ['id'=>1];
+                    $datatosave['id']=$lastrow['id']+1;
+                    $qrcode=$this->generateQRCode($orgdetails,$datatosave);
+                    $datatosave['qr_code']= $qrcode;                
+                    $reportd=ValuationReport::create($datatosave);
+                    //append qr code
+                    $filePath = public_path("reports/".$fileName);
+                    $outputFilePath = public_path("reports/".$fileName."_signed.pdf");
+                    $this->appendQRCODE($filePath, $outputFilePath,$qrcode);
+                    //append qr code
+                    //generate qr code
+
+                    // add ReportSignatories
+                    $url=url("/");
+                    $upurl=['url_path'=>$url.'/'.$outputFilePath];
+                     $signatoriesnames = $request->signatory_name;
+                     $signatories = $request->signatory;
+                     $signatoriesemails = $request->signatory_email;
+                     $indexs=0;
+                     foreach($signatoriesnames as $reportusermail){
+                        //generate code
+                        $otp = Str::random(8);                      
+                        $reportsign['user_id']=$signatories[$indexs];
+                        $reportsign['OTP_code']=$otp;
+                        $reportsign['report_id']=$reportd->id;
+                        ReportSignatories::create($reportsign);
+                        Mail::to($signatoriesemails[$indexs])->send(new sendReportApprovalMail($signatoriesnames[$indexs],
+                         $reportusermail,$signatoriesemails[$indexs],$otp,array_merge($reportd->toArray(),$upurl),$orgdetails));
+                         $index=$indexs+1;
+    
+                     }  
+                     // add ReportSignatories
+                    
+                    //create users
+                    $url=url("/");
+                    $upurl=['url_path'=>$url.'/'.$outputFilePath];
+                    $index=0;
+                    $reportusersmails=$request->report_users_email;
+                    $reportusersphones=$request->report_users_phone;
+                    $reportusersnames=$request->report_users_name;
+                     foreach($reportusersmails as $reportusermail){
+                        //generate code
+                        $accessCode = Str::random(8);                      
                         $reportuser['name']=$reportusersnames[$index];
                         $reportuser['phone']=$reportusersphones[$index];
                         $reportuser['email']=$reportusermail;

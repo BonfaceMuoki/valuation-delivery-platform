@@ -102,6 +102,8 @@ Route::group([
 ], function ($router) {
     Route::post('/upload-report', [ValuerController::class, 'uploadReport']);
     Route::post('/upload-valuation-report', [ValuerController::class, 'uploadReport']);
+
+    Route::post('/upload-valuation-report-v2', [ValuerController::class, 'uploadReportV2']);
     Route::get('/addimage', [ValuerController::class, 'writeToPDF']);
     Route::get('/generate-qr-report', [ValuerController::class, 'generateQRCode']);
     Route::get('/retrieve-valuer-org-details', [ValuerController::class, 'retriveValuerOrgDetails']);

@@ -296,7 +296,7 @@ class AdminController extends Controller
     public function sendValuationInviteMail($request)
     {
         $token = $this->generateInviteToken($request);
-        Mail::to($request['email'])->send(new SendValuationFirmInviteMail($token,$request['registration_url'],$request['login_url']));
+        Mail::to($request['email'])->send(new SendValuationFirmInviteMail($token,$request['registration_url'],$request['login_url'],$request['directors_name']));
     }
     public function generateInviteToken($request)
     {

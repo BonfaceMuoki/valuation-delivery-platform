@@ -28,9 +28,9 @@
                     </tr>
                     <tr style="">
                         <td style="text-align:center; background-color:#986B37;">
-                            <a href="https://mortgagekenya.com" title="logo" target="_blank">
-                                <img width="80" style="height: 80px;"
-                                    src="https://mortgagekenya.com/wp-content/uploads/2022/12/mortgagekenya.png"
+                        <a href="https://mortgagekenya.com" title="logo" target="_blank">
+                                <img width="80" style="height: 50px; margin-top:5px;"
+                                    src="https://isk.or.ke/wp-content/themes/custom/images/logo.png"
                                     title="logo" alt="logo">
                             </a>
                         </td>
@@ -49,7 +49,7 @@
                                     <td style="padding:0 35px;">
                                         <p
                                             style="color:#1e1e2d; font-weight:500; margin:0;font-size:32px;font-family:'Rubik',sans-serif;text-align:left;">
-                                            Hello there, </p>
+                                            Hello {{$name}}, </p>
 
                                         <p style="color:#455056; font-size:15px;line-height:24px; margin:0; text-align:left">
                                             You have been invited by ISK to set up an account on valdel.</p>

@@ -35,6 +35,7 @@ import {
   PeopleAltOutlined,
   CheckBoxOutlineBlankOutlined,
   LockClockOutlined,
+  UploadFileOutlined,
 } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -57,6 +58,11 @@ const navItemsvaluer = [
     text: "Uploaded",
     icon: <ShoppingCartOutlined />,
     routeName: "/valuation-firm/my-reports"
+  },
+  {
+    text: "Upload New",
+    icon: <UploadFileOutlined />,
+    routeName: "/valuation-firm/submit-report"
   },
   {
     text: "User Manager",
@@ -100,7 +106,7 @@ const navItemsaccesor = [
     routeName: "accessor/my-users"
   },
   {
-    text: "My Uploaders",
+    text: "My Valuers",
     icon: <TodayOutlined />,
     routeName: "accessor/my-valuers"
   }
@@ -248,15 +254,22 @@ const Sidebar = ({
             <Box m="1.5rem 2rem 2rem 3rem">
               <FlexBetween color={theme.palette.secondary.main}>
                 <Box display="flex" alignItems="center" gap="0.5rem">
-                  <Typography variant="h4" fontWeight="bold">
-                    VALDEL
+                  <Typography variant="h2" fontWeight="bold">
+                    I    S    K
                   </Typography>
-                </Box>
+                  </Box>
                 {!isNonMobile && (
                   <IconButton onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
                     <ChevronLeft />
                   </IconButton>
                 )}
+              </FlexBetween>
+              <FlexBetween color={theme.palette.secondary.main}>
+                <Box display="flex" alignItems="center" gap="0.5rem">
+                  <Typography variant="h6" fontWeight="bold">
+                    VDS
+                  </Typography>
+                </Box>
               </FlexBetween>
               
             </Box>

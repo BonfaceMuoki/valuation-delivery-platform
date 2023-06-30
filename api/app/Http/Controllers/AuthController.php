@@ -143,7 +143,7 @@ class AuthController extends Controller
                     $requesaccess['contact_person_phone']=$request->phone_number;
                     $requesaccess['contact_person_name']=$request->full_names;
                     $requesaccess['institution_name']=$request->institution_name;                
-                    $invite = ClientRegistrationRequests::create( $requesaccess);
+                    $invite = ClientRegistrationRequests::create($requesaccess);
                     DB::commit();
                     if($invite){
                         return response()->json(['message'=>"Request send succefully. You will get an email to the email you provided once the approval has been made." ], 201);

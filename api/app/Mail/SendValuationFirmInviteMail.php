@@ -13,17 +13,18 @@ class SendValuationFirmInviteMail extends Mailable
 {
     use Queueable, SerializesModels;
    
-public $token,$registration_url,$login_url;
+public $token,$registration_url,$login_url,$contact_person;
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($token,$registration_url,$login_url)
+    public function __construct($token,$registration_url,$login_url,$contact_person)
     {
       $this->token=$token;
       $this->registration_url=$registration_url;
       $this->login_url=$login_url; 
+      $this->contact_person=$contact_person;
         //
     }
 
@@ -52,6 +53,7 @@ public $token,$registration_url,$login_url;
                 'token' => $this->token,
                 'rgistrationcallbackurl' => $this->registration_url,
                 'logincallback' => $this->login_url,
+                'name' => $this->contact_person,
             ],
         );
     }

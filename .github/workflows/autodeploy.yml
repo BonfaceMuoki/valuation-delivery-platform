@@ -30,7 +30,7 @@ jobs:
           port: ${{ secrets.SERVER_PORT }}
           script: |
                  cd /var/www/html
-                 sudo git clone https://github.com/BonfaceMuoki/valuation-delivery-platform .
+                 sudo git pull
                  cd api
                  sudo cp .env.prod .env
                  composer install --no-interaction --prefer-dist --optimize-autoloader                
@@ -56,9 +56,6 @@ jobs:
                  chmod -R 777 public/reportqr_codes
                  chmod -R 777 public/reports               
                  php artisan migrate --force
-                 php artisan db:seed --class=DatabaseSeeder
-                 php artisan db:seed --class=RoleSeeder
-                 php artisan db:seed --class=PermissionSeeder
                  php artisan jwt:secret --force
                  php artisan optimize
                  php artisan key:generate

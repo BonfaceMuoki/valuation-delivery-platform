@@ -68,7 +68,7 @@ function AccesorDashboard() {
           }
         />
         <StatBox
-          title="Accesors served"
+          title="Valuers "
           value={accesordashbaord?.servedaccesors}
           increase=""
           description="Since last month"

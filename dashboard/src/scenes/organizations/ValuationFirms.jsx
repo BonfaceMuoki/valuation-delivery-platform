@@ -133,7 +133,7 @@ function ValuationFirms(row) {
                 return <>
  <Button variant='contained' onClick={() => viewValuationFirmDetails(params.row)}>view</Button> &nbsp;&nbsp;
           <Button variant='contained' onClick={() => editValuationFirm(params.row)}>Edit</Button> &nbsp;&nbsp;
-          <Button variant='contained' onClick={() => blockValuationFirm(params.row)} >Block</Button>
+          {/* <Button variant='contained' onClick={() => blockValuationFirm(params.row)} >Block</Button> */}
                 </>
             },
         }

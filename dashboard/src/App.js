@@ -40,6 +40,7 @@ import ForgotPassword from "scenes/auth/ForgotPassword";
 import ResetPassword from "scenes/auth/ResetPassword";
 import ValuationFirmRequests from "scenes/organizations/ValuationFirmRequests";
 import AccesorRegistrationRequests from "scenes/organizations/AccesorRegistrationRequests";
+import ReportSubmit from "scenes/reports/ReportSubmit";
 
 function App() {
   const mode = useSelector((state) => state.auth.mode);
@@ -206,6 +207,16 @@ function App() {
                   <Route
                     path="/valuation-firm/my-reports"
                     element={<UploaderValuationReports />}
+                  />
+                </Route>
+                <Route
+                  element={
+                    <AuthorizeRoute checkpermission="view valuation firm reports only" />
+                  }
+                >
+                  <Route
+                    path="/valuation-firm/submit-report"
+                    element={<ReportSubmit />}
                   />
                 </Route>
                 <Route
