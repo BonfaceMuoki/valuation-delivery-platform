@@ -36,6 +36,8 @@ import {
   CheckBoxOutlineBlankOutlined,
   LockClockOutlined,
   UploadFileOutlined,
+  CreditScoreOutlined,
+  PaymentOutlined,
 } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -82,6 +84,20 @@ const navItemsvaluer = [
     text: "My Clients",
     icon: <CalendarMonthOutlined />,
     routeName: "/valuation-firm/my-clients"
+  },
+  {
+    text: "Billing",
+    icon: null,
+  },
+  {
+    text: "My Credits",
+    icon: <CreditScoreOutlined />,
+    routeName: "/valuation-firm/my-credits"
+  },
+  {
+    text: "Make Payment",
+    icon: <PaymentOutlined />,
+    routeName: "/valuation-firm/make-payment"
   }
 ];
 
