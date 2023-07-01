@@ -18,7 +18,7 @@ import "../../assets/scss/auth.css"
 import { Label, TextFieldsOutlined } from '@mui/icons-material';
 import Image from 'mui-image';
 import profileImage from "assets/profile.jpg";
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import styled from '@emotion/styled';
 import { useSearchParams,useLocation } from 'react-router-dom';
 
@@ -96,9 +96,10 @@ useEffect(() => {
     setInviteValue("email",retrieved?.invite_email);
     setInviteValue("vrb_number",retrieved?.vrb_number);
     setInviteValue("isk_number",retrieved?.isk_number);
+    setInviteValue("phone_number",retrieved?.invite_phone);
   }
 }, [retrieved, loadingInviteDetails, setInviteValue,]);
-
+const navigate = useNavigate();
 const submitRegister = async (data)=>{
     const formdata= new FormData();
     formdata.append("company_name",data.company_name);
@@ -113,14 +114,12 @@ const submitRegister = async (data)=>{
     formdata.append("register_as","Report Uploader Admin");
     formdata.append("full_name",data.fulls_name);
     const result = await registerValuer(formdata);
-    console.log(result);
     if ('error' in result) {
 
       toastMessage(result.error.data.message, "error");
       if('backendvalerrors' in result.error.data){
 
         setBackendValErrors(result.error.data.backendvalerrors);
-        console.log(backendValErrors['email']);
 
       }
     
@@ -128,6 +127,7 @@ const submitRegister = async (data)=>{
 
     } else {
       toastMessage(result.data.message, "success");
+      navigate('/login');      
 
     }
 
@@ -167,6 +167,7 @@ if(Object.keys(retrieved).length === 0){
   return ( 
     <Box display={'flex'} flexDirection={'column'}
           width={isNonMobile ? "50%" : "80%"}
+          
           sx={{
 
             justifyContent: 'center',
@@ -203,7 +204,7 @@ if(Object.keys(retrieved).length === 0){
             </Grid>
           </Grid>
           <Typography sx={{ ml: 1 }}>Contact Phone Number</Typography>
-          <TextField placeholder='Contact Phone Number'  sx={{ pl:1, mb:1 }} id="outlined-basic" {...acceptInviteRegister("phone_number")}   fullWidth/>
+          <TextField placeholder='Contact Phone Number'  sx={{ pl:1, mb:1 }} id="outlined-basic" {...acceptInviteRegister("phone_number")} disabled   fullWidth/>
           <span sx={{ ml: 1 }} className='errorSpan'>{acceptInviteerrors.phone_number?.message}</span>
           <Grid container direction={isNonMobile ? 'row' : 'column'}  >
             <Grid item md={6}  sm={12} sx={{mb:1}}>

@@ -27,7 +27,9 @@ const baseQueryWithReauth = async (args, api, extraOptions) => {
                 'Accept': 'Application/json'
               }
           }, api, extraOptions)
-        if (refreshResult?.data) {
+    
+          console.log(refreshResult);
+          if (refreshResult?.data) {
             const user = api.getState().auth.user 
             // store the new token 
             api.dispatch(setCredentials({ ...refreshResult.data, user }))

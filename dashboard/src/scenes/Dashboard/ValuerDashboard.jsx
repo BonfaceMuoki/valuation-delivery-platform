@@ -41,7 +41,7 @@ function ValuerDashboard() {
           title="Total Reports"
           value={valuerdashboard?.allreports}
           increase=""
-          description="Since First Day"
+          description="All Reports"
           icon={
             <DocumentScannerOutlined
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}
@@ -63,7 +63,7 @@ function ValuerDashboard() {
           title="Clients served"
           value={valuerdashboard?.servedaccesors}
           increase=""
-          description="Since First Day"
+          description="All Clients"
           icon={
             <CorporateFareOutlined
               sx={{ color: theme.palette.secondary[300], fontSize: "26px" }}

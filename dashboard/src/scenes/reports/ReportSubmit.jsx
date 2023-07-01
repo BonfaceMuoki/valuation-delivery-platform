@@ -55,6 +55,42 @@ const steps = ['Location', 'Property Details', 'Valuation', 'Signature', 'Confir
 
 const ReportSubmit = () => {
 
+  //map auto complete
+
+  const inputRef = useRef()
+  const inputStyle= {
+    boxShadow: 'inset 0 0 10px #eee !important',
+    border: '2px solid #eee',
+    width: '456px',
+    height: '40px',
+    marginLeft: '16px',
+    borderRadius: '20px',
+    fontWeight: '300 !important',
+    outline: 'none',
+    padding: '10px 20px',
+    marginBottom: '10px',
+  }
+
+
+  const autoComplete = new window.google.maps.places.Autocomplete(
+    inputRef.current,
+  )
+
+
+  autoComplete.addListener('place_changed', () => {
+    const place = autoComplete.getPlace()
+    if (!place.geometry || !place.geometry.location) {
+      // User entered the name of a Place that was not suggested and
+      // pressed the Enter key, or the Place Details request failed.
+        alert("this location not available")
+    }
+    if (place.geometry.viewport || place.geometry.location) {
+        // do something
+        console.log(place.geometry.location)
+    }
+  })
+  //map autocomplete
+
   const [signatories, setSignatories] = useState([]);
   //upload image
   const [image, setImage] = useState();
@@ -233,26 +269,42 @@ const ReportSubmit = () => {
       <Box component={Paper} sx={{ p: 5 }}>
         <form onSubmit={handleLocationSubmit(onSubmitLocation)}>
           <Grid container spacing={2} sx={{ mt: 5 }} >
-            <Grid item xs={12} sm={6} md={6} justifyContent="center" alignItems="center">
+            <Grid item xs={12} sm={4} md={4} justifyContent="center" alignItems="center">
               <div>
                 <Typography sx={{ mb: 1 }}>Location Name</Typography>
                 <TextField
                   {...registerlocation('locationName', { required: true }, { shouldRender: !locationerrors.locationName })}
                   placeholder="Location Name"
                   fullWidth
+                  ref={inputRef}
                 />
                 <span className='errorSpan' >{locationerrors.locationName?.message}</span>
               </div>
             </Grid>
-            <Grid item xs={12} sm={6} md={6} justifyContent="center" alignItems="center">
+            <Grid item xs={12} sm={4} md={4} justifyContent="center" alignItems="center">
               <div>
                 <Typography sx={{ mb: 1 }}>County</Typography>
                 <TextField {...registerlocation('county', { required: true }, { shouldRender: !locationerrors.county })} placeholder="County" fullWidth /><br />
                 <span className='errorSpan' >{locationerrors.county?.message}</span>
               </div>
             </Grid>
+            <Grid item xs={12} sm={4} md={4} justifyContent="center" alignItems="center">
+              <div>
+                <Typography sx={{ mb: 1 }}>Town</Typography>
+                <TextField {...registerlocation('town', { required: true }, { shouldRender: !locationerrors.town })} placeholder="town" fullWidth /><br />
+                <span className='errorSpan' >{locationerrors.town?.message}</span>
+              </div>
+            </Grid>
           </Grid>
           <Grid container spacing={2} sx={{ mt: 5 }} >
+
+            <Grid item xs={12} sm={6} md={6} justifyContent="center" alignItems="center">
+              <div>
+                <Typography sx={{ mb: 1 }}>Street</Typography>
+                <TextField {...registerlocation('street', { required: true }, { shouldRender: !locationerrors.neighbourHood })} placeholder="Street" fullWidth /><br />
+                <span className='errorSpan' >{locationerrors.street?.message}</span>
+              </div>
+            </Grid>
             <Grid item xs={12} sm={6} md={6} justifyContent="center" alignItems="center">
               <div>
                 <Typography sx={{ mb: 1 }}>Neighbourhood</Typography>
@@ -262,13 +314,6 @@ const ReportSubmit = () => {
                   fullWidth
                 /><br />
                 <span className='errorSpan' >{locationerrors.neighbourHood?.message}</span>
-              </div>
-            </Grid>
-            <Grid item xs={12} sm={6} md={6} justifyContent="center" alignItems="center">
-              <div>
-                <Typography sx={{ mb: 1 }}>Street</Typography>
-                <TextField {...registerlocation('street', { required: true }, { shouldRender: !locationerrors.neighbourHood })} placeholder="Street" fullWidth /><br />
-                <span className='errorSpan' >{locationerrors.street?.message}</span>
               </div>
             </Grid>
           </Grid>

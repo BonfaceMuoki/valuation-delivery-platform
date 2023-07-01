@@ -33,7 +33,12 @@ return new class extends Migration
             $table->integer("views_count")->default(0);
             $table->integer("insurence_value")->default(0);
 // add columns
-           $table->string("location_name")->nullable();
+           $table->string("location_name_auto")->nullable();
+           $table->string("location_name_map")->nullable();
+           $table->string("latitude_auto")->nullable();
+           $table->string("longitude_auto")->nullable();
+           $table->string("latitude_map")->nullable();
+           $table->string("longitude_map")->nullable();
            $table->string("county")->nullable();
            $table->string("town")->nullable();
            $table->string("street")->nullable();

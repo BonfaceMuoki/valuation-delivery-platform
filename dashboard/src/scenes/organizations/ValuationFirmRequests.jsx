@@ -28,6 +28,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { useApproveValuationFirmRequestMutation, useGetValuationFirmRequestsQuery, useRejectValuationFirmRequestMutation } from 'features/valuationFirmRequestsSlice';
 import { useTheme } from '@emotion/react';
 
+
 const style = {
     position: 'absolute',
     top: '50%',
@@ -70,6 +71,7 @@ function ValuationFirmRequests(row) {
     }
     const frontendbaseurl = process.env.REACT_APP_FRONT_BASE_URL;
     const acceptAcceptingRegistartion = async (data) => {
+        setBlocked(true);
         const formData = new FormData();
         formData.append("request_id", data);
         formData.append("login_url", `${frontendbaseurl}/complete-invite-by-login`);
@@ -81,11 +83,12 @@ function ValuationFirmRequests(row) {
                 toastMessage(result.data.message, "error");
                 // setBackendValErrors(result.error.data.backendvalerrors);
             }
+            setBlocked(false);
         } else {
             toastMessage(result.data.message, "success");
             setBlocked(false);
         }
-
+      
 
         refetchFirmRequests();
     }
@@ -233,7 +236,7 @@ function ValuationFirmRequests(row) {
     // const [submitRequestDecline,]
     //process decline form
     return (
-        <BlockUI blocked={blocked}>
+        <BlockUI blocked={blocked} fullScreen >
             <ConfirmDialog />
             {/* close modal details valuation firm */}
             <Modal
@@ -301,7 +304,7 @@ function ValuationFirmRequests(row) {
             </Modal>
 
 
-            <Box sx={{ mt: 10, ml: 10, mr: 10, height: "650px;", backgroundColor: theme.palette.background.alt, padding: 10 }} >
+            <Box sx={{ mt: 2, ml: 2, mr: 2, height: "650px;", backgroundColor: theme.palette.background.alt, padding: 5 }} >
                 {isFetching && <span>Is refetching</span>}
                 {/* {isLoading&& <span>Is refetching</span>} */}
                 <DataGrid

@@ -51,7 +51,7 @@ const navItemsvaluer = [
     routeName: "/valuer-dashboard"
   },
   {
-    text: "Valuation Reports",
+    text: "Valuations",
     icon: null,
   },
   {
@@ -63,6 +63,11 @@ const navItemsvaluer = [
     text: "Upload New",
     icon: <UploadFileOutlined />,
     routeName: "/valuation-firm/submit-report"
+  },
+  {
+    text: "Comparables",
+    icon: <GradeOutlined />,
+    routeName: "/valuation-firm/comparables"
   },
   {
     text: "User Manager",

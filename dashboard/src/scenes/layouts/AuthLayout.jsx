@@ -8,7 +8,7 @@ import "../../assets/scss/auth.css"
 import Image from 'mui-image';
 import profileImage from "assets/profile.jpg";
 import { Outlet } from 'react-router-dom';
-import BGIMAGE from "../../assets/bg5.jpg"
+import BGIMAGE from "../../assets/bg.jpg"
 const AuthLayout = () => {
   const isNonMobile = useMediaQuery("(min-width: 600px)");
   const theme = useTheme();
@@ -19,9 +19,7 @@ const AuthLayout = () => {
       backgroundImage: `url(${BGIMAGE})`,
       backgroundSize: 'cover',
       backgroundPosition: 'center',
-      width: `calc(100vw + 48px)`,
-      margin: -24,
-      padding: 24,
+      width: `calc(100vw + 48px)`
     }
    };
 
