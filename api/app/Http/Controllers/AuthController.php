@@ -706,6 +706,7 @@ public function registerAccesor(Request $request){
         $userid=['user_id'=>auth()->user()->id];
         $user=auth()->user();
         return response()->json([
+            'message' => 'Logged in successfully. Welcome to VDS',
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60,

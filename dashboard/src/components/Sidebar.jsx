@@ -38,6 +38,13 @@ import {
   UploadFileOutlined,
   CreditScoreOutlined,
   PaymentOutlined,
+  RequestPage,
+  RequestPageOutlined,
+  FoodBankOutlined,
+  CorporateFareOutlined,
+  AccountCircleOutlined,
+  RollerShadesClosed,
+  AccountBoxOutlined,
 } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -155,23 +162,23 @@ const navItemsadmin = [
   },
   {
     text: "Valuation Firms",
-    icon: <ApartmentOutlined />,
+    icon: <CorporateFareOutlined />,
     routeName: "/valuation-firms"
   },
   {
     text: "Valuation Requests",
-    icon: <ApartmentOutlined />,
+    icon: <RequestPageOutlined />,
     routeName: "/valuation-firm-requests"
   }
   ,
   {
-    text: "Clients Requests",
-    icon: <ApartmentOutlined />,
+    text: "Accesor Requests",
+    icon: <RequestPageOutlined />,
     routeName: "/clients-requests"
   },
   {
-    text: "Consumers",
-    icon: <ApartmentOutlined />,
+    text: "Accesors",
+    icon: <FoodBankOutlined />,
     routeName: "/report-consumers"
   },
   {
@@ -180,26 +187,26 @@ const navItemsadmin = [
   },
   {
     text: "All Users",
-    icon: <GradeOutlined />,
+    icon: <PeopleAltOutlined />,
     routeName: "/all-system-users"
   },
-  {
-    text: "Valuation Users",
-    icon: <GradeOutlined />,
-    routeName: "/valuation-firm-users"
-  },
-  {
-    text: "Consumer Users",
-    icon: <GradeOutlined />,
-    routeName: "/accesors-firm-users"
-  },
+  // {
+  //   text: "Valuation Users",
+  //   icon: <GradeOutlined />,
+  //   routeName: "/valuation-firm-users"
+  // },
+  // {
+  //   text: "Consumer Users",
+  //   icon: <GradeOutlined />,
+  //   routeName: "/accesors-firm-users"
+  // },
   {
     text: "Site Settings",
     icon: null,
   },
   {
     text: "Roles",
-    icon: <PeopleAltOutlined />,
+    icon: <AccountBoxOutlined />,
     routeName: "/roles"
   },
   {

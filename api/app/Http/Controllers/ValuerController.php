@@ -89,7 +89,7 @@ class ValuerController extends Controller
                     'report_pdf' => 'required|mimes:pdf|max:2048',
                 ]);
                 if ($validator->fails()) {
-                    return response()->json($validator->errors()->toJson(), 400);
+                    return response()->json(["message"=>"Unprocessable data","backendvalerrors"=>$validator->errors()], 422);
                 }
                 try{
                     DB::beginTransaction();
@@ -185,7 +185,7 @@ class ValuerController extends Controller
                     'report_pdf' => 'required|mimes:pdf|max:2048',
                 ]);
                 if ($validator->fails()) {
-                    return response()->json($validator->errors()->toJson(), 400);
+                    return response()->json(["message"=>"Unprocessable data","backendvalerrors"=>$validator->errors()], 422);
                 }
                 try{
                     DB::beginTransaction();

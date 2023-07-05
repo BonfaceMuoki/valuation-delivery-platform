@@ -8,6 +8,7 @@ use App\Models\ValuationReport;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Models\Permission;
+use App\Models\PropertyType;
 use DB;
 
 class CommonController extends Controller
@@ -162,6 +163,10 @@ class CommonController extends Controller
         } else {
             abort(404, 'File not found!');
         }
+    }
+    public function getAllProprtyTypes(){
+      $all=PropertyType::all();
+      return response()->json($all, 201);
     }
     
 }

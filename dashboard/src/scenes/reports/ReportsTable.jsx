@@ -38,7 +38,7 @@ function ReportsTable () {
             field: "property_lr",
             flex: 1,
         }, {
-            headerName: "Valauation Date",
+            headerName: "Valuation Date",
             field: "valuation_date",
             flex: 1
         }, {
@@ -50,7 +50,7 @@ function ReportsTable () {
             field: "market_value",
             flex: 1
         }, {
-            headerName: "Forced Market value(KES)",
+            headerName: "Forced Sale value(KES)",
             field: "forced_market_value",
             flex: 1,
         },

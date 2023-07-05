@@ -22,6 +22,12 @@ import { useGetUsersQuery } from 'features/usersSlice';
 import { useGetAccesorsListQuery } from 'features/accessorsListSlice';
 import { useUploadValuationReportV2Mutation } from 'features/valuationReportUploadV2Slice';
 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import "primereact/resources/themes/bootstrap4-dark-blue/theme.css";
+import "primereact/resources/primereact.min.css";
+import { useGetPropertyTypeListQuery } from 'features/propertyTypeListSlice';
+
 
 const styles = {
   root: {
@@ -42,23 +48,49 @@ const styles = {
   content: {
     flex: 1,
   },
-  buttonContainer: {
+  buttonContainerLeft: {
     display: 'flex',
     justifyContent: 'flex-end',
     marginTop: '16px',
   },
+  buttonContainer: {
+    display: 'flex',
+    justifyContent: 'flex-left',
+    marginTop: '16px',
+  },
   button: {
     marginLeft: '8px',
+    color: 'white',
+    backgroundColor: '#0096FF',
+    borderRadius: "20px",
+    width: "50%"
   },
 };
 const steps = ['Location', 'Property Details', 'Valuation', 'Signature', 'Confirm'];
 
 const ReportSubmit = () => {
 
+
+  const toastMessage = (message, type) => {
+    if (type == "success") {
+      toast.success(message, {
+        position: toast.POSITION.TOP_RIGHT
+      });
+    } else if (type == "error") {
+      toast.error(message, {
+        position: toast.POSITION.TOP_RIGHT
+      });
+    } else if (type == "warning") {
+      toast.warning(message, {
+        position: toast.POSITION.TOP_RIGHT
+      });
+    }
+  }
+
   //map auto complete
 
   const inputRef = useRef()
-  const inputStyle= {
+  const inputStyle = {
     boxShadow: 'inset 0 0 10px #eee !important',
     border: '2px solid #eee',
     width: '456px',
@@ -76,17 +108,25 @@ const ReportSubmit = () => {
     inputRef.current,
   )
 
+  const [existingAccessors, setExistingAccessors] = useState();
+  const { data: propertytypesapi, isLOading } = useGetPropertyTypeListQuery();
+
+ 
+  const [propertyTypes, setPropertyTypes] = useState([]);
+  useEffect(() => {
+    setPropertyTypes(propertytypesapi);
+  }, [propertytypesapi]);
 
   autoComplete.addListener('place_changed', () => {
     const place = autoComplete.getPlace()
     if (!place.geometry || !place.geometry.location) {
       // User entered the name of a Place that was not suggested and
       // pressed the Enter key, or the Place Details request failed.
-        alert("this location not available")
+      alert("this location not available")
     }
     if (place.geometry.viewport || place.geometry.location) {
-        // do something
-        console.log(place.geometry.location)
+      // do something
+    
     }
   })
   //map autocomplete
@@ -110,6 +150,7 @@ const ReportSubmit = () => {
   const valauationdetails = useSelector(selectValuationDetails);
   const reportignatories = useSelector(selectCurrentSignatories);
   const recipientdetails = useSelector(selectCurrentRecipient);
+
   //upload image
   const [activeStep, setActiveStep] = useState(0);
   const [submitted, setSubmitted] = useState(true);
@@ -119,20 +160,24 @@ const ReportSubmit = () => {
     handleNext();
   }
   const onSubmitPropertyDetails = async (data) => {
-
+   
     dispatch(setValuationPropertyDetails(data));
     handleNext();
   }
   const onSubmitPropertyValuation = async (data) => {
-    console.log(data);
+
     delete data.file;
     dispatch(setValuationDetails(data));
     dispatch(setReportRecipient(data.recipient));
+    if(existingAccessors.length > 0){
+      handleNext();
+    } else{
+      toastMessage("Please contact the admin to add the recipient you want to submit report to","error");
+    }
 
-    handleNext();
   }
   const onSubmitSignee = async (data) => {
-    console.log(data);
+
     dispatch(setReportSignatories(data));
     setSignatories(data.signees);
     handleNext();
@@ -151,11 +196,11 @@ const ReportSubmit = () => {
 
   //submit report toserver\\
   const [uploadReport, { isLoading: isUploading }] = useUploadValuationReportV2Mutation();
-  const [recipientUsernames,setRecipientUsernames]=useState([]);
-  useEffect(()=>{
-    setRecipientUsernames(valauationdetails?.report_user_name);
- },[valauationdetails]);
-  const submitReportForSinature = async () =>{
+  const [recipientUsernames, setRecipientUsernames] = useState([]);
+  const [recipientEmails, setRecipientEmails] = useState([]);
+  const [recipientPhone, setRecipientPhone] = useState([]);
+
+  const submitReportForSinature = async () => {
     const formData = new FormData();
     //location details
     formData.append("location_name", locationDetails?.locationName);
@@ -165,8 +210,8 @@ const ReportSubmit = () => {
     formData.append("street", locationDetails?.street);
     //location details
     //property details
-    formData.append("property_lr", propertdetails?.property_lr);
-    formData.append("Property_type", propertdetails?.property_lr);
+    formData.append("property_lr", propertdetails?.PropertyLR);
+    formData.append("Property_type", propertdetails?.PropertyType[0].name);
     formData.append("total_built_up_area", propertdetails?.totalBuiltUpArea);
     formData.append("land_size", propertdetails?.landSize);
     formData.append("tenure", propertdetails?.tenure);
@@ -184,26 +229,37 @@ const ReportSubmit = () => {
     // valuation summary
 
     //recipients
-    recipientUsernames.map((field,key)=>{
-        formData.append("report_users_name[]", valauationdetails.report_user_name[key]);
-        formData.append("report_users_phone[]", valauationdetails.report_user_phone[key]);
-        formData.append("report_users_email[]", valauationdetails.report_user_email[key]);
+    recipientUsernames.map((field, key) => {
+      formData.append("report_users_name[]", valauationdetails.report_user_name[key]);
+      formData.append("report_users_phone[]", valauationdetails.report_user_phone[key]);
+      formData.append("report_users_email[]", valauationdetails.report_user_email[key]);
     })
     //recipients
 
     // signatories
-    
-    signatories.map((signatory,key)=>{      
+
+    signatories.map((signatory, key) => {
       formData.append("signatory[]", signatory.id);
       formData.append("signatory_name[]", signatory.full_name);
       // formData.append("signatory_phone[]", valauationdetails.report_user_phone[key]);
       formData.append("signatory_email[]", signatory.email);
-  })
+    })
     //signatories
-    const result=await uploadReport(formData);
+    const result = await uploadReport(formData);
+    if ('error' in result) {
+      toastMessage(result.error.data.message, "error");
+      if ('backendvalerrors' in result.error.data) {
+        // setBackendValErrors(result.error.data.backendvalerrors);
+      }
+    } else {
+      toastMessage(result.data.message, "success");
+
+    }
+
+
   }
 
-  const submitReportToClient = async () =>{
+  const submitReportToClient = async () => {
 
   }
   //submit report to server
@@ -249,6 +305,7 @@ const ReportSubmit = () => {
     });
     const locationValidationSchema = Yup.object().shape({
       locationName: Yup.string().required('Location Name is required'),
+      town: Yup.string().required('Town is required'),
       street: Yup.string().required('Street is required'),
       county: Yup.string().required('County is required'),
       neighbourHood: Yup.string().required('Neighbourhood is required'),
@@ -262,6 +319,8 @@ const ReportSubmit = () => {
         setLocationValues("county", locationDetails?.county);
         setLocationValues("neighbourHood", locationDetails?.neighbourHood);
         setLocationValues("street", locationDetails?.street);
+        setLocationValues("town", locationDetails?.town);
+        
       }
     }, [locationDetails])
     return (
@@ -276,7 +335,6 @@ const ReportSubmit = () => {
                   {...registerlocation('locationName', { required: true }, { shouldRender: !locationerrors.locationName })}
                   placeholder="Location Name"
                   fullWidth
-                  ref={inputRef}
                 />
                 <span className='errorSpan' >{locationerrors.locationName?.message}</span>
               </div>
@@ -324,21 +382,20 @@ const ReportSubmit = () => {
             </Grid>
           </Grid>
           <Grid container spacing={2} sx={{ mt: 1 }} >
-            <Grid item xs={12} sm={6} md={6} justifyContent="center" alignItems="center">
-              <div style={styles.buttonContainer}>
-                <BTNMUI fullWidth color="primary" variant='contained' disabled={activeStep === 0} onClick={handleBack} style={styles.button}>
+            <Grid item xs={12} sm={6} md={6} justifyContent="left" alignItems="left">
+              <div style={styles.buttonContainerLeft} justifyContent="left" alignItems="left" >
+                <BTNMUI align='left' variant='contained' disabled={activeStep === 0} onClick={handleBack} style={styles.button} >
                   Back
                 </BTNMUI>
               </div>
             </Grid>
             <Grid item xs={12} sm={6} md={6} justifyContent="center" alignItems="center">
-              <div style={styles.buttonContainer}>
+              <div style={styles.buttonContainer} justify="center" alignItems="center">
                 <BTNMUI
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  type='submit'
                   style={styles.button}
+                  width="50%"
+                  variant="contained"
+                  type='submit'
                 >
                   {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
                 </BTNMUI>
@@ -351,19 +408,14 @@ const ReportSubmit = () => {
     );
   };
   const PropertyDetailsForm = () => {
-    const propertytypes = [
-      { id: 1, name: 'Apartment' },
-      { id: 2, name: 'House' },
-      { id: 3, name: 'Townhouse' },
-      { id: 4, name: 'Commercial Land' },
-      { id: 5, name: 'Residential Land' },
-      { id: 6, name: 'Commercial Property' },
-      { id: 7, name: 'Office' },
-      { id: 8, name: 'Shop' },
-      { id: 9, name: 'Warehouse' }
-      // Additional options...
-    ];
+   
     const propertyDetailsSchema = Yup.object().shape({
+      PropertyLR: Yup.string().required('The proprty Lr is required'),
+      PropertyType: Yup.array().of(Yup.object().shape({
+        value: Yup.string(),
+        label: Yup.string()
+      })
+      ).min(1, "Property tYPE required").max(1, "Only one Property Type is required."),
       totalBuiltUpArea: Yup.number().required('Total Builtup area is required'),
       tenure: Yup.string().required('Tenure is required'),
       landSize: Yup.number().required('Land size is required')
@@ -373,8 +425,8 @@ const ReportSubmit = () => {
     });
     useEffect(() => {
       if (propertdetails != null) {
-        
-        setPropertyDetailsValues("property_lr", propertdetails?.property_lr);
+
+        setPropertyDetailsValues("PropertyLR", propertdetails?.PropertyLR);
         setPropertyDetailsValues("propertyType", propertdetails?.propertyType);
         setPropertyDetailsValues("totalBuiltUpArea", propertdetails?.totalBuiltUpArea);
         setPropertyDetailsValues("tenure", propertdetails?.tenure);
@@ -385,27 +437,18 @@ const ReportSubmit = () => {
       <Box component={Paper} sx={{ p: 5 }}>
         <form onSubmit={handlePropertyDetailsSubmit(onSubmitPropertyDetails)} >
           <Grid container>
-          <Grid item xs={12} sm={12} md={12} >
-                                <Typography sx={{ ml: 1, mt: 3 }}>Property LR</Typography>
-                                <Controller
-                                    control={control}
-                                    name="property_lr"
-                                    defaultValue=""
-                                    render={({ field }) => (
-                                        <div>
-                                            <TextField  {...field} autoComplete="off" fullWidth />
-                                            <span className='errorSpan' >{properrtyErrors.property_lr?.message}</span>
-                                        </div>
-                                    )}
-                                />
+            <Grid item xs={12} sm={12} md={12} >
+              <Typography sx={{ ml: 1, mt: 3 }}>Property LR</Typography>
+              <TextField {...registerproperty('PropertyLR')} placeholder="Property Lr Number / Title" fullWidth /><br />
+              <span className='errorSpan' >{properrtyErrors.PropertyLR?.message}</span>
 
-                            </Grid>
+            </Grid>
           </Grid>
           <Grid container spacing={2} sx={{ mt: 5 }} >
             <Grid item xs={12} sm={6} md={6} justifyContent="center" alignItems="center">
               <div>
                 <Typography sx={{ mb: 1, mt: 1 }}>Property Type</Typography>
-                {propertytypes && propertytypes.length > 0 && (
+                {propertytypesapi && propertytypesapi.length > 0 && (
                   <Controller
                     name="propertyType"
                     control={control}
@@ -420,10 +463,9 @@ const ReportSubmit = () => {
                         disableClearable
                         disablePortal
                         filterSelectedOptions
-                        options={propertytypes}
-
+                        options={propertytypesapi}
                         getOptionDisabled={(option) => option.disabled}
-                        getOptionLabel={(option) => option.name || ""}
+                        getOptionLabel={(option) => option.type_name}
                         isOptionEqualToValue={(option, value) => option.id === value.id}
                         id="propertyType"
                         onChange={(event, value) => field.onChange(value)}
@@ -477,22 +519,20 @@ const ReportSubmit = () => {
             </Grid>
           </Grid>
           <Grid container spacing={2} sx={{ mt: 1 }} >
-            <Grid item xs={12} sm={6} md={6} justifyContent="center" alignItems="center">
-              <div style={styles.buttonContainer}>
-                <BTNMUI fullWidth color="primary" variant='contained' disabled={activeStep === 0} onClick={handleBack} style={styles.button}>
+            <Grid item xs={12} sm={6} md={6} justifyContent="left" alignItems="left">
+              <div style={styles.buttonContainerLeft} justifyContent="left" alignItems="left" >
+                <BTNMUI align='left' variant='contained' disabled={activeStep === 0} onClick={handleBack} style={styles.button} >
                   Back
                 </BTNMUI>
               </div>
             </Grid>
             <Grid item xs={12} sm={6} md={6} justifyContent="center" alignItems="center">
-              <div style={styles.buttonContainer}>
-
+              <div style={styles.buttonContainer} justify="center" alignItems="center">
                 <BTNMUI
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  type='submit'
                   style={styles.button}
+                  width="50%"
+                  variant="contained"
+                  type='submit'
                 >
                   {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
                 </BTNMUI>
@@ -504,6 +544,7 @@ const ReportSubmit = () => {
       </Box>
     );
   };
+
   const PropertyValuationForm = () => {
     const propertyValuationValidationSchema = Yup.object().shape({
       marketValue: Yup.string().required('Market Value is required'),
@@ -511,6 +552,7 @@ const ReportSubmit = () => {
       insurenceValue: Yup.number().required("Insurence Value is required").typeError("Insurence value must be a valid number"),
       valuationDate: Yup.string().required("Valuation date is required"),
       annualGRossRentalIncome: Yup.string(),
+      PropertyDescription:Yup.string(),
       InstructionDate: Yup.string().required("Instruction Date is required"),
       recipient: Yup.array().of(Yup.object().shape({
         value: Yup.string(),
@@ -539,13 +581,29 @@ const ReportSubmit = () => {
     const { register: registerpropertyValuation, control, setValue: setPropertValuationValues, handleSubmit: handlePropertyValuationsSubmit, formState: { errors: propertyValuationErrors, isValid: propertyValuationIsValid } } = useForm({
       resolver: yupResolver(propertyValuationValidationSchema),
     });
- 
+
+    const [reportUsersFields, setReportUsersFields] = useState([]);
+    const addReportUser = (nameVal="",phoneVal="",emailVal="") => {
+      setReportUsersFields([...reportUsersFields,{
+        formFieldName: "report_user_name",
+        fieldEmail: "report_user_email",
+        fieldPhoneNumber: "report_user_phone",
+        formFildNameValue:nameVal,
+        fieldEmailValue: emailVal,
+        fieldPhoneNumberValue: phoneVal,
+        formFieldNamePlace: "Recipient Name",
+        fieldEmailPlace: "Recipient Email",
+        fieldPhoneNumberPlace: "Recipient Phone"
+      }]);
+    }
+
     useEffect(() => {
       if (valauationdetails != null) {
         setPropertValuationValues("marketValue", valauationdetails?.marketValue);
         setPropertValuationValues("forcedSaleValue", valauationdetails?.forcedSaleValue);
         setPropertValuationValues("insurenceValue", valauationdetails?.insurenceValue);
-        setPropertValuationValues("annualGRossRentalIncome", valauationdetails?.annualGRossRentalIncome);
+        setPropertValuationValues("annualGrossRentalIncome", valauationdetails?.annualGrossRentalIncome);
+        setPropertValuationValues("propertyDescription", valauationdetails?.propertyDescription);        
         setPropertValuationValues("valuationDate", valauationdetails?.valuationDate);
         setPropertValuationValues("InstructionDate", valauationdetails?.InstructionDate);
         if (recipientdetails != null) {
@@ -554,12 +612,31 @@ const ReportSubmit = () => {
         if (uploadedFileD != null) {
           setPropertValuationValues("file", [uploadedFileD]);
         }
+      
+     
+       setRecipientUsernames(valauationdetails?.report_user_name);
+       setRecipientEmails(valauationdetails?.report_user_email);
+       setRecipientPhone(valauationdetails?.report_user_phone);
+      
 
-   
+
+
+      }else{
+        setReportUsersFields([...reportUsersFields,{
+          formFieldName: "report_user_name",
+          fieldEmail: "report_user_email",
+          fieldPhoneNumber: "report_user_phone",
+          formFildNameValue: "",
+          fieldEmailValue: "",
+          fieldPhoneNumberValue: "",
+          formFieldNamePlace: "Recipient Name",
+          fieldEmailPlace: "Recipient Email",
+          fieldPhoneNumberPlace: "Recipient Phone"
+        }]);
+        
       }
     }, [valauationdetails, recipientdetails]);
-
-    const [existingAccessors, setExistingAccessors] = useState();
+  
     const {
       data: accesorslist,
       isLoading: loadingAccesors,
@@ -571,23 +648,29 @@ const ReportSubmit = () => {
       setExistingAccessors(accesorslist);
     }, [accesorslist]);
 
-    const [reportUsersFields, setReportUsersFields] = useState([{}]);
-    const addReportUser = () => {
-        setReportUsersFields([...reportUsersFields, { formFildName: "name" }]);
-    }
+
     const handleRemoveReprtUser = (index) => {
       const values = [...reportUsersFields];
       values.splice(index, 1);
       setReportUsersFields(values);
-  };
+    };
+    const handleRemoveAddedOrgRecipient = (index) =>{
+      const values = [...recipientUsernames];
+      values.splice(index, 1);
+      setRecipientUsernames(values);
+    }
 
     return (
       <Box component={Paper} sx={{ p: 5 }}>
         <form onSubmit={handlePropertyValuationsSubmit(onSubmitPropertyValuation)} >
+          {JSON.stringify(recipientUsernames)}
+           {JSON.stringify(recipientEmails)}
+            {JSON.stringify(recipientPhone)}
+          
           <Grid container spacing={2}>
             <Grid item xs={12} sm={12} md={12} >
               <Typography sx={{ ml: 1, mt: 2, mb: 1 }}>Recipient</Typography>
-              {existingAccessors && existingAccessors.length > 0 && (
+              {existingAccessors && existingAccessors.length > 0 ? (
                 <Controller
                   name="recipient"
                   control={control}
@@ -619,7 +702,7 @@ const ReportSubmit = () => {
                   )}
 
                 />
-              )}
+              ):<Typography className="errorSpan">There are no recipients in the system.Please contact Admin because you will need them to continue to the next step.</Typography> }
               <span className='errorSpan' >{propertyValuationErrors.recipient?.message}</span>
             </Grid>
           </Grid>
@@ -644,72 +727,121 @@ const ReportSubmit = () => {
             </Grid>
 
           </Grid>
-           {/* users to consume */}
-           <Box style={{
-                            border: '1px solid lightgrey',
-                            padding: '20px',
-                            marginTop: '15px'
-                        }}>
-                            <Grid container spacing={2}>
-                                <Grid item xs={12} sm={6} md={6} >
-                                    <Typography sx={{ ml: 1, mt: 0 }}>Add Recipients within the client organization</Typography>
-                                </Grid>
-                                <Grid item xs={12} sm={6} md={6} justifyContent="right" display="flex" alignItems="right" >
-                                    <BTNMUI onClick={() => addReportUser()} variant='contained' sx={{ ml: 1, mt: 0, width: "60px", height: "60px", borderRadius: '100%', backgroundColor: "blue", color: "white" }} >+</BTNMUI>
+          {/* users to consume */}
+          <Box style={{
+            border: '1px solid lightgrey',
+            padding: '20px',
+            marginTop: '15px'
+          }}>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6} md={6} >
+                <Typography sx={{ ml: 1, mt: 0 }}>Add Recipients within the client organization</Typography>
+              </Grid>
+              <Grid item xs={12} sm={6} md={6} justifyContent="right" display="flex" alignItems="right" >
+                <BTNMUI onClick={() => addReportUser()} variant='contained' sx={{ ml: 1, mt: 0, width: "60px", height: "60px", borderRadius: '100%', backgroundColor: "blue", color: "white" }} >+</BTNMUI>
 
-                                </Grid>
-                            </Grid>
-                            {
-                                reportUsersFields &&
-                                reportUsersFields.map((field, index) => {
-                                    return (
-                                        <Box>
-                                            <Grid container spacing={2}>
+              </Grid>
+            </Grid>
 
-                                                <Grid item xs={12} sm={4} md={4} >
+            {/* {Object.keys(reportUsersFields).length} */}
+        
+            {
+              reportUsersFields.length>0 &&
+              reportUsersFields.map((field, index) => {    
+                if(field.formFieldName!=undefined){
+                  return (
+                  
+                    <Box>
+                      <Grid container spacing={2}>
+                    
+                        <Grid item xs={12} sm={4} md={4} >
+  
+                     
+  
+                          <Typography sx={{ ml: 1, mt: 1 }}>Name</Typography>
 
-                                                    <Typography sx={{ ml: 1, mt: 1 }}>Name</Typography>
+                   
+                          <div>
+                            <TextField
+                              {...registerpropertyValuation(`${field.formFieldName}[${index}]`)}
+                              autoComplete="off" fullWidth required placeholder={`${field.formFieldNamePlace}`} defaultValue={`${field.formFildNameValue}`} />
+                          </div>
+  
+                        </Grid>
+                        <Grid item xs={12} sm={4} md={4} >
+                          <Typography sx={{ ml: 1, mt: 1 }}>Email</Typography>
+  
+                          <div>
+                            <TextField type='email' {...registerpropertyValuation(`${field.fieldEmail}[${index}]`)}
+                             autoComplete="off"
+                              required
+                               fullWidth
+                               placeholder={`${field.fieldEmailPlace}`} defaultValue={`${field.fieldEmailValue}`} />
+                            {/* <span className='errorSpan' >{errors.market_value?.message}</span> */}
+                          </div>
+  
+                        </Grid>
+                        <Grid item xs={12} sm={3} md={3} >
+                          <Typography sx={{ ml: 1, mt: 1 }}>Phone</Typography>
+  
+                          <div>
+                            <TextField   {...registerpropertyValuation(`${field.fieldPhoneNumber}[${index}]`)}
+                             autoComplete="off" 
+                             required
+                              fullWidth
+                              placeholder={`${field.fieldPhoneNumberPlace}`}  defaultValue={`${field.fieldPhoneNumberValue}`} />
+                            {/* <span className='errorSpan' >{errors.market_value?.message}</span> */}
+                          </div>
+  
+                        </Grid>
+                        <Grid item xs={12} sm={1} md={1} display="flex" justifyContent="center" alignItems="center">
+                          <BTNMUI onClick={() => handleRemoveReprtUser(index)} variant='contained' sx={{ ml: 1, mt: 1, width: "60px", height: "60px", borderRadius: '100%', backgroundColor: "red", color: "white" }} >X</BTNMUI>
+                        </Grid>
+                      </Grid>
+                    </Box>
+                  );
+                }            
 
-                                                    <div>
-                                                        <TextField  
-                                                        {...registerpropertyValuation(`report_user_name[${index}]`)} 
-                                                        autoComplete="off" fullWidth  required
-                                                        />
-                                                        {/* <span className='errorSpan' >{propertyValuationErrors.market_value?.message}</span> */}
-                                                    </div>
+              })
+            }
+            <TableContainer component={Paper} sx={{ width: "95%", ml: "2.5%", mr: "2.5%", mt: 2 }}>
+              <Table size="large" aria-label="a  table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Name</TableCell>
+                    <TableCell align="left">Email</TableCell>
+                    <TableCell align="left">Phone</TableCell>
+                    <TableCell align="left">Action</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {
+                    Object.keys(recipientUsernames).length >0  &&
+                    recipientUsernames.map((orgrecipient,key) => {
+                      return (
+                        <>
+                          <TableRow
+                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                          >
+                            <TableCell component="th" scope="row">
+                              {orgrecipient}
+                            </TableCell>
+                            <TableCell >{recipientEmails[key]}</TableCell>
+                            <TableCell >{recipientPhone[key]}</TableCell>
+                            <TableCell ><BTNMUI onClick={() => handleRemoveAddedOrgRecipient(key)} variant='contained' sx={{ ml: 1, mt: 1, width: "10px", height: "10px", borderRadius: '10%', backgroundColor: "red", color: "white" }} >X</BTNMUI>
+                       </TableCell>
+                          </TableRow>
+                        </>
+                      )
+                    })
+                  }
+                </TableBody>
+              </Table>
+            </TableContainer>
 
-                                                </Grid>
-                                                <Grid item xs={12} sm={4} md={4} >
-                                                    <Typography sx={{ ml: 1, mt: 1 }}>Email</Typography>
 
-                                                    <div>
-                                                        <TextField type='email' {...registerpropertyValuation(`report_user_email[${index}]`)} autoComplete="off"  required fullWidth />
-                                                        {/* <span className='errorSpan' >{errors.market_value?.message}</span> */}
-                                                    </div>
-
-                                                </Grid>
-                                                <Grid item xs={12} sm={3} md={3} >
-                                                    <Typography sx={{ ml: 1, mt: 1 }}>Phone</Typography>
-
-                                                    <div>
-                                                        <TextField   {...registerpropertyValuation(`report_user_phone[${index}]`)} autoComplete="off" required fullWidth />
-                                                        {/* <span className='errorSpan' >{errors.market_value?.message}</span> */}
-                                                    </div>
-
-                                                </Grid>
-                                                <Grid item xs={12} sm={1} md={1} display="flex" justifyContent="center" alignItems="center">
-
-                                                    <BTNMUI onClick={() => handleRemoveReprtUser(index)} variant='contained' sx={{ ml: 1, mt: 1, width: "60px", height: "60px", borderRadius: '100%', backgroundColor: "red", color: "white" }} >X</BTNMUI>
-                                                </Grid>
-                                            </Grid>
-                                        </Box>
-                                    );
-                                })
-                            }
-
-
-                        </Box>
-                        {/* close users to consume */}
+          </Box>
+          {/* close users to consume */}
           <Grid container spacing={2} sx={{ mt: 2 }} >
             <Grid item xs={12} sm={4} md={4} justifyContent="center" alignItems="center">
               <div>
@@ -767,41 +899,34 @@ const ReportSubmit = () => {
           </Grid>
 
           <Grid container spacing={2}>
-                            <Grid item xs={12} sm={12} md={12} >
-                                <Typography sx={{ ml: 1, mt: 3 }}>Property Description</Typography>
-                                <Controller
-                                    control={control}
-                                    name="report_description"
-                                    defaultValue=""
-                                    render={({ field }) => (
-                                        <div>
-                                            <TextField  {...field} fullWidth
-                                                multiline
-                                                rows={4}
-                                            />
-                                            <span className='errorSpan' >{propertyValuationErrors.report_description?.message}</span>
-                                        </div>
-                                    )}
-                                />
+            <Grid item xs={12} sm={12} md={12} >
+              <Typography sx={{ ml: 1, mt: 3 }}>Property Description</Typography>
+           
+                    <TextField  fullWidth
+                      multiline
+                      rows={4}
+                      {...registerpropertyValuation('PropertyDescription')}
+                    />
+                    <span className='errorSpan' >{propertyValuationErrors.PropertyDescription?.message}</span>
+             
 
-                            </Grid>
+            </Grid>
           </Grid>
           <Grid container spacing={2} sx={{ mt: 0 }} >
-            <Grid item xs={12} sm={6} md={6} justifyContent="center" alignItems="center">
-              <div style={styles.buttonContainer}>
-                <BTNMUI fullWidth color="primary" variant='contained' disabled={activeStep === 0} onClick={handleBack} style={styles.button}>
+            <Grid item xs={12} sm={6} md={6} justifyContent="left" alignItems="left">
+              <div style={styles.buttonContainerLeft} justifyContent="left" alignItems="left" >
+                <BTNMUI align='left' variant='contained' disabled={activeStep === 0} onClick={handleBack} style={styles.button} >
                   Back
                 </BTNMUI>
               </div>
             </Grid>
             <Grid item xs={12} sm={6} md={6} justifyContent="center" alignItems="center">
-              <div style={styles.buttonContainer}>
+              <div style={styles.buttonContainer} justify="center" alignItems="center">
                 <BTNMUI
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  type='submit'
                   style={styles.button}
+                  width="50%"
+                  variant="contained"
+                  type='submit'
                 >
                   {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
                 </BTNMUI>
@@ -823,7 +948,8 @@ const ReportSubmit = () => {
       isError,
       error
     } = useGetUsersQuery();
-    const [existingUsers, setExistingUsers] = useState([]);
+   
+    const [existingUsers, setExistingUsers] = useState();
     useEffect(() => {
       setExistingUsers(loadedusers);
     }, [loadedusers]);
@@ -840,7 +966,10 @@ const ReportSubmit = () => {
     }, [signeesAreValid]);
 
     useEffect(() => {
-      setSigneesValues("signees", reportignatories);
+      if(reportignatories!=null){
+        setSigneesValues("signees", reportignatories);
+      }
+     
     }, [reportignatories]);
 
 
@@ -869,8 +998,8 @@ const ReportSubmit = () => {
                         filterSelectedOptions
                         options={existingUsers}
                         getOptionDisabled={(option) => option.disabled}
-                        getOptionLabel={(option) => option.full_name || ""}
-                        isOptionEqualToValue={(option, value) => option.id === value.id || ""}
+                        getOptionLabel={(option) => option.full_name}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
                         id="signees"
                         onChange={(event, value) => field.onChange(value)}
                         renderInput={(params) => (
@@ -897,21 +1026,20 @@ const ReportSubmit = () => {
 
           </Grid>
           <Grid container spacing={2} sx={{ mt: 1 }} >
-            <Grid item xs={12} sm={6} md={6} justifyContent="center" alignItems="center">
-              <div style={styles.buttonContainer}>
-                <BTNMUI fullWidth color="primary" variant='contained' disabled={activeStep === 0} onClick={handleBack} style={styles.button}>
+            <Grid item xs={12} sm={6} md={6} justifyContent="left" alignItems="left">
+              <div style={styles.buttonContainerLeft} justifyContent="left" alignItems="left" >
+                <BTNMUI align='left' variant='contained' disabled={activeStep === 0} onClick={handleBack} style={styles.button} >
                   Back
                 </BTNMUI>
               </div>
             </Grid>
             <Grid item xs={12} sm={6} md={6} justifyContent="center" alignItems="center">
-              <div style={styles.buttonContainer}>
+              <div style={styles.buttonContainer} justify="center" alignItems="center">
                 <BTNMUI
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  type='submit'
                   style={styles.button}
+                  width="50%"
+                  variant="contained"
+                  type='submit'
                 >
                   {activeStep === steps.length - 1 ? 'Finish' : 'Next'}
                 </BTNMUI>
@@ -929,33 +1057,22 @@ const ReportSubmit = () => {
     function createData(name, calories, fat, carbs, protein) {
       return { name, calories, fat, carbs, protein };
     }
-    console.log("signatories");
-    console.log(signatories);
+
   
-    console.log("valuationdetails");
-    console.log(valauationdetails);
+    useEffect(() => {
+      setRecipientUsernames(valauationdetails?.report_user_name);
+    }, [valauationdetails]);
 
-    const [recipientUsernames,setRecipientUsernames]=useState([]);
-    useEffect(()=>{
-       setRecipientUsernames(valauationdetails?.report_user_name);
-    },[valauationdetails]);
-  
-    console.log("recipientusernames");
-    console.log(recipientUsernames);
 
-    const [recipientUserEmail,setRecipientUserEmail]=useState([]);
-    useEffect(()=>{
-       setRecipientUserEmail(valauationdetails?.report_user_email);
-    },[valauationdetails]);
-    console.log("recipientuseremail");
-    console.log(recipientUserEmail);
+    const [recipientUserEmail, setRecipientUserEmail] = useState([]);
+    useEffect(() => {
+      setRecipientUserEmail(valauationdetails?.report_user_email);
+    }, [valauationdetails]);
 
-    const [recipientUserPhone,setRecipientUserPhone]=useState([]);
-    useEffect(()=>{
+    const [recipientUserPhone, setRecipientUserPhone] = useState([]);
+    useEffect(() => {
       setRecipientUserPhone(valauationdetails?.report_user_phone);
-    },[valauationdetails]);
-    console.log("recipientuserphone");
-    console.log(recipientUserPhone);
+    }, [valauationdetails]);
 
 
     return (
@@ -1090,7 +1207,7 @@ const ReportSubmit = () => {
                     <TableCell component="th" scope="row">
                       Client
                     </TableCell>
-                    <TableCell align="left">{ recipientdetails[0].organization_name }</TableCell>
+                    <TableCell align="left">{recipientdetails[0].organization_name}</TableCell>
                   </TableRow>
                   <TableRow
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -1184,7 +1301,7 @@ const ReportSubmit = () => {
                 </TableBody>
               </Table>
             </TableContainer>
-            <Typography sx={{ mb: 1, ml: 2, mt:2 }} variant='h4'>Recipients for Client Organization</Typography>
+            <Typography sx={{ mb: 1, ml: 2, mt: 2 }} variant='h4'>Recipients for Client Organization</Typography>
             <Divider ></Divider>
             <TableContainer component={Paper} sx={{ width: "95%", ml: "2.5%", mr: "2.5%", mt: 2 }}>
               <Table size="large" aria-label="a  table">
@@ -1198,7 +1315,8 @@ const ReportSubmit = () => {
                 <TableBody>
                   {
 
-             recipientUsernames.map((signee,key) => {
+                 (JSON.stringify(recipientUsernames)!=null && JSON.stringify(recipientUsernames)!="") &&
+                    recipientUsernames.map((signee, key) => {
                       return (
                         <>
                           <TableRow

@@ -66,7 +66,8 @@ Route::group([
     Route::get('/get-uploaders-users-list/{uploader}', [CommonController::class, 'getUploadersUsersList']);
     Route::get('/get-reports-list', [CommonController::class, 'getReportsList']);
     Route::get('/downloadvaluationreport/{id}/{signed}', [CommonController::class, 'downloadValuationReport']);
-    Route::get('/get-all-users', [CommonController::class, 'getAllUsers']);   
+    Route::get('/get-all-users', [CommonController::class, 'getAllUsers']);
+    Route::get('/get-all-propertytypes', [CommonController::class, 'getAllProprtyTypes']);   
     
 });
 Route::group([

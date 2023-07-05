@@ -25,6 +25,10 @@ import { ToastContainer, toast } from 'react-toastify';
 import { useLoginMutation } from './authApiSlice';
 import { setCredentials } from './authSlice'; 
 import ReCAPTCHA from "react-google-recaptcha";
+import 'react-toastify/dist/ReactToastify.css';
+import "primereact/resources/themes/bootstrap4-dark-blue/theme.css";
+import "primereact/resources/primereact.min.css";
+
 
 // 👇 Styled React Route Dom Link Component
 export const LinkItem = styled(Link)`
@@ -37,6 +41,24 @@ export const LinkItem = styled(Link)`
 `;
 
 function Login() {
+
+
+  const toastMessage = (message, type) => {
+    if (type == "success") {
+      toast.success(message, {
+        position: toast.POSITION.TOP_RIGHT
+      });
+    } else if (type == "error") {
+      toast.error(message, {
+        position: toast.POSITION.TOP_RIGHT
+      });
+    } else if (type == "warning") {
+      toast.warning(message, {
+        position: toast.POSITION.TOP_RIGHT
+      });
+    }
+  }
+
 
   const SITE_KEY = process.env.REACT_APP_reCAPTCHA_SITE_KEY;
   const SECRET_KEY = process.env.REACT_APP_reCAPTCHA_SECRET_KEY;
@@ -65,16 +87,29 @@ function Login() {
     let email=data.email;
     let password = data.password;
     let recaptcha_token =  captchaRef.current.getValue();
-    const userData = await login({ email, password,recaptcha_token }).unwrap()
-    dispatch(setCredentials({ ...userData, email }));
-    console.log(userData.role.name);
-    if(userData.role.name==="Super Admin"){
-      navigate('/admin-dashboard')
-    }else if(userData.role.name==="Report Uploader"||userData.role.name==="Report Uploader Admin"){
-      navigate('/valuer-dashboard')
-    }else if(userData.role.name==="Report Accesor"||userData.role.name==="Report Accessor Admin"){
-      navigate('/accessor-dashboard')
+    const userData = await login({ email, password,recaptcha_token });
+    dispatch(setCredentials({ ...userData.data, email }));
+   console.log(userData);
+    if ('error' in userData) {
+      toastMessage(userData.error.data.message, "error");
+      if ('backendvalerrors' in userData.error.data) {
+        // setBackendValErrors(result.error.data.backendvalerrors);
+      }
+    } else {
+      console.log(userData);
+      toastMessage(userData.data.message, "success");
+   
+        if(userData.data.user.role_name==="Super Admin"){
+          navigate('/admin-dashboard');
+        }else if(userData.data.user.role_name==="Report Uploader"|userData.data.user.role_name==="Report Uploader Admin"){
+          navigate('/valuer-dashboard');
+        }else if(userData.data.user.role_name==="Report Accesor"||userData.data.user.role_name==="Report Accessor Admin"){
+          navigate('/accessor-dashboard');
+        }
+
+      
     }
+
     
     
  

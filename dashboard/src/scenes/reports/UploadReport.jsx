@@ -236,7 +236,6 @@ function UploadReport() {
                                             isOptionEqualToValue={(option, value) => option.id === value.id}
                                             id="days-autocomplete"
                                             onChange={(event, value) => field.onChange(value)}
-
                                             renderInput={(params) => (
                                                 <TextField
                                                     id="receipient"
