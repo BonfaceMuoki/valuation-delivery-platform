@@ -35,10 +35,43 @@ class AdminController extends Controller
         $this->middleware("Admin")->except(['getAllRoles']);
 
     }
-    public function getDashboard(Request $request){
-     $valuationfirms=Organization::count();
-     $accesors=ReportConsumer::count();
-     return response()->json(['allvaluers' => $valuationfirms,'allaccesors'=>$accesors], 200);     
+    public function getDashboard(Request $request)
+    {
+
+        $now = Carbon::now();
+        $valuationfirms = Organization::count();
+        $accesors = ReportConsumer::count();
+
+        $startOfWeek = $now->startOfWeek()->format("Y-m-d h:m:s");
+        // Get the end of the current week (Sunday)
+        $endOfWeek = $now->endOfWeek()->format("Y-m-d h:m:s");
+        // Format the dates if needed (optional)
+        $valuationfirmsthisweek = Organization::whereBetween("created_at",[$startOfWeek, $endOfWeek])->count();
+        $accesorsthisweek = ReportConsumer::whereBetween("created_at",[$startOfWeek, $endOfWeek])->count();
+
+        $startOfmonth = $now->startOfMonth()->format("Y-m-d h:m:s");
+        // Get the end of the current week (Sunday)
+        $endOfmonth = $now->endOfMonth()->format("Y-m-d h:m:s");
+
+        $valuationfirmsthismonth = Organization::whereBetween("created_at",[$startOfmonth, $endOfmonth])->count();
+        $accesorsthismonth = ReportConsumer::whereBetween("created_at",[$startOfmonth, $endOfmonth])->count();
+        
+        $courts =ReportConsumer::where("organization_type","Court")->count();
+        $leneders= ReportConsumer::where("organization_type","Lender")->count();
+
+        return response()->json(
+            [
+                'allvaluers' => $valuationfirms,
+                'allaccesors' => $accesors,
+                'allvaluersthisweek' => $valuationfirmsthisweek,
+                'allaccesorsthisweek' => $accesorsthisweek,
+                'allvaluersthismonth' => $valuationfirmsthismonth,
+                'allaccesorsthimonth' => $accesorsthismonth,
+                'courts' => $courts,
+                'lenders' => $leneders
+            ],
+            200
+        );
     }
     public function deleteRole($id){
         $user = auth()->user();
@@ -476,7 +509,7 @@ class AdminController extends Controller
                 ->first();
                 if($exist==null){
                    //send email notification
-                   Mail::to($requestde->invite_email)->send(new SendCompanyRegistrationRequestDeclineMail($request->reason,$requestde));
+                   Mail::to($requestde->invite_email)->send(new SendCompanyRegistrationRequestDeclineMail($request->reason,$requestde,"valuer"));
                    //send notification                   
                     //update status
                     ValuationFirmRegistrationRequests::where("id",$request->invite)->update(['status'=>'Rejected']);
@@ -603,10 +636,7 @@ class AdminController extends Controller
         try{
             DB::beginTransaction();
             $requestde = ClientRegistrationRequests::where("id",$request->invite)->first();
-            $exist = ReportConsumer::where("organization_email", )
-                ->where("directors_vrb",$requestde->vrb_number)
-                ->where("isk_number",$requestde->isk_number)
-                ->first();
+            $exist = ReportConsumer::where("organization_email",$requestde->invite_email)->first();
                 if($exist==null){
                    //send email notification
                    Mail::to($requestde->invite_email)->send(new SendCompanyRegistrationRequestDeclineMail($request->reason,$requestde));

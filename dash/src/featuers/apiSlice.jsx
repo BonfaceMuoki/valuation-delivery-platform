@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { setCredentials } from './authSlice'
+import { setCredentials,logOut } from './authSlice'
 import { Navigate,useNavigate } from 'react-router-dom'
 
 const baseQuery = fetchBaseQuery({

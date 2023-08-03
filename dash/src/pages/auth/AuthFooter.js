@@ -29,77 +29,12 @@ const AuthFooter = () => {
                   Help
                 </Link>
               </li>
-              <li className="nav-item ">
-                <UncontrolledDropdown direction="up">
-                  <DropdownToggle
-                    color="transparent"
-                    className="dropdown-toggle dropdown-indicator has-indicator nav-link"
-                  >
-                    <span>English</span>
-                  </DropdownToggle>
-                  <DropdownMenu end className="dropdown-menu-sm">
-                    <ul className="language-list">
-                      <li>
-                        <DropdownItem
-                          tag="a"
-                          href="#dropdownitem"
-                          onClick={(ev) => {
-                            ev.preventDefault();
-                          }}
-                          className="language-item"
-                        >
-                          <img src={EnglishFlag} alt="" className="language-flag" />
-                          <span className="language-name">English</span>
-                        </DropdownItem>
-                      </li>
-                      <li>
-                        <DropdownItem
-                          tag="a"
-                          href="#dropdownitem"
-                          onClick={(ev) => {
-                            ev.preventDefault();
-                          }}
-                          className="language-item"
-                        >
-                          <img src={SpanishFlag} alt="" className="language-flag" />
-                          <span className="language-name">Español</span>
-                        </DropdownItem>
-                      </li>
-                      <li>
-                        <DropdownItem
-                          tag="a"
-                          href="#dropdownitem"
-                          onClick={(ev) => {
-                            ev.preventDefault();
-                          }}
-                          className="language-item"
-                        >
-                          <img src={FrenchFlag} alt="" className="language-flag" />
-                          <span className="language-name">Français</span>
-                        </DropdownItem>
-                      </li>
-                      <li>
-                        <DropdownItem
-                          tag="a"
-                          href="#dropdownitem"
-                          onClick={(ev) => {
-                            ev.preventDefault();
-                          }}
-                          className="language-item"
-                        >
-                          <img src={TurkeyFlag} alt="" className="language-flag" />
-                          <span className="language-name">Türkçe</span>
-                        </DropdownItem>
-                      </li>
-                    </ul>
-                  </DropdownMenu>
-                </UncontrolledDropdown>
-              </li>
+
             </ul>
           </Col>
           <Col lg="6">
             <div className="nk-block-content text-center text-lg-start">
-              <p className="text-soft">&copy; 2022 Dashlite. All Rights Reserved.</p>
+              <p className="text-soft">&copy; 2022 @Prowiz. All Rights Reserved.</p>
             </div>
           </Col>
         </Row>

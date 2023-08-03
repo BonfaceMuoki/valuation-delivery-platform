@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import Content from "../layout/content/Content";
 import Head from "../layout/head/Head";
-import InvestOverview from "../components/partials/invest/invest-overview/InvestOverview";
-import InvestPlan from "../components/partials/invest/invest-plan/InvestPlan";
 import RecentInvest from "../components/partials/invest/recent-investment/RecentInvest";
-import RecentActivity from "../components/partials/default/recent-activity/Activity";
 import Notifications from "../components/partials/default/notification/Notification";
 import { DropdownToggle, DropdownMenu, Card, UncontrolledDropdown, DropdownItem } from "reactstrap";
+
+import { useGetAccesorRequestsQuery,useApproveAccesorRequestMutation,useRejectAccesorRequestMutation } from "../api/admin/accesorRequestsSlliceApi";
+import { retrieveAdminDashboardSliceApi } from "../api/admin/retrieveAdminDashboardSlice";
 import {
   Block,
   BlockDes,
@@ -22,9 +22,14 @@ import {
   TooltipComponent,
 } from "../components/Component";
 import { BalanceBarChart, DepositBarChart, WithdrawBarChart } from "../components/partials/charts/invest/InvestChart";
-
+import ValuerReports from "./valuerspages/valuerreports";
+import AccesorInvites from "./accesorpages/accesorInvites";
+import ValuerAccessInvite from "./valuerspages/valuerAccessInvites";
+import { useGetAdminDashboardDetailsQuery } from "../api/admin/retrieveAdminDashboardSlice";
 const HomePage = () => {
   const [sm, updateSm] = useState(false);
+  const {data:adminDashboard,isLoading:loadingdashboard}=useGetAdminDashboardDetailsQuery();
+  
   return (
     <>
       <Head title="Invest Dashboard" />
@@ -32,9 +37,9 @@ const HomePage = () => {
         <BlockHead size="sm">
           <BlockBetween>
             <BlockHeadContent>
-              <BlockTitle page>Investment Dashboard</BlockTitle>
+              <BlockTitle page>Home Dashboard</BlockTitle>
               <BlockDes className="text-soft">
-                <p>Welcome to Crypto Invest Dashboard</p>
+                <p>Logged in Super Admin !!!!</p>
               </BlockDes>
             </BlockHeadContent>
             <BlockHeadContent>
@@ -47,62 +52,14 @@ const HomePage = () => {
                 </Button>
                 <div className="toggle-expand-content" style={{ display: sm ? "block" : "none" }}>
                   <ul className="nk-block-tools g-3">
+             
                     <li>
                       <Button color="primary" outline className="btn-dim btn-white">
-                        <Icon name="download-cloud"></Icon>
-                        <span>Export</span>
+                        <Icon name="mail"></Icon>
+                        <span>New Broadcast Message</span>
                       </Button>
                     </li>
-                    <li>
-                      <Button color="primary" outline className="btn-dim btn-white">
-                        <Icon name="reports"></Icon>
-                        <span>Reports</span>
-                      </Button>
-                    </li>
-                    <li className="nk-block-tools-opt">
-                      <UncontrolledDropdown>
-                        <DropdownToggle color="transparent" className="dropdown-toggle btn btn-icon btn-primary">
-                          <Icon name="plus"></Icon>
-                        </DropdownToggle>
-                        <DropdownMenu end>
-                          <ul className="link-list-opt no-bdr">
-                            <li>
-                              <DropdownItem
-                                href="#adduser"
-                                onClick={(ev) => {
-                                  ev.preventDefault();
-                                }}
-                              >
-                                <Icon name="user-add-fill"></Icon>
-                                <span>Add User</span>
-                              </DropdownItem>
-                            </li>
-                            <li>
-                              <DropdownItem
-                                href="#addorder"
-                                onClick={(ev) => {
-                                  ev.preventDefault();
-                                }}
-                              >
-                                <Icon name="coin-alt-fill"></Icon>
-                                <span>Add Order</span>
-                              </DropdownItem>
-                            </li>
-                            <li>
-                              <DropdownItem
-                                href="#addpage"
-                                onClick={(ev) => {
-                                  ev.preventDefault();
-                                }}
-                              >
-                                <Icon name="note-add-fill-c"></Icon>
-                                <span>Add Page</span>
-                              </DropdownItem>
-                            </li>
-                          </ul>
-                        </DropdownMenu>
-                      </UncontrolledDropdown>
-                    </li>
+                
                   </ul>
                 </div>
               </div>
@@ -112,11 +69,11 @@ const HomePage = () => {
 
         <Block>
           <Row className="g-gs">
-            <Col md="4">
+            <Col md="6">
               <PreviewAltCard className="card-full">
                 <div className="card-title-group align-start mb-0">
                   <div className="card-title">
-                    <h6 className="subtitle">Total Money You have paid</h6>
+                    <h6 className="subtitle">Registered Valuers</h6>
                   </div>
                   <div className="card-tools">
                     <TooltipComponent
@@ -130,39 +87,40 @@ const HomePage = () => {
                 </div>
                 <div className="card-amount">
                   <span className="amount">
-                    49,595.34 <span className="currency currency-usd">USD</span>
+                     {adminDashboard?.allvaluers}
                   </span>
                   <span className="change up text-success">
-                    <Icon name="arrow-long-up"></Icon>1.93%
+                    {/* <Icon name="arrow-long-up"></Icon>1.93% */}
                   </span>
                 </div>
                 <div className="invest-data">
                   <div className="invest-data-amount g-2">
-                    <div className="invest-data-history">
-                      <div className="title">This Month</div>
-                      <span className="amount">
-                        2,940.59 <span className="currency currency-usd"> USD</span>
-                      </span>
-                    </div>
+  
                     <div className="invest-data-history">
                       <div className="title">This Week</div>
                       <span className="amount">
-                        1,259.28 <span className="currency currency-usd"> USD</span>
+                      {adminDashboard?.allvaluersthisweek} <span className="currency currency-usd"> Valuers</span>
+                      </span>
+                    </div>
+                    <div className="invest-data-history">
+                      <div className="title">This Month</div>
+                      <span className="amount">
+                        {adminDashboard?.allvaluersthismonth} <span className="currency currency-usd"> Valuers</span>
                       </span>
                     </div>
                   </div>
                   <div className="invest-data-ck">
-                    <DepositBarChart />
+                    {/* <DepositBarChart /> */}
                   </div>
                 </div>
               </PreviewAltCard>
             </Col>
 
-            <Col md="4">
+            <Col md="6">
               <PreviewAltCard className="card-full">
                 <div className="card-title-group align-start mb-0">
                   <div className="card-title">
-                    <h6 className="subtitle">Invite Bonuses</h6>
+                    <h6 className="subtitle">Registered Accesors</h6>
                   </div>
                   <div className="card-tools">
                     <TooltipComponent
@@ -176,86 +134,43 @@ const HomePage = () => {
                 </div>
                 <div className="card-amount">
                   <span className="amount">
-                    49,595.34 <span className="currency currency-usd">USD</span>
+                    {adminDashboard?.allaccesors}
+                    <span className="currency currency-usd"></span>
                   </span>
                   <span className="change down text-danger">
-                    <Icon name="arrow-long-down"></Icon>1.93%
+                    {/* <Icon name="arrow-long-down"></Icon>1.93% */}
                   </span>
                 </div>
                 <div className="invest-data">
                   <div className="invest-data-amount g-2">
                     <div className="invest-data-history">
-                      <div className="title">This Month</div>
+                      <div className="title">Lenders</div>
                       <div className="amount">
-                        2,940.59 <span className="currency currency-usd">USD</span>
+                         {adminDashboard?.lenders} <span className="currency currency-usd">Lenders</span>
                       </div>
                     </div>
                     <div className="invest-data-history">
-                      <div className="title">This Week</div>
+                      <div className="title">Courts</div>
                       <div className="amount">
-                        1,259.28 <span className="currency currency-usd">USD</span>
+                      {adminDashboard?.courts} <span className="currency currency-usd">Courts</span>
                       </div>
                     </div>
                   </div>
                   <div className="invest-data-ck">
-                    <WithdrawBarChart />
+                    {/* <WithdrawBarChart /> */}
                   </div>
                 </div>
               </PreviewAltCard>
             </Col>
 
-            <Col md="4">
-              <PreviewAltCard className="card-full">
-                <div className="card-title-group align-start mb-0">
-                  <div className="card-title">
-                    <h6 className="subtitle">Other Benefits</h6>
-                  </div>
-                  <div className="card-tools">
-                    <TooltipComponent
-                      iconClass="card-hint"
-                      icon="help-fill"
-                      direction="left"
-                      id="invest-balance"
-                      text="Total Balance"
-                    ></TooltipComponent>
-                  </div>
-                </div>
-                <div className="card-amount">
-                  <span className="amount">
-                    79,358.50 <span className="currency currency-usd">USD</span>
-                  </span>
-                </div>
-                <div className="invest-data">
-                  <div className="invest-data-amount g-2">
-                    <div className="invest-data-history">
-                      <div className="title">This Month</div>
-                      <div className="amount">
-                        2,940.59 <span className="currency currency-usd">USD</span>
-                      </div>
-                    </div>
-                    <div className="invest-data-history">
-                      <div className="title">This Week</div>
-                      <div className="amount">
-                        1,259.28 <span className="currency currency-usd">USD</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="invest-data-ck">
-                    <BalanceBarChart />
-                  </div>
-                </div>
-              </PreviewAltCard>
-            </Col>
-
-
-            <Col md="6" xxl="4">
-              <Card className="card-bordered h-100">
-                <Notifications />
+            <Col xl="12" xxl="6">
+              <Card className="card-bordered card-full">
+                <AccesorInvites/>
               </Card>
             </Col>
-            <Col xl="12" xxl="8">
+            <Col xl="12" xxl="6">
               <Card className="card-bordered card-full">
-                <RecentInvest />
+                <ValuerAccessInvite/>
               </Card>
             </Col>
           </Row>

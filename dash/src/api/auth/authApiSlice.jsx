@@ -2,6 +2,16 @@ import { apiSlice } from "../../featuers/apiSlice"
 
 export const authApiSlice = apiSlice.injectEndpoints({
     endpoints: builder => ({
+        requestAccesorAccess: builder.mutation({
+            query: credentials => ({
+                url: '/api/auth/login',
+                method: 'POST',
+                body: { ...credentials },
+                headers: {
+                    'Accept': 'Application/json'
+                  }  
+            })
+        }),
         login: builder.mutation({
             query: credentials => ({
                 url: '/api/auth/login',
@@ -47,4 +57,4 @@ export const authApiSlice = apiSlice.injectEndpoints({
 
 export const {
     useLoginMutation,useSendForgotPasswordMutation,useResetPasswordMutation,useVerifyResetTokenQuery
-} = authApiSlice
+} = authApiSlice;

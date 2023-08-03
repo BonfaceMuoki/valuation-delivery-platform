@@ -15,6 +15,12 @@ return new class extends Migration
     {
         Schema::create('archive_client_registartion_requests', function (Blueprint $table) {
             $table->id();
+            $table->string('invite_email');
+            $table->string('contact_person_name');
+            $table->string('contact_person_phone');
+            $table->string('institution_name');
+            $table->string('type')->default("Court"); 
+            $table->enum('status',['Requested','Approved','Rejected','Registered']);  
             $table->timestamps();
         });
     }

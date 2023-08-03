@@ -54,7 +54,7 @@ services:
     ports:
       - 3307:3304
     volumes:
-      - api-volume:/var/lib/mysql
+      - valtrackapi-volume:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
       - MYSQL_USER=${DB_USERNAME}
@@ -70,7 +70,7 @@ services:
     depends_on:
       - database
     ports:
-      - 8089:80
+      - 8095:80
     environment:
       PMA_HOST: database
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
@@ -82,5 +82,5 @@ networks:
     driver: bridge
 
 volumes:
-  api-volume:
+  valtrackapi-volume:
     driver: local

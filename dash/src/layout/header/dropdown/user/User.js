@@ -3,14 +3,19 @@ import UserAvatar from "../../../../components/user/UserAvatar";
 import { DropdownToggle, DropdownMenu, Dropdown } from "reactstrap";
 import { Icon } from "../../../../components/Component";
 import { LinkList, LinkItem } from "../../../../components/links/Links";
+import { useSelector,useDispatch } from "react-redux";
+import { logOut, selectCurrentPermissions,selectCurrentRoles,selectCurrentUser } from "../../../../featuers/authSlice";
 
 const User = () => {
+  const currentuser = useSelector(selectCurrentUser);
   const [open, setOpen] = useState(false);
   const toggle = () => setOpen((prevState) => !prevState);
 
   const handleSignout = () => {
-    localStorage.removeItem("accessToken");
+     dispatch(logOut);
   };
+const dispatch = useDispatch();
+
 
   return (
     <Dropdown isOpen={open} className="user-dropdown" toggle={toggle}>
@@ -25,8 +30,8 @@ const User = () => {
         <div className="user-toggle">
           <UserAvatar icon="user-alt" className="sm" />
           <div className="user-info d-none d-md-block">
-            <div className="user-status">Administrator</div>
-            <div className="user-name dropdown-indicator">Abu Bin Ishityak</div>
+            <div className="user-status">{currentuser?.role_name}</div>
+            <div className="user-name dropdown-indicator">{currentuser?.full_name}</div>
           </div>
         </div>
       </DropdownToggle>
@@ -37,27 +42,27 @@ const User = () => {
               <span>AB</span>
             </div>
             <div className="user-info">
-              <span className="lead-text">Abu Bin Ishtiyak</span>
-              <span className="sub-text">info@softnio.com</span>
+              <span className="lead-text">{currentuser?.full_name}</span>
+              <span className="sub-text">{currentuser?.email}</span>
             </div>
           </div>
         </div>
         <div className="dropdown-inner">
           <LinkList>
-            <LinkItem link="/user-profile-regular" icon="user-alt" onClick={toggle}>
+            <LinkItem link="/admin-profile" icon="user-alt" onClick={toggle}>
               View Profile
             </LinkItem>
-            <LinkItem link="/user-profile-setting" icon="setting-alt" onClick={toggle}>
+            {/* <LinkItem link="/user-profile-setting" icon="setting-alt" onClick={toggle}>
               Account Setting
             </LinkItem>
             <LinkItem link="/user-profile-activity" icon="activity-alt" onClick={toggle}>
               Login Activity
-            </LinkItem>
+            </LinkItem> */}
           </LinkList>
         </div>
         <div className="dropdown-inner">
           <LinkList>
-            <a href={`${process.env.PUBLIC_URL}/auth-login`} onClick={handleSignout}>
+            <a href={`${process.env.PUBLIC_URL}/login`} onClick={handleSignout}>
               <Icon name="signout"></Icon>
               <span>Sign Out</span>
             </a>

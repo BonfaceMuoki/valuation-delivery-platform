@@ -1,11 +1,22 @@
-import React, { useEffect } from "react";
-import menu from "./MenuData";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { selectCurrentRoles,selectCurrentUser } from "../../featuers/authSlice";
+import menudata from "./MenuData";
 import Icon from "../../components/icon/Icon";
 import classNames from "classnames";
 import { NavLink, Link } from "react-router-dom";
 
+const menuadmin=menudata.admin;
+const menuvaluer=menudata.valuer;
+const menulender=menudata.lender;
+
+
 const MenuHeading = ({ heading }) => {
-  return (
+const token = useSelector(selectCurrentToken);
+const user = useSelector(selectCurrentUser);
+const roles = useSelector(selectCurrentRoles);
+const userrole = currentuser?.role_name;
+return (
     <li className="nk-menu-heading">
       <h6 className="overline-title text-primary-alt">{heading}</h6>
     </li>
@@ -13,6 +24,7 @@ const MenuHeading = ({ heading }) => {
 };
 
 const MenuItem = ({ icon, link, text, sub, newTab, sidebarToggle, mobileView, badge, ...props }) => {
+
   let currentUrl;
   const toggleActionSidebar = (e) => {
     if (!sub && !newTab && mobileView) {
@@ -27,6 +39,7 @@ const MenuItem = ({ icon, link, text, sub, newTab, sidebarToggle, mobileView, ba
   }
 
   const menuHeight = (el) => {
+   
     var totalHeight = [];
     for (var i = 0; i < el.length; i++) {
       var margin =
@@ -180,6 +193,20 @@ const MenuItem = ({ icon, link, text, sub, newTab, sidebarToggle, mobileView, ba
 };
 
 const MenuSub = ({ icon, link, text, sub, sidebarToggle, mobileView, ...props }) => {
+  const currentuser = useSelector(selectCurrentUser);
+  const userrole = currentuser?.role_name;
+  const [menu, setMenu ] = useState([]);
+  
+  useEffect(() => {
+    if (userrole === "Super Admin") {
+      setMenu(menuadmin);
+    } else if (userrole == "Report Uploader" || userrole == "Report Uploader Admin") {
+      setMenu(menuvaluer);
+    } else if (userrole == "Report Accessor" || userrole == "Report Accessor Admin") {
+      setMenu(menulender);
+    }
+  }, [userrole]);
+
   return (
     <ul className="nk-menu-sub" style={props.style}>
       {sub.map((item) => (
@@ -200,6 +227,19 @@ const MenuSub = ({ icon, link, text, sub, sidebarToggle, mobileView, ...props })
 };
 
 const Menu = ({ sidebarToggle, mobileView }) => {
+  const currentuser = useSelector(selectCurrentUser);
+  const userrole = currentuser?.role_name;
+  const [menu, setMenu ] = useState([]);  
+  useEffect(() => {
+    if (userrole === "Super Admin") {
+      setMenu(menuadmin);
+    } else if (userrole == "Report Uploader" || userrole == "Report Uploader Admin") {
+      setMenu(menuvaluer);
+    } else if (userrole == "Report Accessor" || userrole == "Report Accessor Admin") {
+      setMenu(menulender);
+    }
+  }, [userrole]);
+  
   return (
     <ul className="nk-menu">
       {menu.map((item) =>

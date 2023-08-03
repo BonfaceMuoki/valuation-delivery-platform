@@ -65,13 +65,7 @@ const Login = () => {
               </BlockDes>
             </BlockContent>
           </BlockHead>
-          {errorVal && (
-            <div className="mb-3">
-              <Alert color="danger" className="alert-icon">
-                <Icon name="alert-circle" /> Unable to login with credentials{" "}
-              </Alert>
-            </div>
-          )}
+          
           <Form className="is-alter" onSubmit={handleSubmit(onFormSubmit)}>
             <div className="form-group">
               <div className="form-label-group">

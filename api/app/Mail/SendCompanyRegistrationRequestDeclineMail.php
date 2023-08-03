@@ -19,10 +19,11 @@ class SendCompanyRegistrationRequestDeclineMail extends Mailable
      *
      * @return void
      */
-    public function __construct($message,$invitedetails)
+    public function __construct($message,$invitedetails,$companytype="")
     {
         $this->message=$message;
         $this->invitedetails=$invitedetails;
+        $this->companytype=$companytype;
         //
     }
 
@@ -45,13 +46,24 @@ class SendCompanyRegistrationRequestDeclineMail extends Mailable
      */
     public function content()
     {
-        return new Content(
-            view: 'Email.registrationrequestdenial',
-            with:[
-                'reason'=>$this->message,
-                'invitedetails'=>$this->invitedetails
-            ]
-        );
+        if($this->companytype=="valuer"){
+            return new Content(
+                view: 'Email.registrationrequestdenial',
+                with:[
+                    'reason'=>$this->message,
+                    'invitedetails'=>$this->invitedetails
+                ]
+            );
+        }else{
+            return new Content(
+                view: 'Email.registrationrequestdenialaccesor',
+                with:[
+                    'reason'=>$this->message,
+                    'invitedetails'=>$this->invitedetails
+                ]
+            );
+        }
+      
     }
 
     /**

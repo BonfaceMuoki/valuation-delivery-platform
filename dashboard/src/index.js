@@ -11,6 +11,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store ,persistor} from 'features/store';
 import { persistStore } from 'redux-persist';
+
+import { persistStore } from 'redux-persist';
 import { ToastContainer} from 'react-toastify';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));

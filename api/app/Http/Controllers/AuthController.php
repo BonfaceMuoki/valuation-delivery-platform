@@ -26,6 +26,7 @@ use App\Models\AccesorUserInvite;
 use Illuminate\Support\Facades\Http;
 use App\Models\PasswordReset;
 use App\Mail\SendPasswordResetMail;
+
 class AuthController extends Controller
 {
 
@@ -57,7 +58,8 @@ class AuthController extends Controller
             ]
         ]);
     }
-    public function VarifyRecaptchaToken($request){
+    public function VarifyRecaptchaToken($request)
+    {
         $response = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
             'secret' => env('GOOGLE_SITE_KEY'),
             'response' => $request->recaptcha_token,
@@ -69,130 +71,134 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-  
-     public function requestValuerAccess(Request $request){
+
+    public function requestValuerAccess(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'login_email' => 'required|email|unique:valuation_firm_registration_requests,invite_email',
             'recaptcha_token' => 'required|string',
             'phone_number' => 'required|string',
             'directors_isk_numer' => 'required|string|unique:valuation_firm_registration_requests,isk_number',
             'directors_vrb_numer' => 'required|string|unique:valuation_firm_registration_requests,vrb_number',
-            'full_names'=>'required'
+            'full_names' => 'required'
         ]);
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
-       $response=$this->VarifyRecaptchaToken($request);
+        $response = $this->VarifyRecaptchaToken($request);
 
         if ($response->successful()) {
             $data = $response->json();
             // Process the response data
-            if ($data['success']) {               
+            if ($data['success']) {
                 // reCAPTCHA validation passed
-                $requesaccess['invite_email']=$request->login_email;
-                $requesaccess['invite_phone']=$request->phone_number;
-                $requesaccess['isk_number']=$request->directors_isk_numer;
-                $requesaccess['vrb_number']=$request->directors_vrb_numer;
-                $requesaccess['valauaion_firm_name']=$request->company_name;
-                $requesaccess['director_name']=$request->full_names;
-                $invite = ValuationFirmRegistrationRequests::create( $requesaccess);
-                if($invite){
-                    return response()->json(['message'=>"Request send succefully. You will get an email to the email you provided once the approval has been made." ], 201);
-                }else{
-                    return response()->json(['message'=>"Failed.Please contact admin" ], 422);            
-                }                
+                $requesaccess['invite_email'] = $request->login_email;
+                $requesaccess['invite_phone'] = $request->phone_number;
+                $requesaccess['isk_number'] = $request->directors_isk_numer;
+                $requesaccess['vrb_number'] = $request->directors_vrb_numer;
+                $requesaccess['valauaion_firm_name'] = $request->company_name;
+                $requesaccess['director_name'] = $request->full_names;
+                $invite = ValuationFirmRegistrationRequests::create($requesaccess);
+                if ($invite) {
+                    return response()->json(['message' => "Request send succefully. You will get an email to the email you provided once the approval has been made."], 201);
+                } else {
+                    return response()->json(['message' => "Failed.Please contact admin"], 422);
+                }
                 // Proceed with your desired logic
             } else {
                 $statusCode = $response->status();
-                return response()->json(['message'=>"Failed. Invalid recaptcha code."], 422);
+                return response()->json(['message' => "Failed. Invalid recaptcha code."], 422);
                 // reCAPTCHA validation failed
                 // Handle the validation failure
             }
         } else {
             // Request to Google reCAPTCHA API failed
             $statusCode = $response->status();
-            return response()->json(['message'=>"Failed. Invalid recaptcha code." ], 422);
+            return response()->json(['message' => "Failed. Invalid recaptcha code."], 422);
             // Handle the error
         }
-        
-     }
+
+    }
 
 
-     public function requestAccesorAccess(Request $request){
+    public function requestAccesorAccess(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'login_email' => 'required|email|unique:valuation_firm_registration_requests,invite_email',
             'recaptcha_token' => 'required|string',
             'phone_number' => 'required|string',
-            'full_names'=>'required',
-            'institution_name'=>'required'
+            'full_names' => 'required',
+            'institution_name' => 'required'
         ]);
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
-       $response=$this->VarifyRecaptchaToken($request);
+        $response = $this->VarifyRecaptchaToken($request);
 
         if ($response->successful()) {
             $data = $response->json();
             // return response()->json(['message'=>"Failed. Invalid recaptcha code.". json_encode($data) ], 422);
             // Process the response data
-            if ($data['success']) {               
+            if ($data['success']) {
                 // reCAPTCHA validation passed
-                try{
+                try {
                     DB::beginTransaction();
-                    $requesaccess['invite_email']=$request->login_email;
-                    $requesaccess['contact_person_phone']=$request->phone_number;
-                    $requesaccess['contact_person_name']=$request->full_names;
-                    $requesaccess['institution_name']=$request->institution_name;                
+                    $requesaccess['invite_email'] = $request->login_email;
+                    $requesaccess['contact_person_phone'] = $request->phone_number;
+                    $requesaccess['contact_person_name'] = $request->full_names;
+                    $requesaccess['institution_name'] = $request->institution_name;
                     $invite = ClientRegistrationRequests::create($requesaccess);
                     DB::commit();
-                    if($invite){
-                        return response()->json(['message'=>"Request send succefully. You will get an email to the email you provided once the approval has been made." ], 201);
-                    }else{
-                        return response()->json(['message'=>"Failed.Please contact admin" ], 422);            
-                    } 
+                    if ($invite) {
+                        return response()->json(['message' => "Request send succefully. You will get an email to the email you provided once the approval has been made."], 201);
+                    } else {
+                        return response()->json(['message' => "Failed.Please contact admin"], 422);
+                    }
 
 
-                }catch(Exception $exp){
+                } catch (Exception $exp) {
                     DB::rollBack();
-                    return response()->json(['message'=>"Failed.".$exp->getMessage() ], 422);
+                    return response()->json(['message' => "Failed." . $exp->getMessage()], 422);
                 }
-               
+
                 // Proceed with your desired logic
             } else {
                 $statusCode = $response->status();
-                return response()->json(['message'=>"Failed. Invalid recaptcha code.".$statusCode ], 422);
+                return response()->json(['message' => "Failed. Invalid recaptcha code." . $statusCode], 422);
                 // reCAPTCHA validation failed
                 // Handle the validation failure
             }
         } else {
             // Request to Google reCAPTCHA API failed
             $statusCode = $response->status();
-            return response()->json(['message'=>"Failed. Invalid recaptcha code." ], 422);
+            return response()->json(['message' => "Failed. Invalid recaptcha code."], 422);
             // Handle the error
         }
-        
-     }
-     public function verifyResetToken(Request $request){
-        $verified=PasswordReset::where("token",$request->reset_token)->first();
-        if($verified!=null){
-            return response()->json($verified,200);
-        }else{
-            return response()->json($verified,404);
+
+    }
+    public function verifyResetToken(Request $request)
+    {
+        $verified = PasswordReset::where("token", $request->reset_token)->first();
+        if ($verified != null) {
+            return response()->json($verified, 200);
+        } else {
+            return response()->json($verified, 404);
         }
-     }
-     public function ResetPassword(Request $request){
+    }
+    public function ResetPassword(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'password' => 'required',
             'reset_token' => 'required|exists:password_resets,token',
         ]);
         if ($validator->fails()) {
-            return response()->json(['backenderrors'=>$validator->errors()], 422);
+            return response()->json(['backenderrors' => $validator->errors()], 422);
         }
         try {
             DB::beginTransaction();
             //update user
-            User::where("email", $request->email)->update(['password' => bcrypt($request->password)]);             
+            User::where("email", $request->email)->update(['password' => bcrypt($request->password)]);
             //update user
             DB::commit();
             return response()->json(['message' => 'Password updated successfully.'], 201);
@@ -200,9 +206,9 @@ class AuthController extends Controller
             DB::rollBack();
             return response()->json(['message' => 'Failed.' . $exp->getMessage()], 422);
         }
-     
 
-     }
+
+    }
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -239,10 +245,10 @@ class AuthController extends Controller
 
                 // Request to Google reCAPTCHA API failed
                 $statusCode = $response->status();
-                return response()->json(['message' => "Failed. Invalid recaptcha code.".$response], 422);
+                return response()->json(['message' => "Failed. Invalid recaptcha code." . $response], 422);
                 // Handle the error
             }
-        }else {           
+        } else {
             return response()->json(['message' => "Inactive account."], 403);
             // Handle the error
         }
@@ -256,7 +262,8 @@ class AuthController extends Controller
         return $token;
     }
 
-    public function SendAccountPasswordResetLink(Request $request){
+    public function SendAccountPasswordResetLink(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'recaptcha_token' => 'required',
@@ -265,58 +272,60 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
-        try{
+        try {
             DB::beginTransaction();
             $isactive = User::where("is_active", 1)->where("email", $request->email)->first();
             if ($isactive != null) {
                 //verify token
-                $response=$this->VarifyRecaptchaToken($request);
+                $response = $this->VarifyRecaptchaToken($request);
                 if ($response->successful()) {
                     $data = $response->json();
                     // Process the response data
-                    if ($data['success']) {               
+                    if ($data['success']) {
                         // reCAPTCHA validation passed
-                         //send reset mail
-                        $token=$this->generatePasswordResetToken($request);
-                        $saverequest['email']=$request->email;
-                        $saverequest['token']=$token;   
-                        $mailsend= Mail::to($request['email'])->send(new SendPasswordResetMail($token,$isactive,$request->reset_link));           
-                       //send reset mail
+                        //send reset mail
+                        $token = $this->generatePasswordResetToken($request);
+                        $saverequest['email'] = $request->email;
+                        $saverequest['token'] = $token;
+                        $mailsend = Mail::to($request['email'])->send(new SendPasswordResetMail($token, $isactive, $request->reset_link));
+                        //send reset mail
                         $passwordreset = PasswordReset::insert($saverequest);
                         DB::commit();
-                        if($passwordreset){
-                            return response()->json(['message'=>"Request send succefully. We have send you a reset Link on your email." ], 201);
-                        }else{
-                            return response()->json(['message'=>"Failed.Please contact admin" ], 422);            
-                        }                
+                        if ($passwordreset) {
+                            return response()->json(['message' => "Request send succefully. We have send you a reset Link on your email."], 201);
+                        } else {
+                            return response()->json(['message' => "Failed.Please contact admin"], 422);
+                        }
                         // Proceed with your desired logic
                     } else {
                         $statusCode = $response->status();
-                        return response()->json(['message'=>"Failed. Invalid recaptcha code." ], 422);
+                        return response()->json(['message' => "Failed. Invalid recaptcha code."], 422);
                         // reCAPTCHA validation failed
                         // Handle the validation failure
                     }
                 } else {
-                    
+
                     // Request to Google reCAPTCHA API failed
                     $statusCode = $response->status();
-                    return response()->json(['message'=>"Failed. Invalid recaptcha code." ], 422);
+                    return response()->json(['message' => "Failed. Invalid recaptcha code."], 422);
                     // Handle the error
                 }
-    
+
                 //verify token
-               
+
             } else {
-                 return response()->json(['message'=>'Your account does not exist or it has been deactivated.Please contact admin'],403);
-            }  
-        }catch(Exception $exp){
+                return response()->json(['message' => 'Your account does not exist or it has been deactivated.Please contact admin'], 403);
+            }
+        } catch (Exception $exp) {
             DB::rollBack();
             return response()->json(
                 [
-                    'message'=>'Failed.'.$exp->getMessage()
-                ], 422); 
+                    'message' => 'Failed.' . $exp->getMessage()
+                ],
+                422
+            );
         }
-   
+
     }
     /**
      * Register a User.
@@ -334,14 +343,14 @@ class AuthController extends Controller
             'password_confirmation' => 'required|same:password'
         ]);
         if ($validator->fails()) {
-            return response()->json(["message"=>"Unprocessable data","backendvalerrors"=>$validator->errors()], 400);
+            return response()->json(["message" => "Unprocessable data", "backendvalerrors" => $validator->errors()], 400);
         }
         $user = [];
         try {
             DB::beginTransaction();
 
             $organization = null;
-            $user=null;
+            $user = null;
             if (strtolower($request->post('register_as')) == 'report uploader admin') {
                 $user = User::create(
                     [
@@ -367,44 +376,43 @@ class AuthController extends Controller
                 $company['organization_email'] = $request->post('company_email');
                 $company['directors_vrb'] = $request->post('directors_vrb');
                 $company['isk_number'] = $request->post('isk_number');
-                $organization=Organization::where($company)->first();
-                if(!$organization){
+                $organization = Organization::where($company)->first();
+                if (!$organization) {
                     $company['created_by'] = $user->id;
                     $organization = Organization::create($company);
                     $organization->users()->attach($user);
-                }else{
+                } else {
                     $organization->users()->attach($user);
                 }
                 //check if organization exist
-            }else if(strtolower($request->post('register_as')) == 'report uploader'){
-              //get admin account user
-              if(auth()->user()==null){
-                 return response()->json([
-                    'code'=>0,
-                    'message'=>'Unauthorized access'
-                 ],401);
-              }else{
-                $user = User::create(
-                    [
-                        'full_name' => $request->full_name,
-                        'email' => $request->email,
-                        'password' => bcrypt($request->password)
-                    ]
-                );
-                $uploader_role = Role::where('slug', 'report uploader')->first();
-                $user->roles()->attach($uploader_role);
-                //
-                $loggeduser=auth()->user();
-                $organizations=$loggeduser->UploaderOrganization()->get();
-                $organization=$organizations[0];
-                $organization->users()->attach($user);
-                //
+            } else if (strtolower($request->post('register_as')) == 'report uploader') {
+                //get admin account user
+                if (auth()->user() == null) {
+                    return response()->json([
+                        'code' => 0,
+                        'message' => 'Unauthorized access'
+                    ], 401);
+                } else {
+                    $user = User::create(
+                        [
+                            'full_name' => $request->full_name,
+                            'email' => $request->email,
+                            'password' => bcrypt($request->password)
+                        ]
+                    );
+                    $uploader_role = Role::where('slug', 'report uploader')->first();
+                    $user->roles()->attach($uploader_role);
+                    //
+                    $loggeduser = auth()->user();
+                    $organizations = $loggeduser->UploaderOrganization()->get();
+                    $organization = $organizations[0];
+                    $organization->users()->attach($user);
+                    //
 
-              }
-            }
-            else if(strtolower($request->post('register_as')) == 'valuation firm director'){
+                }
+            } else if (strtolower($request->post('register_as')) == 'valuation firm director') {
 
-            }else if(strtolower($request->post('register_as')) == 'super admin'){
+            } else if (strtolower($request->post('register_as')) == 'super admin') {
                 $user = User::create(
                     [
                         'full_name' => $request->full_name,
@@ -426,14 +434,15 @@ class AuthController extends Controller
         } catch (\Exception $exp) {
             DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
             return response()->json([
-                'message' => 'Account has not been created successfully '.$exp->getMessage(),
-                
+                'message' => 'Account has not been created successfully ' . $exp->getMessage(),
+
             ], 400);
 
         }
 
     }
-    public function registerAccesorUser(Request $request){
+    public function registerAccesorUser(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'full_name' => 'required|string|between:2,100',
             'email' => 'required|string|between:2,100|unique:users',
@@ -441,7 +450,7 @@ class AuthController extends Controller
             'password_confirmation' => 'required|same:password'
         ]);
         if ($validator->fails()) {
-            return response()->json(["message"=>"Unprocessable data","backendvalerrors"=>$validator->errors()], 400);
+            return response()->json(["message" => "Unprocessable data", "backendvalerrors" => $validator->errors()], 400);
         }
         $user = [];
         try {
@@ -455,9 +464,9 @@ class AuthController extends Controller
             );
             $accesor_role = Role::where('id', $request->register_as)->first();
             $user->roles()->attach($accesor_role);
-            $organization=ReportConsumer::where("id",$request->organization)->first();
+            $organization = ReportConsumer::where("id", $request->organization)->first();
             $organization->users()->attach($user);
-            AccesorUserInvite::where("invite_token",$request->invite_token)->update(['status'=>1]);
+            AccesorUserInvite::where("invite_token", $request->invite_token)->update(['status' => 1]);
             DB::commit();
             return response()->json([
                 'message' => 'Account has been created successfully',
@@ -465,8 +474,8 @@ class AuthController extends Controller
         } catch (\Exception $exp) {
             DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
             return response()->json([
-                'message' => 'Account has not been created successfully '.$exp->getMessage(),
-                
+                'message' => 'Account has not been created successfully ' . $exp->getMessage(),
+
             ], 400);
 
         }
@@ -482,7 +491,7 @@ class AuthController extends Controller
             'password_confirmation' => 'required|same:password'
         ]);
         if ($validator->fails()) {
-            return response()->json(["message"=>"Unprocessable data","backendvalerrors"=>$validator->errors()], 400);
+            return response()->json(["message" => "Unprocessable data", "backendvalerrors" => $validator->errors()], 400);
         }
         $user = [];
         try {
@@ -497,11 +506,11 @@ class AuthController extends Controller
             );
             $uploader_role = Role::where('id', $request->register_as)->first();
             $user->roles()->attach($uploader_role);
-            $organization=Organization::where("id",$request->organization)->first();
+            $organization = Organization::where("id", $request->organization)->first();
             $organization->users()->attach($user);
 
 
-            ValuerfirmUserInvite::where("invite_token",$request->invite_token)->update(['status'=>1]);
+            ValuerfirmUserInvite::where("invite_token", $request->invite_token)->update(['status' => 1]);
 
             DB::commit();
             return response()->json([
@@ -512,112 +521,112 @@ class AuthController extends Controller
         } catch (\Exception $exp) {
             DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
             return response()->json([
-                'message' => 'Account has not been created successfully '.$exp->getMessage(),
-                
+                'message' => 'Account has not been created successfully ' . $exp->getMessage(),
+
             ], 400);
 
         }
 
     }
-public function registerAccesor(Request $request){
+    public function registerAccesor(Request $request)
+    {
 
-    $validator = Validator::make($request->all(), [
-        'register_as' => 'required|in:Report Accessor,Report Accessor Admin',
-        'full_name' => 'required|string|between:2,100',
-        'email' => 'required|string|between:2,100',
-        'password' => ['required', Password::min(6)->letters()->mixedCase()->numbers()->symbols()->uncompromised()],
-        'password_confirmation' => 'required|same:password'
-    ]);
-    if ($validator->fails()) {
-        return response()->json($validator->errors()->toJson(), 400);
-    }
-    $user = [];
-    try {
-        DB::beginTransaction();
-
-        $organization = null;
-        $organizations = null;
-        $user=null;
-        if (strtolower($request->post('register_as')) == 'report accessor admin') {
-            $user = User::create(
-                [
-                    'full_name' => $request->full_name,
-                    'email' => $request->email,
-                    'password' => bcrypt($request->password)
-                ]
-            );
-            $uploaderadmin_role = Role::where('slug', 'report accessor admin')->first();
-            $user->roles()->attach($uploaderadmin_role);
-            //check if organization exist
-            $validator = Validator::make($request->all(), [
-                'company_name' => 'required|string|between:2,100',
-                'organization_phone' => 'regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:report_consumers',
-            ]);
-            if ($validator->fails()) {
-                return response()->json($validator->errors()->toJson(), 400);
-            }
-            $company['organization_name'] = $request->post('company_name');
-            $company['organization_phone'] = $request->post('organization_phone');
-            $company['organization_email'] = $request->post('company_email');
-            $company['organization_type'] = $request->post('accessor_type');
-            $organization=ReportConsumer::where($company)->first();
-            if(!$organization){
-                $company['created_by'] = $user->id;
-                $organization = ReportConsumer::create($company);
-
-                $organization->users()->attach($user);
-
-
-            }else{
-                $organization->users()->attach($user);
-            }
-            //check if organization exist
-        }else if(strtolower($request->post('register_as')) == 'report accessor'){
-          //get admin account user
-          if(auth()->user()==null){
-             return response()->json([
-                'code'=>0,
-                'message'=>'Unauthorized access'
-             ],401);
-          }else{
-            $user = User::create(
-                [
-                    'full_name' => $request->full_name,
-                    'email' => $request->email,
-                    'password' => bcrypt($request->password)
-                ]
-            );
-            //
-            $loggeduser=auth()->user();
-            $organizations=$loggeduser->AccessorOrganization()->get();
-            $organization=$organizations[0];
-            $organization->users()->attach($user);
-            //
-
-          }
+        $validator = Validator::make($request->all(), [
+            'register_as' => 'required|in:Report Accessor,Report Accessor Admin',
+            'full_name' => 'required|string|between:2,100',
+            'email' => 'required|string|between:2,100',
+            'password' => ['required', Password::min(6)->letters()->mixedCase()->numbers()->symbols()->uncompromised()],
+            'password_confirmation' => 'required|same:password'
+        ]);
+        if ($validator->fails()) {
+            return response()->json($validator->errors()->toJson(), 400);
         }
-        else if(strtolower($request->post('register_as')) == 'valuation firm director'){
+        $user = [];
+        try {
+            DB::beginTransaction();
+
+            $organization = null;
+            $organizations = null;
+            $user = null;
+            if (strtolower($request->post('register_as')) == 'report accessor admin') {
+                $user = User::create(
+                    [
+                        'full_name' => $request->full_name,
+                        'email' => $request->email,
+                        'password' => bcrypt($request->password)
+                    ]
+                );
+                $uploaderadmin_role = Role::where('slug', 'report accessor admin')->first();
+                $user->roles()->attach($uploaderadmin_role);
+                //check if organization exist
+                $validator = Validator::make($request->all(), [
+                    'company_name' => 'required|string|between:2,100',
+                    'organization_phone' => 'regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:report_consumers',
+                ]);
+                if ($validator->fails()) {
+                    return response()->json($validator->errors()->toJson(), 400);
+                }
+                $company['organization_name'] = $request->post('company_name');
+                $company['organization_phone'] = $request->post('organization_phone');
+                $company['organization_email'] = $request->post('company_email');
+                $company['organization_type'] = $request->post('accessor_type');
+                $organization = ReportConsumer::where($company)->first();
+                if (!$organization) {
+                    $company['created_by'] = $user->id;
+                    $organization = ReportConsumer::create($company);
+
+                    $organization->users()->attach($user);
+
+
+                } else {
+                    $organization->users()->attach($user);
+                }
+                //check if organization exist
+            } else if (strtolower($request->post('register_as')) == 'report accessor') {
+                //get admin account user
+                if (auth()->user() == null) {
+                    return response()->json([
+                        'code' => 0,
+                        'message' => 'Unauthorized access'
+                    ], 401);
+                } else {
+                    $user = User::create(
+                        [
+                            'full_name' => $request->full_name,
+                            'email' => $request->email,
+                            'password' => bcrypt($request->password)
+                        ]
+                    );
+                    //
+                    $loggeduser = auth()->user();
+                    $organizations = $loggeduser->AccessorOrganization()->get();
+                    $organization = $organizations[0];
+                    $organization->users()->attach($user);
+                    //
+
+                }
+            } else if (strtolower($request->post('register_as')) == 'valuation firm director') {
+
+            }
+            DB::commit();
+            return response()->json([
+                'message' => 'Account has been created successfully',
+                'organization_d_u' => $user->UploaderOrganization()->get(),
+                'organization_d_a' => $user->AccessorOrganization()->get(),
+                'user' => $user
+            ], 201);
+
+
+        } catch (\Exception $exp) {
+            DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
+            return response()->json([
+                'message' => 'Account has mot been created successfully',
+                'error' => $exp
+            ], 400);
 
         }
-        DB::commit();
-        return response()->json([
-            'message' => 'Account has been created successfully',
-            'organization_d_u' => $user->UploaderOrganization()->get(),
-            'organization_d_a' => $user->AccessorOrganization()->get(),
-            'user' => $user
-        ], 201);
-
-
-    } catch (\Exception $exp) {
-        DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
-        return response()->json([
-            'message' => 'Account has mot been created successfully',
-            'error' => $exp
-        ], 400);
 
     }
-
-}
 
     /**
      * Log the user out (Invalidate the token).
@@ -649,25 +658,25 @@ public function registerAccesor(Request $request){
     }
     public function userProfileDetails(Request $request)
     {
-        $user=User::where("id",$request->user_id)->first();
-        if($user!=null){
-          
-                $role=  $user->roles()->first(["id", "name","name as role_name"]);   
-                $userid=['user_id'=>$request->user_id];  
-                return response()->json([
-                    'user' => array_merge($user->toArray(),$role->toArray(),$userid),
-                    'role' => $role,
-                    'user_id' => $user,
-                    'roles' => $user->roles()->get(["id", "name"]),
-                    'permissions' => array_merge($role->permissions()->get(['id','slug as name'])->toArray())
-                ]);
-    
-        }else{
-            return response()->json(['message'=>'user not found'],404);
-          
+        $user = User::where("id", $request->user_id)->first();
+        if ($user != null) {
+
+            $role = $user->roles()->first(["id", "name", "name as role_name"]);
+            $userid = ['user_id' => $request->user_id];
+            return response()->json([
+                'user' => array_merge($user->toArray(), $role->toArray(), $userid),
+                'role' => $role,
+                'user_id' => $user,
+                'roles' => $user->roles()->get(["id", "name"]),
+                'permissions' => array_merge($role->permissions()->get(['id', 'slug as name'])->toArray())
+            ]);
+
+        } else {
+            return response()->json(['message' => 'user not found'], 404);
+
         }
 
-   
+
     }
     /**
      * Get the token array structure.
@@ -702,19 +711,19 @@ public function registerAccesor(Request $request){
     }
     protected function createNewToken($token)
     {
-        $role=auth()->user()->roles()->first(["id", "name","name as role_name"]);
-        $userid=['user_id'=>auth()->user()->id];
-        $user=auth()->user();
+        $role = auth()->user()->roles()->first(["id", "name", "name as role_name"]);
+        $userid = ['user_id' => auth()->user()->id];
+        $user = auth()->user();
         return response()->json([
             'message' => 'Logged in successfully. Welcome to VDS',
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60,
-            'user' => array_merge($user->toArray(),$role->toArray(),$userid),
+            'user' => array_merge($user->toArray(), $role->toArray(), $userid),
             'role' => $role,
             'user_id' => $user,
             'roles' => $user->roles()->get(["id", "name"]),
-            'permissions' => array_merge($user->permissions()->get(["id", "slug as name"])->toArray(),$role->permissions()->get(['id','slug as name'])->toArray())
+            'permissions' => array_merge($user->permissions()->get(["id", "slug as name"])->toArray(), $role->permissions()->get(['id', 'slug as name'])->toArray())
         ]);
     }
 
@@ -780,28 +789,32 @@ public function registerAccesor(Request $request){
         return response()->json(["users" => User::all()]);
     }
 
-    public function retrieveValuerInviteDetails(Request $request){
+    public function retrieveValuerInviteDetails(Request $request)
+    {
 
-       $detailss= ValuationFirmInvite::where("invite_token",$request->invite_token)->where("completed",0)->first();
-       return response()->json($detailss,200);
+        $detailss = ValuationFirmInvite::where("invite_token", $request->invite_token)->where("completed", 0)->first();
+        return response()->json($detailss, 200);
 
     }
-    public function retrieveValuerUserInviteDetails(Request $request){
-     $details=ValuerfirmUserInvite::where("invite_token",$request->invite_token)
-     ->join("organizations","organizations.id","=","valuerfirm_user_invites.organization_id")
-     ->where("valuerfirm_user_invites.status",0)->first();
-     return response()->json($details,200);
+    public function retrieveValuerUserInviteDetails(Request $request)
+    {
+        $details = ValuerfirmUserInvite::where("invite_token", $request->invite_token)
+            ->join("organizations", "organizations.id", "=", "valuerfirm_user_invites.organization_id")
+            ->where("valuerfirm_user_invites.status", 0)->first();
+        return response()->json($details, 200);
     }
-    public function retrieveAccesorInviteDetails(Request $request){
+    public function retrieveAccesorInviteDetails(Request $request)
+    {
 
-        $detailss= AccesorInvite::where("invite_token",$request->invite_token)->first();
-        return response()->json($detailss,200); 
-        
+        $detailss = AccesorInvite::where("invite_token", $request->invite_token)->first();
+        return response()->json($detailss, 200);
+
     }
-    public function retrieveAccesorUserInviteDetails(Request $request){
-        $details=AccesorUserInvite::where("invite_token",$request->invite_token)
-        ->join("report_consumers","report_consumers.id","=","accesor_user_invites.report_consumer_id")
-        ->where("accesor_user_invites.status",0)->first();
-        return response()->json($details,200);
+    public function retrieveAccesorUserInviteDetails(Request $request)
+    {
+        $details = AccesorUserInvite::where("invite_token", $request->invite_token)
+            ->join("report_consumers", "report_consumers.id", "=", "accesor_user_invites.report_consumer_id")
+            ->where("accesor_user_invites.status", 0)->first();
+        return response()->json($details, 200);
     }
 }
