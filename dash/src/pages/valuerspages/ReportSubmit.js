@@ -13,15 +13,13 @@ import {
   RSelect
 } from "../../components/Component";
 import makeAnimated from 'react-select/animated';
-import { useForm } from "react-hook-form";
+import { Controller,useForm } from "react-hook-form";
 import { Steps, Step } from "react-step-builder";
 import { Row, Col, Button } from "reactstrap";
 
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { useSelector,useDispatch } from "react-redux";
-
-import { GoogleMapsProvider, useGoogleMap } from "@ubilabs/google-maps-react-hooks";
 import MapWithAutoSearch from "./MapWithAutoSearch";
 import {setValuationLocationDetails} from "../../featuers/authSlice";
 
@@ -35,7 +33,10 @@ import {
     useGetAccesorsListQuery,
     useGetPropertyTypeListQuery,
   } from "../../api/commonEndPointsAPI";
-import Dropzone from "react-dropzone";
+
+import DatePicker from "react-datepicker"
+
+
 const LocationForm = (props) => {
   const dispatch = useDispatch();
   const locationDetails = useSelector(selectLocationDetails);
@@ -221,7 +222,7 @@ const PropertyDetailsForm = (props) => {
                 id="username"
                 className="form-control"
                 {...registerproperty("PropertyLR", { required: true })}
-                defaultValue={propertdetails?.username}
+                defaultValue={propertdetails?.PropertyLR}
               />
               {properrtyErrors.PropertyLR && <span className="invalid">{properrtyErrors.PropertyLR?.message}</span>}
             </div>
@@ -325,13 +326,35 @@ const PropertyDetailsForm = (props) => {
 
 const PropertyValuationForm = (props) => {
   const propertyValuationValidationSchema = Yup.object().shape({
-    marketValue: Yup.string().required('Market Value is required'),
-    forcedSaleValue: Yup.number().required('Forced Sale value is required').typeError("FSV must be a valid number"),
-    insurenceValue: Yup.number().required("Insurence Value is required").typeError("Insurence value must be a valid number"),
-    valuationDate: Yup.string().required("Valuation date is required"),
-    annualGRossRentalIncome: Yup.string(),
+    marketValue: Yup.string()
+    .required('This field is required')
+    .test('valid-number', 'Invalid number', (value) => {
+      if (!value) return true; 
+      const rawValue = value.replace(/,/g, '');
+      return !isNaN(rawValue); 
+    }),
+    forcedSaleValue: Yup.string()
+    .required('Forced Sale value is required')
+    .test('valid-number', 'Invalid number', (value) => {
+      if (!value) return true; 
+      const rawValue = value.replace(/,/g, '');
+      return !isNaN(rawValue); 
+    }),
+    insurenceValue: Yup.string()
+    .required('Insurence Value is required')
+    .test('valid-number', 'Invalid Insurence Value', (value) => {
+      if (!value) return true; 
+      const rawValue = value.replace(/,/g, '');
+      return !isNaN(rawValue); 
+    }),  
+    annualGRossRentalIncome: Yup.string()
+    .required('Annual Gross Rental Income is required')
+    .test('valid-number', 'Invalid Annual Gross Rental Income', (value) => {
+      if (!value) return true; 
+      const rawValue = value.replace(/,/g, '');
+      return !isNaN(rawValue); 
+    }), 
     PropertyDescription:Yup.string(),
-    InstructionDate: Yup.string().required("Instruction Date is required"),
     recipient: Yup.array().of(Yup.object().shape({
       value: Yup.string(),
       label: Yup.string()
@@ -346,7 +369,6 @@ const PropertyValuationForm = (props) => {
           return value[0].size <= 1024 * 1024 * 2;
         }
         return true;
-
       })
       .test('fileType', 'Only PDF files are allowed', (value) => {
         if (value[0]) {
@@ -434,6 +456,7 @@ const PropertyValuationForm = (props) => {
   }
 
   const onSubmitPropertyValuation = async (data) => {
+    console.log(data);
     delete data.file;
     dispatch(setValuationDetails(data));
     dispatch(setReportRecipient(data.recipient));
@@ -443,18 +466,31 @@ const PropertyValuationForm = (props) => {
 
     }
   }
+  const [valuationDT, setValuationDT] = useState("");
+  const [instructionDT, setInstructionDT] = useState("");
   const [image, setImage] = useState();
   const [uploadedFile, setUploadedFile] = useState();
   const [uploadedFileD, setUploadedFileD] = useState();
   const dispatch = useDispatch();
   const handleImage = (e) => {
-
     setImage(e.target.files[0]);
     if (e.target.files[0]) {
       setUploadedFile(e.target.files[0].name);
       setUploadedFileD(e.target.files[0]);
     }
   }
+  const formatNumberWithCommas = (value) => {
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+  const onNumberInputChange = (e,fieldlabel) => {
+    // Remove commas from the user input and convert back to a number
+    const rawValue = e.target.value.replace(/,/g, '');
+    const numberValue = parseFloat(rawValue);
+    // Format the number with commas 
+    const formattedValue = isNaN(numberValue) ? '' : formatNumberWithCommas(numberValue);
+    // Set the formatted value in the form state using setValue
+    setPropertValuationValues(fieldlabel, formattedValue, { shouldValidate: true });
+  };
 
 
   return (
@@ -466,19 +502,17 @@ const PropertyValuationForm = (props) => {
               Recipient
             </label>
             <div className="form-control-wrap">
-              {
-                ((existingAccessors!=undefined) >0)&& <RSelect
-                value={[1]}
-                isMulti
-                {...registerpropertyValuation("recipient", { required: true })}
-                options={existingAccessors}
-              />
-             
-              }
-               {propertyValuationErrors.recipient && (
+              {(existingAccessors != undefined) > 0 && (
+                <RSelect
+                  isMulti
+                  {...registerpropertyValuation("recipient", { required: true })}
+                  options={existingAccessors}
+                  defaultValue={existingAccessors[0]}
+                />
+              )}
+              {propertyValuationErrors.recipient && (
                 <span className="invalid">{propertyValuationErrors.recipient?.message}</span>
               )}
-         
             </div>
           </div>
         </Col>
@@ -487,21 +521,26 @@ const PropertyValuationForm = (props) => {
             <label className="form-label">Report Document(Only PDF)</label>
             <div className="form-control-wrap">
               <div className="form-file">
-                <input className="form-control" type="file" multiple id="customMultipleFiles" />
+                <input
+                  className="form-control"
+                  type="file"
+                  multiple
+                  id="customMultipleFiles"
+                  {...registerpropertyValuation("file", { required: true })}
+                />
                 {propertyValuationErrors.recipient && (
-                <span className="invalid">{propertyValuationErrors.file?.message}</span>
-              )}
+                  <span className="invalid">{propertyValuationErrors.file?.message}</span>
+                )}
               </div>
             </div>
           </div>
         </Col>
-        
       </Row>
       <Row>
-      <Col md="4">
-      <div className="form-group">
+        <Col md="4">
+          <div className="form-group">
             <label className="form-label" htmlFor="first-name">
-            Market Value
+              Market Value
             </label>
             <div className="form-control-wrap">
               <input
@@ -510,16 +549,18 @@ const PropertyValuationForm = (props) => {
                 className="form-control"
                 {...registerpropertyValuation("marketValue", { required: true })}
                 defaultValue={valauationdetails?.marketValue}
-               
+                onChange={(e) => onNumberInputChange(e, "marketValue")}
               />
-              {propertyValuationErrors.marketValue && <span className="invalid">{propertyValuationErrors.marketValue?.message}</span>}
+              {propertyValuationErrors.marketValue && (
+                <span className="invalid">{propertyValuationErrors.marketValue?.message}</span>
+              )}
             </div>
           </div>
-      </Col>
-      <Col md="4">
-      <div className="form-group">
+        </Col>
+        <Col md="4">
+          <div className="form-group">
             <label className="form-label" htmlFor="first-name">
-            Forced Sale Value
+              Forced Sale Value
             </label>
             <div className="form-control-wrap">
               <input
@@ -528,16 +569,18 @@ const PropertyValuationForm = (props) => {
                 className="form-control"
                 {...registerpropertyValuation("forcedSaleValue", { required: true })}
                 defaultValue={valauationdetails?.marketValue}
-               
+                onChange={(e) => onNumberInputChange(e, "forcedSaleValue")}
               />
-              {propertyValuationErrors.forcedSaleValue && <span className="invalid">{propertyValuationErrors.forcedSaleValue?.message}</span>}
+              {propertyValuationErrors.forcedSaleValue && (
+                <span className="invalid">{propertyValuationErrors.forcedSaleValue?.message}</span>
+              )}
             </div>
           </div>
-      </Col>
-      <Col md="4">
-      <div className="form-group">
+        </Col>
+        <Col md="4">
+          <div className="form-group">
             <label className="form-label" htmlFor="first-name">
-            Insurence Value
+              Insurence Value
             </label>
             <div className="form-control-wrap">
               <input
@@ -546,18 +589,20 @@ const PropertyValuationForm = (props) => {
                 className="form-control"
                 {...registerpropertyValuation("insurenceValue", { required: true })}
                 defaultValue={valauationdetails?.insurenceValue}
-               
+                onChange={(e) => onNumberInputChange(e, "insurenceValue")}
               />
-              {propertyValuationErrors.insurenceValue && <span className="invalid">{propertyValuationErrors.insurenceValue?.message}</span>}
+              {propertyValuationErrors.insurenceValue && (
+                <span className="invalid">{propertyValuationErrors.insurenceValue?.message}</span>
+              )}
             </div>
           </div>
-      </Col>
+        </Col>
       </Row>
       <Row>
-      <Col md="6">
-      <div className="form-group">
+        <Col md="4">
+          <div className="form-group">
             <label className="form-label" htmlFor="first-name">
-            Annual Grooss Income
+              Annual Grooss Income
             </label>
             <div className="form-control-wrap">
               <input
@@ -566,69 +611,88 @@ const PropertyValuationForm = (props) => {
                 className="form-control"
                 {...registerpropertyValuation("annualGRossRentalIncome", { required: true })}
                 defaultValue={valauationdetails?.annualGRossRentalIncome}
-               
+                onChange={(e) => onNumberInputChange(e, "annualGRossRentalIncome")}
               />
-              {propertyValuationErrors.annualGRossRentalIncome && <span className="invalid">{propertyValuationErrors.annualGRossRentalIncome?.message}</span>}
+              {propertyValuationErrors.annualGRossRentalIncome && (
+                <span className="invalid">{propertyValuationErrors.annualGRossRentalIncome?.message}</span>
+              )}
             </div>
           </div>
-      </Col>
-      <Col md="6">
-      <div className="form-group">
+        </Col>
+        <Col md="4">
+          <div className="form-group">
             <label className="form-label" htmlFor="first-name">
-            Forced Sale Value
+              Valuation Date
             </label>
             <div className="form-control-wrap">
-              <input
-                type="text"
-                id="first-name"
-                className="form-control"
-                {...registerpropertyValuation("forcedSaleValue", { required: true })}
-                defaultValue={valauationdetails?.marketValue}
-               
+            <Controller
+                control={control}
+                name="valuationDate"
+                render={({ field }) => (
+                  <DatePicker
+                   className="form-control date-picker"
+                   placeholderText="Select date" 
+                   onChange={(date) => field.onChange(date)} 
+                   selected={field.value} />
+                )}
               />
-              {propertyValuationErrors.forcedSaleValue && <span className="invalid">{propertyValuationErrors.forcedSaleValue?.message}</span>}
+              {propertyValuationErrors.valuationDate && (
+                <span className="invalid">{propertyValuationErrors.valuationDate?.message}</span>
+              )}
+
+            </div>
+            <div className="form-note">
+              Date Format <code>yyyy</code>
             </div>
           </div>
-      </Col>
+        </Col>
+        <Col md="4">
+          <div className="form-group">
+            <label className="form-label" htmlFor="first-name">
+              Instruction Date
+            </label>
+            <div className="form-control-wrap">
+              <Controller
+                control={control}
+                name="InstructionDate"
+                render={({ field }) => (
+                  <DatePicker 
+                  className="form-control date-picker" 
+                  placeholderText="Select date" 
+                  onChange={(date) => field.onChange(date)} 
+                  selected={field.value} />
+                )}
+              />
+              {propertyValuationErrors.InstructionDate && (
+                <span className="invalid">{propertyValuationErrors.InstructionDate?.message}</span>
+              )}
+            </div>
+            <div className="form-note">
+              Date Format <code>yyyy</code>
+            </div>
+          </div>
+        </Col>
       </Row>
+
       <Row>
-      <Col md="6">
-      <div className="form-group">
+        <Col className="12">
+          <div className="form-group">
             <label className="form-label" htmlFor="first-name">
-            Valuation Date
+              Property Description
             </label>
             <div className="form-control-wrap">
-              <input
-                type="text"
-                id="first-name"
+              <textarea
                 className="form-control"
-                {...registerpropertyValuation("valuationDate", { required: true })}
-                defaultValue={valauationdetails?.valuationDate}
-               
+                {...registerpropertyValuation("PropertyDescription", { required: true })}
               />
-              {propertyValuationErrors.valuationDate && <span className="invalid">{propertyValuationErrors.valuationDate?.message}</span>}
+              {propertyValuationErrors.PropertyDescription && (
+                <span className="invalid">{propertyValuationErrors.PropertyDescription?.message}</span>
+              )}
             </div>
           </div>
-      </Col>
-      <Col md="6">
-      <div className="form-group">
-            <label className="form-label" htmlFor="first-name">
-            Instruction Date
-            </label>
-            <div className="form-control-wrap">
-              <input
-                type="text"
-                id="first-name"
-                className="form-control"
-                {...registerpropertyValuation("InstructionDate", { required: true })}
-                defaultValue={valauationdetails?.InstructionDate}
-               
-              />
-              {propertyValuationErrors.InstructionDate && <span className="invalid">{propertyValuationErrors.InstructionDate?.message}</span>}
-            </div>
-          </div>
-      </Col>
+        </Col>
       </Row>
+
       <div className="actions clearfix">
         <ul>
           <li>
@@ -834,7 +898,7 @@ const ValuationSummary = (props) => {
                 id="username"
                 className="form-control"
                 {...registerproperty("PropertyLR", { required: true })}
-                defaultValue={propertdetails?.username}
+                defaultValue={propertdetails?.PropertyLR}
               />
               {properrtyErrors.PropertyLR && <span className="invalid">{properrtyErrors.PropertyLR?.message}</span>}
             </div>
@@ -953,26 +1017,26 @@ const Header = (props) => {
         </li>
         <li className={props.current >= 3 ? "done" : ""}>
           <a href="#wizard-01-h-2" onClick={(ev) => ev.preventDefault()}>
-            <span className="current-info audible">current step: </span>
-            <span className="number">03</span> <h5>Step 3</h5>
+            <span className="current-info audible">Step 03: </span>
+            <span className="number">03</span> <h5>Valuation Data</h5>
           </a>
         </li>
         <li className={props.current >= 4 ? "done" : ""}>
           <a href="#wizard-01-h-2" onClick={(ev) => ev.preventDefault()}>
-            <span className="current-info audible">current step: </span>
-            <span className="number">04</span> <h5>Step 4</h5>
+            <span className="current-info audible">Step 04: </span>
+            <span className="number">04</span> <h5>Signatories</h5>
           </a>
         </li>
         <li className={props.current >= 5 ? "done" : ""}>
           <a href="#wizard-01-h-2" onClick={(ev) => ev.preventDefault()}>
-            <span className="current-info audible">current step: </span>
-            <span className="number">05</span> <h5>Step 5</h5>
+            <span className="current-info audible">Step 05: </span>
+            <span className="number">05</span> <h5>Summary</h5>
           </a>
         </li>
         <li className={props.current === 6 ? "last done" : "last"}>
           <a href="#wizard-01-h-2" onClick={(ev) => ev.preventDefault()}>
-            <span className="current-info audible">current step: </span>
-            <span className="number">06</span> <h5>Step 6</h5>
+            <span className="current-info audible">Step 06: </span>
+            <span className="number">06</span> <h5>Successful</h5>
           </a>
         </li>
       </ul>

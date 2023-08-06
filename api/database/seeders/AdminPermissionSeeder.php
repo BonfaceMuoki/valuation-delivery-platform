@@ -58,8 +58,7 @@ class AdminPermissionSeeder extends Seeder
           foreach ($admin_permissions as $permission) {
             $perm = Permission::where("name", $permission['name'])->first();
             $axist=DB::table("roles_permissions")->where("permission_id",$perm->id)->where("role_id",$superadmin_role->id)->get();
-            if(sizeof($axist)==0){
-                
+            if(sizeof($axist)==0){                
                 $valuationadmin_role->permissions()->attach($perm);
              }
             
