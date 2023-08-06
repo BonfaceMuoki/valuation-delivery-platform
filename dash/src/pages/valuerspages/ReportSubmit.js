@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback, forwardRef } from "react";
+import React, { useState, useRef, useEffect, useCallback} from "react";
 import Head from "../../layout/head/Head";
 import Content from "../../layout/content/Content";
 import {
@@ -32,6 +32,7 @@ import {
     useGetUsersQuery,
     useGetAccesorsListQuery,
     useGetPropertyTypeListQuery,
+
   } from "../../api/commonEndPointsAPI";
 
 import DatePicker from "react-datepicker"
@@ -201,12 +202,21 @@ const PropertyDetailsForm = (props) => {
     dispatch(setValuationPropertyDetails(data));
     props.next();
   }
-  const options = [
-    { value: "chocolate", label: "Chocolate" },
-    { value: "strawberry", label: "Strawberry" },
-    { value: "vanilla", label: "Vanilla" },
-  ];
-  const animatedComponents = makeAnimated();
+
+  const { data: propertytypesapi, isLOading } = useGetPropertyTypeListQuery();
+  console.log(propertytypesapi);
+  const [propertyTypes, setPropertyTypes] = useState([]);
+  useEffect(() => {
+    if(propertytypesapi!=undefined){
+      const restructuredData = propertytypesapi.map(({ id, type_name }) => ({
+        value: id,
+        label: type_name,
+        name:  type_name
+      }));
+      setPropertyTypes(restructuredData);
+    }
+ 
+  }, [propertytypesapi]);
 
   return (
     <form onSubmit={handlePropertyDetailsSubmit(onSubmitPropertyDetails)} >
@@ -230,19 +240,22 @@ const PropertyDetailsForm = (props) => {
         </Col>
         <Col md="6">
           <div className="form-group">
-            <label className="form-label" htmlFor="password">
+            <label className="form-label">
               Property Type
             </label>
-            <div className="form-control-wrap">
-            <RSelect 
-            isMulti 
-            components={animatedComponents}
-            options={options}
-            {...registerproperty("PropertyType", {
-              required: "This field is required"                 
-            })}
-
-            />
+            <div className="form-control-wrap">    
+            <Controller
+                control={control}
+                name="PropertyType"
+                render={({ field }) => (
+                  <RSelect
+                  isMulti
+                  options={propertyTypes}
+                  defaultValue={propertyTypes[0]}
+                />
+                )}
+              />
+             
               {properrtyErrors?.PropertyType && <span className="invalid">{properrtyErrors.PropertyType?.message}</span>}
             </div>
           </div>
@@ -426,8 +439,6 @@ const PropertyValuationForm = (props) => {
     isError: errorLodingAccesors,
     error: loadingAccesorError
   } = useGetAccesorsListQuery();
-  console.log("Accesors List");
-  console.log(accesorslist);
   useEffect(() => {
     if(accesorslist!=undefined){
       const restructuredData = accesorslist.map(({ id, organization_name }) => ({
@@ -503,12 +514,18 @@ const PropertyValuationForm = (props) => {
             </label>
             <div className="form-control-wrap">
               {(existingAccessors != undefined) > 0 && (
-                <RSelect
+                <Controller
+                control={control}
+                name="recipient"
+                render={({ field }) => (
+                  <RSelect
                   isMulti
-                  {...registerpropertyValuation("recipient", { required: true })}
                   options={existingAccessors}
                   defaultValue={existingAccessors[0]}
                 />
+                )}
+              />
+            
               )}
               {propertyValuationErrors.recipient && (
                 <span className="invalid">{propertyValuationErrors.recipient?.message}</span>

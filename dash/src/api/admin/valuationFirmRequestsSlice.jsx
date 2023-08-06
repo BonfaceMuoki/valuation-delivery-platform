@@ -33,10 +33,18 @@ export const valuationFirmRequestsSlliceApi = apiSlice.injectEndpoints({
                   }          
             })
            
+        }),
+        getPropertyTypeList: builder.query({
+            query: () => `/api/commons/get-all-propertytypes`,
+            skipCache: true,
+            keepUnusedDataFor:5,
+            refetchOnFocus: true,
         })
     })
 })
 
 export const {
-    useGetValuationFirmRequestsQuery,useApproveValuationFirmRequestMutation,useRejectValuationFirmRequestMutation
+    useGetValuationFirmRequestsQuery,
+    useApproveValuationFirmRequestMutation,
+    useRejectValuationFirmRequestMutation
 } = valuationFirmRequestsSlliceApi ;
