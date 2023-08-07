@@ -160,7 +160,7 @@ const menuvaluer = [
       },
       {
         text: "Reports - New Report",
-        link: "/valuation-firm/submit-report",
+        link: "/upload-new-report",
       },
     ],
   },

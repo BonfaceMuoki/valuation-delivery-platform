@@ -36,6 +36,7 @@ import {
   } from "../../api/commonEndPointsAPI";
 
 import DatePicker from "react-datepicker"
+import Select from "react-select";
 
 
 const LocationForm = (props) => {
@@ -244,18 +245,21 @@ const PropertyDetailsForm = (props) => {
               Property Type
             </label>
             <div className="form-control-wrap">    
-            <Controller
-                control={control}
-                name="PropertyType"
-                render={({ field }) => (
-                  <RSelect
-                  isMulti
-                  options={propertyTypes}
-                  defaultValue={propertyTypes[0]}
-                />
-                )}
-              />
-             
+   
+              <Controller
+                 name="PropertyType"
+                 control={control}
+                 render={({ field }) => (
+                   <Select
+                     className="react-select-container "
+                     classNamePrefix="react-select"
+                     options={propertyTypes}
+                     {...field}
+                     isMulti
+                     placeholder="Select Property Type"
+                   />
+                 )}
+               />
               {properrtyErrors?.PropertyType && <span className="invalid">{properrtyErrors.PropertyType?.message}</span>}
             </div>
           </div>
@@ -468,14 +472,14 @@ const PropertyValuationForm = (props) => {
 
   const onSubmitPropertyValuation = async (data) => {
     console.log(data);
-    delete data.file;
-    dispatch(setValuationDetails(data));
-    dispatch(setReportRecipient(data.recipient));
-    if(existingAccessors.length > 0){
-      props.next();
-    } else{
+    // delete data.file;
+    // dispatch(setValuationDetails(data));
+    // dispatch(setReportRecipient(data.recipient));
+    // if(existingAccessors.length > 0){
+    //   props.next();
+    // } else{
 
-    }
+    // }
   }
   const [valuationDT, setValuationDT] = useState("");
   const [instructionDT, setInstructionDT] = useState("");
@@ -502,7 +506,9 @@ const PropertyValuationForm = (props) => {
     // Set the formatted value in the form state using setValue
     setPropertValuationValues(fieldlabel, formattedValue, { shouldValidate: true });
   };
-
+  const onRecipientChange = (e)=>{
+    console.log(e.target.value);
+  }
 
   return (
     <form onSubmit={handlePropertyValuationsSubmit(onSubmitPropertyValuation)}>
@@ -514,18 +520,21 @@ const PropertyValuationForm = (props) => {
             </label>
             <div className="form-control-wrap">
               {(existingAccessors != undefined) > 0 && (
-                <Controller
-                control={control}
-                name="recipient"
-                render={({ field }) => (
-                  <RSelect
-                  isMulti
-                  options={existingAccessors}
-                  defaultValue={existingAccessors[0]}
-                />
-                )}
-              />
-            
+                 <Controller
+                 name="recipient"
+                 control={control}
+                 render={({ field }) => (
+                   <Select
+                     className="react-select-container "
+                     classNamePrefix="react-select"
+                     options={existingAccessors}
+                     {...field}
+                     isMulti
+                     placeholder="Select organization"
+                   />
+                 )}
+               />
+         
               )}
               {propertyValuationErrors.recipient && (
                 <span className="invalid">{propertyValuationErrors.recipient?.message}</span>
