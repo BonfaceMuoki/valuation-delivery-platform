@@ -7,7 +7,14 @@ import "../../assets/scss/validation.css";
 import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
 import { useMemo } from "react";
 import { UploadFileOutlined } from '@mui/icons-material';
-import { valauationFormSlice, setValuationDetails, setValuationLocationDetails, setValuationPropertyDetails, setReportRecipient, selectCurrentSignatories, setReportSignatories, selectCurrentRecipient } from 'scenes/auth/authSlice';
+import { valauationFormSlice,
+   setValuationDetails, 
+  setValuationLocationDetails,
+   setValuationPropertyDetails,
+    setReportRecipient,
+     selectCurrentSignatories, 
+     setReportSignatories,
+      selectCurrentRecipient } from 'scenes/auth/authSlice';
 import { selectValuationDetails, selectLocationDetails, selectPropertyDetails } from 'scenes/auth/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 

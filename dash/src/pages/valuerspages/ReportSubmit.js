@@ -226,14 +226,14 @@ const PropertyDetailsForm = (props) => {
     resolver: yupResolver(propertyDetailsSchema),
   });
   const onSubmitPropertyDetails = async (data) => {
-    console.log("propertdetails");
-    console.log(propertdetails);
-    console.log("Submitted data");
+    // console.log("propertdetails");
+    // console.log(propertdetails);
+    // console.log("Submitted data");
 
     if (!("PropertyType" in data)) {
       data["PropertyType"] = propertdetails.PropertyType;
     }
-    console.log(data);
+    // console.log(data);
     dispatch(setValuationPropertyDetails(data));
     props.next();
   };
@@ -462,17 +462,46 @@ const PropertyValuationForm = (props) => {
     ]);
   };
   const valauationdetails = useSelector(selectValuationDetails);
+  // console.log(valauationdetails);
   const selectedrecipient = useSelector(selectSelectedRecipient);
-  console.log("selectedrecipient");
-  console.log(selectedrecipient);
+  // console.log("selectedrecipient");
+  // console.log(selectedrecipient);
 
   const recipientdetails = useSelector(selectCurrentRecipient);
   const [existingAccessors, setExistingAccessors] = useState();
   useEffect(() => {
     if (valauationdetails != null) {
       setRecipientUsernames(valauationdetails?.report_user_name);
-      //  setRecipientEmails(valauationdetails?.report_user_email);
+      setRecipientEmails(valauationdetails?.report_user_email);
       setRecipientPhone(valauationdetails?.report_user_phone);
+      console.log("count "+Object.keys(valauationdetails?.report_user_name).length);
+      console.log("count "+Object.keys(recipientUsernames).length);
+      
+      const available_usernames=valauationdetails?.report_user_name;
+      const available_useremails=valauationdetails?.report_user_email;
+      const available_userphones=valauationdetails?.report_user_phone;
+
+      console.log("count ss "+available_usernames.length);
+
+      if(Object.keys(available_usernames).length >0){
+
+        const updatedFields = available_usernames.map((orgrecipient, key) => ({
+          formFieldName: "report_user_name",
+          fieldEmail: "report_user_email",
+          fieldPhoneNumber: "report_user_phone",
+          formFildNameValue: orgrecipient,
+          fieldEmailValue: available_useremails[key],
+          fieldPhoneNumberValue: available_userphones[key],
+          formFieldNamePlace: "Recipient Name",
+          fieldEmailPlace: "Recipient Email",
+          fieldPhoneNumberPlace: "Recipient Phone",
+        }));
+        setReportUsersFields(reportUsersFields => [...reportUsersFields, ...updatedFields]);
+        
+      }  
+      
+
+
     } else {
       setReportUsersFields([
         ...reportUsersFields,
@@ -489,7 +518,7 @@ const PropertyValuationForm = (props) => {
         },
       ]);
     }
-  }, [valauationdetails, recipientdetails]);
+  }, []);
 
   const {
     data: accesorslist,
@@ -521,6 +550,8 @@ const PropertyValuationForm = (props) => {
   };
 
   const onSubmitPropertyValuation = async (data) => {
+    // console.log("stored");
+    // console.log(valauationdetails);
     delete data.file;
     if (!("recipient" in data)) {
       data["recipient"] = valauationdetails.recipient;
@@ -533,6 +564,13 @@ const PropertyValuationForm = (props) => {
       props.next();
     } else {
     }
+    // console.log("submitted");
+    // console.log(data);
+
+    // console.log("stored after update");
+    // console.log(valauationdetails);
+
+
   };
   const [valuationDT, setValuationDT] = useState("");
   const [instructionDT, setInstructionDT] = useState("");
@@ -617,6 +655,7 @@ const PropertyValuationForm = (props) => {
       </Row>
       <Row className="mt-5 mb-5">
         <Col className="12">
+        
           <table className="table table-bordered">
             <thead>
               <tr>
@@ -641,16 +680,15 @@ const PropertyValuationForm = (props) => {
                 reportUsersFields.map((field, index) => {
                   if (field.formFieldName != undefined) {
                     return (
-                      <tr>
+                      <tr key={index}>
                         <th scope="row">
                           <input
                             type="text"
                             className="form-control"
                             {...registerpropertyValuation(`${field.formFieldName}[${index}]`)}
-                            autoComplete="off"
-                            fullWidth
+                            autoComplete="off"                            
                             required
-                            placeholder={`${field.formFieldNamePlace}`}
+                            placeholder=''
                             defaultValue={`${field.formFildNameValue}`}
                           />
                         </th>
@@ -660,9 +698,8 @@ const PropertyValuationForm = (props) => {
                             className="form-control"
                             {...registerpropertyValuation(`${field.fieldEmail}[${index}]`)}
                             autoComplete="off"
-                            required
-                            fullWidth
-                            placeholder={`${field.fieldEmailPlace}`}
+                            required                            
+                            placeholder=''
                             defaultValue={`${field.fieldEmailValue}`}
                           />
                         </td>
@@ -672,9 +709,8 @@ const PropertyValuationForm = (props) => {
                             className="form-control"
                             {...registerpropertyValuation(`${field.fieldPhoneNumber}[${index}]`)}
                             autoComplete="off"
-                            required
-                            fullWidth
-                            placeholder={`${field.fieldPhoneNumberPlace}`}
+                            required                            
+                            placeholder=''
                             defaultValue={`${field.fieldPhoneNumberValue}`}
                           />
                         </td>
@@ -686,7 +722,10 @@ const PropertyValuationForm = (props) => {
                       </tr>
                     );
                   }
+               
                 })}
+                  
+            
             </tbody>
           </table>
         </Col>
