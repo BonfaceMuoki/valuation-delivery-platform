@@ -53,6 +53,10 @@ class CommonController extends Controller
                 })->get();
             return response($users,200);
             
+        }else{
+
+            $users=User::with("roles")->get();
+            return response($users,200);
         }
 
 

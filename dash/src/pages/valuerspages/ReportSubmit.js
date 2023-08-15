@@ -23,6 +23,7 @@ import { useSelector, useDispatch } from "react-redux";
 import MapWithAutoSearch from "./MapWithAutoSearch";
 // import {setValuationLocationDetails} from "../../featuers/authSlice";
 
+
 import {
   setValuationDetails,
   setValuationLocationDetails,
@@ -471,6 +472,7 @@ const PropertyValuationForm = (props) => {
   const [existingAccessors, setExistingAccessors] = useState();
   useEffect(() => {
     if (valauationdetails != null) {
+      console.log(valauationdetails);
       setRecipientUsernames(valauationdetails?.report_user_name);
       setRecipientEmails(valauationdetails?.report_user_email);
       setRecipientPhone(valauationdetails?.report_user_phone);
@@ -550,12 +552,34 @@ const PropertyValuationForm = (props) => {
   };
 
   const onSubmitPropertyValuation = async (data) => {
-    // console.log("stored");
-    // console.log(valauationdetails);
+    console.log("stored");
+   
+    if(data.valuationDate===undefined){
+      data['valuationDate']=new Date(valauationdetails?.valuationDate);
+    }
+    if(data.InstructionDate===undefined){
+      data['InstructionDate']=new Date(valauationdetails?.InstructionDate);
+    }
+    console.log(data);
+
+    //
+    const valuation_year=data.valuationDate.getFullYear();
+    const valuation_month=data.valuationDate.getMonth()+1;
+    const valuation_day=data.valuationDate.getDate();
+
+    const instruction_year=data.InstructionDate.getFullYear();
+    const instruction_month=data.InstructionDate.getMonth()+1;
+    const instruction_day=data.InstructionDate.getDate();
+
+    //
     delete data.file;
+    delete data.valuationDate;
+    delete data.instructionDate;
     if (!("recipient" in data)) {
       data["recipient"] = valauationdetails.recipient;
     }
+    data['valuationDate']=valuation_month+"/"+valuation_day+"/"+valuation_year;
+    data['InstructionDate']=instruction_month+"/"+instruction_day+"/"+instruction_year;
 
     dispatch(setValuationDetails(data));
     dispatch(setReportRecipient(data.recipient));
@@ -639,6 +663,7 @@ const PropertyValuationForm = (props) => {
             <div className="form-control-wrap">
               <div className="form-file">
                 <input
+                  required
                   className="form-control"
                   type="file"
                   multiple
@@ -820,6 +845,7 @@ const PropertyValuationForm = (props) => {
             </label>
             <div className="form-control-wrap">
               <Controller
+                required
                 control={control}
                 name="valuationDate"
                 render={({ field }) => (
@@ -827,7 +853,7 @@ const PropertyValuationForm = (props) => {
                     className="form-control date-picker"
                     placeholderText="Select date"
                     onChange={(date) => field.onChange(date)}
-                    selected={field.value}
+                    selected={(valauationdetails.valuationDate!=undefined && field.value==null)? new Date(valauationdetails.valuationDate):field.value}
                   />
                 )}
               />
@@ -847,6 +873,7 @@ const PropertyValuationForm = (props) => {
             </label>
             <div className="form-control-wrap">
               <Controller
+              required
                 control={control}
                 name="InstructionDate"
                 render={({ field }) => (
@@ -854,7 +881,8 @@ const PropertyValuationForm = (props) => {
                     className="form-control date-picker"
                     placeholderText="Select date"
                     onChange={(date) => field.onChange(date)}
-                    selected={field.value}
+                    selected={(valauationdetails.InstructionDate!=undefined && field.value==null)? new Date(valauationdetails.InstructionDate):field.value}
+                 
                   />
                 )}
               />
@@ -879,7 +907,8 @@ const PropertyValuationForm = (props) => {
               <textarea
                 className="form-control"
                 {...registerpropertyValuation("PropertyDescription", { required: true })}
-              />
+                defaultValue={valauationdetails?.PropertyDescription}
+              ></textarea>
               {propertyValuationErrors.PropertyDescription && (
                 <span className="invalid">{propertyValuationErrors.PropertyDescription?.message}</span>
               )}
@@ -907,14 +936,82 @@ const PropertyValuationForm = (props) => {
 };
 
 const ValuationSignatures = (props) => {
+  const dispatch = useDispatch();
+  const {
+    data: loadedusers,
+    isFetching,
+    isLoading,
+    refetch: refetchUsers,
+    isSuccess,
+    isError,
+    error
+  } = useGetUsersQuery();
+  console.log("loadedusers");
+
+  console.log(loadedusers);
+  const [existingUsers, setExistingUsers] = useState();
+  useEffect(() => { 
+  const restructuredrecipients = loadedusers.map(({ id, full_name }) => ({
+    value: id,
+    label: full_name,
+    name: full_name,
+  }));
+    setExistingUsers(restructuredrecipients);
+  }, [loadedusers]);
+
+ 
+  const signeesvalidationschema = Yup.object().shape({
+  });
+  const { register: registerSignees, control, setValue: setSigneesValues, handleSubmit: handleSigneeSubmit,
+    formState: { errors: signeeErrors, isValid: signeesAreValid } } = useForm({
+      resolver: yupResolver(signeesvalidationschema),
+    });
+  useEffect(() => {
+    if (signeesAreValid != null) {
+    }
+  }, [signeesAreValid]);
+  const [signatories, setSignatories] = useState([]);
+  const onSubmitSignee = async (data) => {
+    dispatch(setReportSignatories(data));
+    setSignatories(data.signees);
+    props.next();
+  }
+ 
   return (
     <>
       <p>Valuation signatures</p>
-      <div className="actions clearfix">
+      <form onSubmit={handleSigneeSubmit(onSubmitSignee)} >
+      <div className="form-group">
+            <label className="form-label" htmlFor="fw-token-address">
+              Recipient
+            </label>
+            <div className="form-control-wrap">
+              {(existingUsers != undefined) > 0 && (
+                <Controller
+                  name="signees"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      className="react-select-container "
+                      classNamePrefix="react-select"
+                      options={existingUsers}
+                      // defaultValue={selectedrecipient != null ? selectedrecipient : ""}
+                      {...field}
+                      isMulti
+                      placeholder="Select organization"
+                    />
+                  )}
+                />
+              )}
+              {signeeErrors.recipient && (
+                <span className="invalid">{signeeErrors.signees?.message}</span>
+              )}
+            </div>
+            <div className="actions clearfix">
         <ul>
           <li>
             <Button color="primary" type="submit">
-              Next
+              Submit
             </Button>
           </li>
           <li>
@@ -924,6 +1021,8 @@ const ValuationSignatures = (props) => {
           </li>
         </ul>
       </div>
+          </div>
+          </form>
     </>
   );
 };
