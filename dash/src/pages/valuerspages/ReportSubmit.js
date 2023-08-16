@@ -15,14 +15,24 @@ import {
 import makeAnimated from "react-select/animated";
 import { Controller, useForm } from "react-hook-form";
 import { Steps, Step } from "react-step-builder";
-import { Row, Col, Button } from "reactstrap";
+import {
+  Row,
+  Col,
+  Button,
+  Card,
+  UncontrolledDropdown,
+  CardTitle,
+  DropdownMenu,
+  DropdownItem,
+  DropdownToggle,
+} from "reactstrap";
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
 import MapWithAutoSearch from "./MapWithAutoSearch";
+import UserAvatar from "../user/UserAvatar";
 // import {setValuationLocationDetails} from "../../featuers/authSlice";
-
 
 import {
   setValuationDetails,
@@ -106,13 +116,13 @@ const LocationForm = (props) => {
         </Col>
         <Col md="6">
           <div className="form-group">
-            <label className="form-label" htmlFor="last-name">
+            <label className="form-label" htmlFor="county">
               County
             </label>
             <div className="form-control-wrap">
               <input
                 type="text"
-                id="last-name"
+                id="county"
                 className="form-control"
                 {...registerlocation("county", { required: true })}
                 defaultValue={locationDetails?.county}
@@ -123,7 +133,7 @@ const LocationForm = (props) => {
         </Col>
         <Col md="6">
           <div className="form-group">
-            <label className="form-label" htmlFor="email">
+            <label className="form-label" htmlFor="town">
               Town
             </label>
             <div className="form-control-wrap">
@@ -142,13 +152,13 @@ const LocationForm = (props) => {
         </Col>
         <Col md="6">
           <div className="form-group">
-            <label className="form-label" htmlFor="phone-no">
+            <label className="form-label" htmlFor="street">
               Street
             </label>
             <div className="form-control-wrap">
               <input
                 type="text"
-                id="phone-no"
+                id="street"
                 className="form-control"
                 {...registerlocation("street", { required: true })}
                 defaultValue={locationDetails?.street}
@@ -159,13 +169,13 @@ const LocationForm = (props) => {
         </Col>
         <Col md="12">
           <div className="form-group">
-            <label className="form-label" htmlFor="city">
+            <label className="form-label" htmlFor="neighbourhood">
               Neighbourhood
             </label>
             <div className="form-control-wrap">
               <input
                 type="text"
-                id="city"
+                id="neighbourhood"
                 className="form-control"
                 {...registerlocation("neighbourHood", { required: true })}
                 defaultValue={locationDetails?.neighbourHood}
@@ -257,13 +267,13 @@ const PropertyDetailsForm = (props) => {
       <Row className="gy-4">
         <Col md="6">
           <div className="form-group">
-            <label className="form-label" htmlFor="username">
+            <label className="form-label" htmlFor="propertylr">
               Property LR
             </label>
             <div className="form-control-wrap">
               <input
                 type="text"
-                id="username"
+                id="propertylr"
                 className="form-control"
                 {...registerproperty("PropertyLR", { required: true })}
                 defaultValue={propertdetails?.PropertyLR}
@@ -476,17 +486,16 @@ const PropertyValuationForm = (props) => {
       setRecipientUsernames(valauationdetails?.report_user_name);
       setRecipientEmails(valauationdetails?.report_user_email);
       setRecipientPhone(valauationdetails?.report_user_phone);
-      console.log("count "+Object.keys(valauationdetails?.report_user_name).length);
-      console.log("count "+Object.keys(recipientUsernames).length);
-      
-      const available_usernames=valauationdetails?.report_user_name;
-      const available_useremails=valauationdetails?.report_user_email;
-      const available_userphones=valauationdetails?.report_user_phone;
+      console.log("count " + Object.keys(valauationdetails?.report_user_name).length);
+      console.log("count " + Object.keys(recipientUsernames).length);
 
-      console.log("count ss "+available_usernames.length);
+      const available_usernames = valauationdetails?.report_user_name;
+      const available_useremails = valauationdetails?.report_user_email;
+      const available_userphones = valauationdetails?.report_user_phone;
 
-      if(Object.keys(available_usernames).length >0){
+      console.log("count ss " + available_usernames.length);
 
+      if (Object.keys(available_usernames).length > 0) {
         const updatedFields = available_usernames.map((orgrecipient, key) => ({
           formFieldName: "report_user_name",
           fieldEmail: "report_user_email",
@@ -498,12 +507,8 @@ const PropertyValuationForm = (props) => {
           fieldEmailPlace: "Recipient Email",
           fieldPhoneNumberPlace: "Recipient Phone",
         }));
-        setReportUsersFields(reportUsersFields => [...reportUsersFields, ...updatedFields]);
-        
-      }  
-      
-
-
+        setReportUsersFields((reportUsersFields) => [...reportUsersFields, ...updatedFields]);
+      }
     } else {
       setReportUsersFields([
         ...reportUsersFields,
@@ -553,23 +558,23 @@ const PropertyValuationForm = (props) => {
 
   const onSubmitPropertyValuation = async (data) => {
     console.log("stored");
-   
-    if(data.valuationDate===undefined){
-      data['valuationDate']=new Date(valauationdetails?.valuationDate);
+
+    if (data.valuationDate === undefined) {
+      data["valuationDate"] = new Date(valauationdetails?.valuationDate);
     }
-    if(data.InstructionDate===undefined){
-      data['InstructionDate']=new Date(valauationdetails?.InstructionDate);
+    if (data.InstructionDate === undefined) {
+      data["InstructionDate"] = new Date(valauationdetails?.InstructionDate);
     }
     console.log(data);
 
     //
-    const valuation_year=data.valuationDate.getFullYear();
-    const valuation_month=data.valuationDate.getMonth()+1;
-    const valuation_day=data.valuationDate.getDate();
+    const valuation_year = data.valuationDate.getFullYear();
+    const valuation_month = data.valuationDate.getMonth() + 1;
+    const valuation_day = data.valuationDate.getDate();
 
-    const instruction_year=data.InstructionDate.getFullYear();
-    const instruction_month=data.InstructionDate.getMonth()+1;
-    const instruction_day=data.InstructionDate.getDate();
+    const instruction_year = data.InstructionDate.getFullYear();
+    const instruction_month = data.InstructionDate.getMonth() + 1;
+    const instruction_day = data.InstructionDate.getDate();
 
     //
     delete data.file;
@@ -578,8 +583,8 @@ const PropertyValuationForm = (props) => {
     if (!("recipient" in data)) {
       data["recipient"] = valauationdetails.recipient;
     }
-    data['valuationDate']=valuation_month+"/"+valuation_day+"/"+valuation_year;
-    data['InstructionDate']=instruction_month+"/"+instruction_day+"/"+instruction_year;
+    data["valuationDate"] = valuation_month + "/" + valuation_day + "/" + valuation_year;
+    data["InstructionDate"] = instruction_month + "/" + instruction_day + "/" + instruction_year;
 
     dispatch(setValuationDetails(data));
     dispatch(setReportRecipient(data.recipient));
@@ -593,8 +598,6 @@ const PropertyValuationForm = (props) => {
 
     // console.log("stored after update");
     // console.log(valauationdetails);
-
-
   };
   const [valuationDT, setValuationDT] = useState("");
   const [instructionDT, setInstructionDT] = useState("");
@@ -680,7 +683,6 @@ const PropertyValuationForm = (props) => {
       </Row>
       <Row className="mt-5 mb-5">
         <Col className="12">
-        
           <table className="table table-bordered">
             <thead>
               <tr>
@@ -711,9 +713,9 @@ const PropertyValuationForm = (props) => {
                             type="text"
                             className="form-control"
                             {...registerpropertyValuation(`${field.formFieldName}[${index}]`)}
-                            autoComplete="off"                            
+                            autoComplete="off"
                             required
-                            placeholder=''
+                            placeholder=""
                             defaultValue={`${field.formFildNameValue}`}
                           />
                         </th>
@@ -723,8 +725,8 @@ const PropertyValuationForm = (props) => {
                             className="form-control"
                             {...registerpropertyValuation(`${field.fieldEmail}[${index}]`)}
                             autoComplete="off"
-                            required                            
-                            placeholder=''
+                            required
+                            placeholder=""
                             defaultValue={`${field.fieldEmailValue}`}
                           />
                         </td>
@@ -734,23 +736,25 @@ const PropertyValuationForm = (props) => {
                             className="form-control"
                             {...registerpropertyValuation(`${field.fieldPhoneNumber}[${index}]`)}
                             autoComplete="off"
-                            required                            
-                            placeholder=''
+                            required
+                            placeholder=""
                             defaultValue={`${field.fieldPhoneNumberValue}`}
                           />
                         </td>
                         <td>
-                          <Button className="btn-round btn-icon" color="danger" size="sm" onClick={() => handleRemoveReprtUser(index)}>
+                          <Button
+                            className="btn-round btn-icon"
+                            color="danger"
+                            size="sm"
+                            onClick={() => handleRemoveReprtUser(index)}
+                          >
                             <Icon name="cross" />
                           </Button>
                         </td>
                       </tr>
                     );
                   }
-               
                 })}
-                  
-            
             </tbody>
           </table>
         </Col>
@@ -758,13 +762,13 @@ const PropertyValuationForm = (props) => {
       <Row>
         <Col md="4">
           <div className="form-group">
-            <label className="form-label" htmlFor="first-name">
+            <label className="form-label" htmlFor="marketvalue">
               Market Value
             </label>
             <div className="form-control-wrap">
               <input
                 type="text"
-                id="first-name"
+                id="marketvalue"
                 className="form-control"
                 {...registerpropertyValuation("marketValue", { required: true })}
                 defaultValue={valauationdetails?.marketValue}
@@ -778,13 +782,13 @@ const PropertyValuationForm = (props) => {
         </Col>
         <Col md="4">
           <div className="form-group">
-            <label className="form-label" htmlFor="first-name">
+            <label className="form-label" htmlFor="forced_sale-value">
               Forced Sale Value
             </label>
             <div className="form-control-wrap">
               <input
                 type="text"
-                id="first-name"
+                id="forced_sale-value"
                 className="form-control"
                 {...registerpropertyValuation("forcedSaleValue", { required: true })}
                 defaultValue={valauationdetails?.marketValue}
@@ -853,7 +857,11 @@ const PropertyValuationForm = (props) => {
                     className="form-control date-picker"
                     placeholderText="Select date"
                     onChange={(date) => field.onChange(date)}
-                    selected={(valauationdetails.valuationDate!=undefined && field.value==null)? new Date(valauationdetails.valuationDate):field.value}
+                    selected={
+                      valauationdetails.valuationDate != undefined && field.value == null
+                        ? new Date(valauationdetails.valuationDate)
+                        : field.value
+                    }
                   />
                 )}
               />
@@ -873,7 +881,7 @@ const PropertyValuationForm = (props) => {
             </label>
             <div className="form-control-wrap">
               <Controller
-              required
+                required
                 control={control}
                 name="InstructionDate"
                 render={({ field }) => (
@@ -881,8 +889,11 @@ const PropertyValuationForm = (props) => {
                     className="form-control date-picker"
                     placeholderText="Select date"
                     onChange={(date) => field.onChange(date)}
-                    selected={(valauationdetails.InstructionDate!=undefined && field.value==null)? new Date(valauationdetails.InstructionDate):field.value}
-                 
+                    selected={
+                      valauationdetails.InstructionDate != undefined && field.value == null
+                        ? new Date(valauationdetails.InstructionDate)
+                        : field.value
+                    }
                   />
                 )}
               />
@@ -944,70 +955,498 @@ const ValuationSignatures = (props) => {
     refetch: refetchUsers,
     isSuccess,
     isError,
-    error
+    error,
   } = useGetUsersQuery();
   console.log("loadedusers");
 
   console.log(loadedusers);
   const [existingUsers, setExistingUsers] = useState();
-  useEffect(() => { 
-  const restructuredrecipients = loadedusers.map(({ id, full_name }) => ({
-    value: id,
-    label: full_name,
-    name: full_name,
-  }));
-    setExistingUsers(restructuredrecipients);
+  useEffect(() => {
+    if (loadedusers != undefined) {
+      const restructuredrecipients = loadedusers.map(({ id, full_name, email }) => ({
+        value: id,
+        label: full_name,
+        name: full_name,
+        email: email,
+      }));
+      setExistingUsers(restructuredrecipients);
+    }
   }, [loadedusers]);
 
- 
-  const signeesvalidationschema = Yup.object().shape({
+  const reportignatories = useSelector(selectCurrentSignatories);
+  console.log("reportignatories");
+  console.log(reportignatories);
+  const signeesvalidationschema = Yup.object().shape({});
+  const {
+    register: registerSignees,
+    control,
+    setValue: setSigneesValues,
+    handleSubmit: handleSigneeSubmit,
+    formState: { errors: signeeErrors, isValid: signeesAreValid },
+  } = useForm({
+    resolver: yupResolver(signeesvalidationschema),
   });
-  const { register: registerSignees, control, setValue: setSigneesValues, handleSubmit: handleSigneeSubmit,
-    formState: { errors: signeeErrors, isValid: signeesAreValid } } = useForm({
-      resolver: yupResolver(signeesvalidationschema),
-    });
   useEffect(() => {
     if (signeesAreValid != null) {
     }
   }, [signeesAreValid]);
   const [signatories, setSignatories] = useState([]);
   const onSubmitSignee = async (data) => {
-    dispatch(setReportSignatories(data));
-    setSignatories(data.signees);
-    props.next();
-  }
- 
+    if (data.signees != undefined) {
+      dispatch(setReportSignatories(data));
+      setSignatories(data.signees);
+    }
+    if (reportignatories != undefined) {
+      if (Object.keys(reportignatories).length > 0) {
+        props.next();
+      } else {
+        alert("Please select the signatories");
+      }
+    } else {
+      alert("Please select the signatories");
+    }
+  };
+
   return (
     <>
       <p>Valuation signatures</p>
-      <form onSubmit={handleSigneeSubmit(onSubmitSignee)} >
-      <div className="form-group">
-            <label className="form-label" htmlFor="fw-token-address">
-              Recipient
-            </label>
-            <div className="form-control-wrap">
-              {(existingUsers != undefined) > 0 && (
-                <Controller
-                  name="signees"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      className="react-select-container "
-                      classNamePrefix="react-select"
-                      options={existingUsers}
-                      // defaultValue={selectedrecipient != null ? selectedrecipient : ""}
-                      {...field}
-                      isMulti
-                      placeholder="Select organization"
-                    />
-                  )}
-                />
-              )}
-              {signeeErrors.recipient && (
-                <span className="invalid">{signeeErrors.signees?.message}</span>
-              )}
-            </div>
-            <div className="actions clearfix">
+      <form onSubmit={handleSigneeSubmit(onSubmitSignee)}>
+        <div className="form-group">
+          <label className="form-label" htmlFor="fw-token-address">
+            Recipient
+          </label>
+          <div className="form-control-wrap">
+            {(existingUsers != undefined) > 0 && (
+              <Controller
+                name="signees"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    className="react-select-container "
+                    classNamePrefix="react-select"
+                    options={existingUsers}
+                    defaultValue={reportignatories != null ? reportignatories : ""}
+                    {...field}
+                    isMulti
+                    placeholder="Select organization"
+                  />
+                )}
+              />
+            )}
+            {signeeErrors.recipient && <span className="invalid">{signeeErrors.signees?.message}</span>}
+          </div>
+          <div className="actions clearfix">
+            <ul>
+              <li>
+                <Button color="primary" type="submit">
+                  Submit
+                </Button>
+              </li>
+              <li>
+                <Button color="primary" onClick={props.prev}>
+                  Previous
+                </Button>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </form>
+    </>
+  );
+};
+const ValuationSummary = (props) => {
+  const locationDetails = useSelector(selectLocationDetails);
+  const propertdetails = useSelector(selectPropertyDetails);
+  const valauationdetails = useSelector(selectValuationDetails);
+  const reportignatories = useSelector(selectCurrentSignatories);
+  const recipientdetails = useSelector(selectCurrentRecipient);
+  
+
+  const [recipientUsernames, setRecipientUsernames] = useState([]);
+  const [recipientEmails, setRecipientEmails] = useState([]);
+  const [recipientPhone, setRecipientPhone] = useState([]);
+  useEffect(() => {
+    if (valauationdetails != null) {
+      setRecipientUsernames(valauationdetails?.report_user_name);
+      setRecipientEmails(valauationdetails?.report_user_email);
+      setRecipientPhone(valauationdetails?.report_user_phone);
+    }
+  });
+
+  return (
+    <>
+      <Block size="lg">
+        <BlockHead>
+          <BlockHeadContent>
+            <BlockTitle tag="h5"></BlockTitle>
+            <BlockDes>
+              <p>These are the Details You are about to submit .</p>
+            </BlockDes>
+          </BlockHeadContent>
+        </BlockHead>
+        <PreviewCard>
+          <Row>
+            <Col lg="6">
+              <Card className="card-bordered card-full">
+                <div className="card-inner-group">
+                  <div className="card-inner card-inner-md">
+                    <div className="card-title-group">
+                      <CardTitle>
+                        <h6 className="title">Location Details</h6>
+                      </CardTitle>
+                    </div>
+                  </div>
+                  <div className="card-inner">
+                    <div className="nk-wg-action">
+                      <div className="nk-wg-action-content">
+                        <Icon name="cc-alt-fill"></Icon>
+                        <div className="title">Location Name</div>
+                        <p>
+                          {""}
+                          {locationDetails?.locationName}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Row>
+                    <Col className="6">
+                      {" "}
+                      <div className="card-inner">
+                        <div className="nk-wg-action">
+                          <div className="nk-wg-action-content">
+                            <Icon name="cc-alt-fill"></Icon>
+                            <div className="title">County</div>
+                            <p>
+                              {""}
+                              {locationDetails?.county}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </Col>
+                    <Col className="6">
+                      <div className="card-inner">
+                        <div className="nk-wg-action">
+                          <div className="nk-wg-action-content">
+                            <Icon name="cc-alt-fill"></Icon>
+                            <div className="title">Town</div>
+                            <p>
+                              {""}
+                              {locationDetails?.town}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </Col>
+                  </Row>
+                  <hr />
+                  <div className="card-inner">
+                    <div className="nk-wg-action">
+                      <div className="nk-wg-action-content">
+                        <Icon name="cc-alt-fill"></Icon>
+                        <div className="title">Street</div>
+                        <p>
+                          {""}
+                          {locationDetails?.street}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="card-inner">
+                    <div className="nk-wg-action">
+                      <div className="nk-wg-action-content">
+                        <Icon name="cc-alt-fill"></Icon>
+                        <div className="title">Neighbourhood</div>
+                        <p>
+                          {""}
+                          {locationDetails?.neighbourHood}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="card-inner">
+                    <div className="nk-wg-action">
+                      <div className="nk-wg-action-content">
+                        <Icon name="cc-alt-fill"></Icon>
+                        <div className="title">Mapped</div>
+                        <p>{""}</p>
+                        <p>{""}</p>
+                        <p>{""}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </Col>
+            <Col lg="6">
+              <Card className="card-bordered card-full">
+                <div className="card-inner-group">
+                  <div className="card-inner card-inner-md">
+                    <div className="card-title-group">
+                      <CardTitle>
+                        <h6 className="title">Property Details</h6>
+                      </CardTitle>
+                    </div>
+                  </div>
+                  <div className="card-inner">
+                    <div className="nk-wg-action">
+                      <div className="nk-wg-action-content">
+                        <Icon name="cc-alt-fill"></Icon>
+                        <div className="title">Property LR</div>
+                        <p>
+                          {""}
+                          {propertdetails?.PropertyLR}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="card-inner">
+                    <div className="nk-wg-action">
+                      <div className="nk-wg-action-content">
+                        <Icon name="help-fill"></Icon>
+                        <div className="title">Property Type</div>
+                        <p></p>
+                        {propertdetails?.PropertyType[0].label}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="card-inner">
+                    <div className="nk-wg-action">
+                      <div className="nk-wg-action-content">
+                        <Icon name="wallet-fill"></Icon>
+                        <div className="title">Total Built up Area</div>
+                        <p></p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="card-inner">
+                    <div className="nk-wg-action">
+                      <div className="nk-wg-action-content">
+                        <Icon name="wallet-fill"></Icon>
+                        <div className="title">Land Size</div>
+                        <p></p>
+                        {propertdetails?.landSize}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="card-inner">
+                    <div className="nk-wg-action">
+                      <div className="nk-wg-action-content">
+                        <Icon name="wallet-fill"></Icon>
+                        <div className="title">Tenure</div>
+                        <p></p>
+                        {propertdetails?.tenure}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </Col>
+          </Row>
+          <Row className="mt-3">
+            <Col lg="6">
+              <Card className="card-bordered card-full">
+                <div className="card-inner-group">
+                  <div className="card-inner card-inner-md">
+                    <div className="card-title-group">
+                      <CardTitle>
+                        <h6 className="title">Valuation Details</h6>
+                      </CardTitle>
+                    </div>
+                  </div>
+                  <div className="card-inner">
+                    <div className="nk-wg-action">
+                      <div className="nk-wg-action-content">
+                        <Icon name="cc-alt-fill"></Icon>
+                        <div className="title">Recipient</div>
+                        <p>
+                          {""}
+                          {valauationdetails.recipient[0].label}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="card-inner">
+                    <div className="nk-wg-action">
+                      <div className="nk-wg-action-content">
+                        <Icon name="help-fill"></Icon>
+                        <div className="title">Recipients Within recipient Organization</div>
+                        <div className="table-responsive">
+                        <ul className="nk-activity">
+                            {recipientUsernames.length > 0 &&
+                              recipientUsernames.map((field, index) => {
+                                return (
+                                  <li className="nk-activity-item" key={index}>
+                                    <UserAvatar
+                                      className="nk-activity-media"
+                                      theme={recipientUsernames[index]}
+                                      text={recipientUsernames[index]}
+                                    ></UserAvatar>
+                                    <div className="nk-activity-data">
+                                      <div className="label">{recipientUsernames[index]}</div>
+                                      <span className="time">{recipientEmails[index]}</span>
+                                      <span className="time">{recipientPhone[index]}</span>
+                                    </div>
+                                  </li>
+                                );
+                              })}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Row>
+                    <Col className="6">
+                      {" "}
+                      <div className="card-inner">
+                        <div className="nk-wg-action">
+                          <div className="nk-wg-action-content">
+                            <Icon name="wallet-fill"></Icon>
+                            <div className="title">Market Value</div>
+                            <p>
+                              {""}
+                              {valauationdetails?.marketValue}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </Col>
+                    <Col className="6">
+                      {" "}
+                      <div className="card-inner">
+                        <div className="nk-wg-action">
+                          <div className="nk-wg-action-content">
+                            <Icon name="wallet-fill"></Icon>
+                            <div className="title">FSV</div>
+                            <p>
+                              {""}
+                              {valauationdetails?.forcedSaleValue}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </Col>
+                  </Row>
+                  <hr />
+
+                  <div className="card-inner">
+                    <div className="nk-wg-action">
+                      <div className="nk-wg-action-content">
+                        <Icon name="wallet-fill"></Icon>
+                        <div className="title">Insurence Value</div>
+                        <p>
+                          {""}
+                          {valauationdetails?.insurenceValue}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="card-inner">
+                    <div className="nk-wg-action">
+                      <div className="nk-wg-action-content">
+                        <Icon name="wallet-fill"></Icon>
+                        <div className="title">Annual Gross Income</div>
+                        <p>
+                          {""}
+                          {valauationdetails?.annualGRossRentalIncome}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <Row>
+                    <Col className="6">
+                      {" "}
+                      <div className="card-inner">
+                        <div className="nk-wg-action">
+                          <div className="nk-wg-action-content">
+                            <Icon name="wallet-fill"></Icon>
+                            <div className="title">Valuation Date</div>
+                            <p>
+                              {""}
+                              {valauationdetails?.valuationDate}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </Col>
+                    <Col className="6">
+                      <div className="card-inner">
+                        <div className="nk-wg-action">
+                          <div className="nk-wg-action-content">
+                            <Icon name="wallet-fill"></Icon>
+                            <div className="title">Instruction Date</div>
+                            <p>
+                              {""}
+                              {valauationdetails?.InstructionDate}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </Col>
+                  </Row>
+                </div>
+              </Card>
+            </Col>
+            <Col lg="6">
+              <Card className="card-bordered card-full">
+                <div className="card-inner-group">
+                  <div className="card-inner card-inner-md">
+                    <div className="card-title-group">
+                      <CardTitle>
+                        <h6 className="title">Signatories and Property Description</h6>
+                      </CardTitle>
+                    </div>
+                  </div>
+                  <div className="card-inner">
+                    <div className="nk-wg-action">
+                      <div className="nk-wg-action-content">
+                        <Icon name="cc-alt-fill"></Icon>
+                        <div className="title">Signatories</div>
+                        <div className="table-responsive">
+                          <ul className="nk-activity">
+                            {reportignatories.length > 0 &&
+                              reportignatories.map((field, index) => {
+                                return (
+                                  <li className="nk-activity-item" key={index}>
+                                    <UserAvatar
+                                      className="nk-activity-media"
+                                      initial="SM"
+                                      theme="primary"
+                                      text={field.label}
+                                    ></UserAvatar>
+                                    <div className="nk-activity-data">
+                                      <div className="label">{field.label}</div>
+                                    </div>
+                                  </li>
+                                );
+                              })}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="card-inner">
+                    <div className="nk-wg-action">
+                      <div className="nk-wg-action-content">
+                        <Icon name="wallet-fill"></Icon>
+                        <div className="title">Property Description</div>
+                        <p>
+                          {""}
+                          {valauationdetails?.PropertyDescription}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            </Col>
+          </Row>
+        </PreviewCard>
+      </Block>
+      <div className="actions clearfix">
         <ul>
           <li>
             <Button color="primary" type="submit">
@@ -1021,16 +1460,8 @@ const ValuationSignatures = (props) => {
           </li>
         </ul>
       </div>
-          </div>
-          </form>
     </>
   );
-};
-const ValuationSummary = (props) => {
-  const propertdetails = useSelector(selectPropertyDetails);
-  const dispatch = useDispatch();
-
-  return <></>;
 };
 
 const Header = (props) => {
