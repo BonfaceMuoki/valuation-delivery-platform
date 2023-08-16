@@ -1278,11 +1278,11 @@ const ValuationSummary = (props) => {
                               recipientUsernames.map((field, index) => {
                                 return (
                                   <li className="nk-activity-item" key={index}>
-                                    <UserAvatar
+                                    {/* <UserAvatar
                                       className="nk-activity-media"
                                       theme={recipientUsernames[index]}
                                       text={recipientUsernames[index]}
-                                    ></UserAvatar>
+                                    ></UserAvatar> */}
                                     <div className="nk-activity-data">
                                       <div className="label">{recipientUsernames[index]}</div>
                                       <span className="time">{recipientEmails[index]}</span>
@@ -1410,12 +1410,12 @@ const ValuationSummary = (props) => {
                               reportignatories.map((field, index) => {
                                 return (
                                   <li className="nk-activity-item" key={index}>
-                                    <UserAvatar
+                                    {/* <UserAvatar
                                       className="nk-activity-media"
                                       initial="SM"
                                       theme="primary"
                                       text={field.label}
-                                    ></UserAvatar>
+                                    ></UserAvatar> */}
                                     <div className="nk-activity-data">
                                       <div className="label">{field.label}</div>
                                     </div>

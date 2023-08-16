@@ -15,10 +15,10 @@ const UserAvatar = ({ className, size, theme, icon, text, image, imageAlt, ...pr
   });
   return (
     <div className={classes}>
-      {icon ? <Icon name={icon} /> : null}
-      {image && <img src={image} alt={imageAlt} />}
+      {/* {icon ? <Icon name={icon} /> : null} */}
+      {/* {image && <img src={image} alt={imageAlt} />} */}
       {text && !image && <span>{text}</span>}
-      {props.children}
+      {/* {props.children} */}
     </div>
   );
 };
