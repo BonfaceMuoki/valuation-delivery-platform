@@ -955,13 +955,11 @@ const ReportSubmit = () => {
       isError,
       error
     } = useGetUsersQuery();
-    console.log(loadedusers);
-   
+    console.log(loadedusers);   
     const [existingUsers, setExistingUsers] = useState();
     useEffect(() => {
       setExistingUsers(loadedusers);
     }, [loadedusers]);
-
     const signeesvalidationschema = Yup.object().shape({
     });
     const { register: registerSignees, control, setValue: setSigneesValues, handleSubmit: handleSigneeSubmit,
