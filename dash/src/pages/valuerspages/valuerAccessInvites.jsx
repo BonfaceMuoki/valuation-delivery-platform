@@ -47,8 +47,8 @@ import * as yup from "yup";
 
 
 const ValuerInvites = () => {
-  
- 
+
+
 
   const [modalSm, setModalSm] = useState(false);
   const toggleSm = () => setModalSm(!modalSm);
@@ -184,11 +184,11 @@ const ValuerInvites = () => {
   };
   //actions
   const schema = yup.object().shape({
-    reasonForRejection:yup.string().required("Reason is required")
-});
-const {register: registerDeclineForm, handleSubmit: handleSubmitDeclineForm, formState:{errors: registerDeclineFormErrorrs}} = useForm({
-    resolver:yupResolver(schema)
-})
+    reasonForRejection: yup.string().required("Reason is required")
+  });
+  const { register: registerDeclineForm, handleSubmit: handleSubmitDeclineForm, formState: { errors: registerDeclineFormErrorrs } } = useForm({
+    resolver: yupResolver(schema)
+  })
 
   if (tableData.length > 0) {
     console.log("Table Data");
@@ -196,8 +196,8 @@ const {register: registerDeclineForm, handleSubmit: handleSubmitDeclineForm, for
     return (
       <PreviewCard>
 
-                {/* open modal decline */}
-                <Modal size="sm" isOpen={modalOpenCompanyDetails} toggle={toggleOpenCompanyDetails}>
+        {/* open modal decline */}
+        <Modal size="sm" isOpen={modalOpenCompanyDetails} toggle={toggleOpenCompanyDetails}>
           <ModalHeader
             toggle={toggleOpenCompanyDetails}
             close={
@@ -209,7 +209,7 @@ const {register: registerDeclineForm, handleSubmit: handleSubmitDeclineForm, for
             Company Information
           </ModalHeader>
           <ModalBody>
-         <CompanySummary item={fullActiveRequest} companytypes="valuer"/>
+            <CompanySummary item={fullActiveRequest} companytypes="valuer" />
           </ModalBody>
           <ModalFooter className="bg-light"></ModalFooter>
         </Modal>
@@ -250,7 +250,7 @@ const {register: registerDeclineForm, handleSubmit: handleSubmitDeclineForm, for
 
         <BlockHead size="lg" wide="sm">
           <BlockHeadContent>Valuer Access Requests.</BlockHeadContent>
-        </BlockHead>      
+        </BlockHead>
         <DataTable className="card-stretch">
           <DataTableBody>
             <DataTableHead>
@@ -267,9 +267,9 @@ const {register: registerDeclineForm, handleSubmit: handleSubmitDeclineForm, for
             {/*Head*/}
             {currentItems != undefined &&
               currentItems != null &&
-              currentItems.map((item) => {
+              currentItems.map((item, index) => {
                 return (
-                  <DataTableItem key={item.id}>
+                  <DataTableItem key={item.id} >
                     <DataTableRow>
                       <Link to={`${process.env.PUBLIC_URL}/user-details-regular/${item.id}`}>
                         <div className="user-card">
@@ -286,13 +286,12 @@ const {register: registerDeclineForm, handleSubmit: handleSubmitDeclineForm, for
                             <span className="tb-lead">
                               {item?.valauaion_firm_name}{" "}
                               <span
-                                className={`dot dot-${
-                                  item.status === "Active"
-                                    ? "success"
-                                    : item?.status === "Pending"
+                                className={`dot dot-${item.status === "Active"
+                                  ? "success"
+                                  : item?.status === "Pending"
                                     ? "warning"
                                     : "danger"
-                                } d-md-none ms-1`}
+                                  } d-md-none ms-1`}
                               ></span>
                             </span>
                             <span>{item?.invite_email}</span>
@@ -328,7 +327,7 @@ const {register: registerDeclineForm, handleSubmit: handleSubmitDeclineForm, for
                               <Icon name="more-h"></Icon>
                             </DropdownToggle>
                             <DropdownMenu end>
-                            <ul className="link-list-opt no-bdr">
+                              <ul className="link-list-opt no-bdr">
                                 {item?.status === "Requested" && (
                                   <React.Fragment>
                                     <li onClick={() => acceptRequest(item)}>

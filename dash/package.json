@@ -10,6 +10,7 @@
     "@fullcalendar/list": "^5.11.3",
     "@fullcalendar/react": "^5.11.2",
     "@fullcalendar/timegrid": "^5.11.3",
+    "@hookform/resolvers": "^3.3.1",
     "@react-google-maps/api": "^2.19.2",
     "@reduxjs/toolkit": "^1.9.5",
     "@testing-library/jest-dom": "^5.16.5",
@@ -35,8 +36,9 @@
     "react-dom": "^18.2.0",
     "react-dropzone": "^11.7.1",
     "react-dual-listbox": "^2.3.0",
+    "react-google-recaptcha": "^3.1.0",
     "react-helmet": "^6.1.0",
-    "react-hook-form": "^7.43.9",
+    "react-hook-form": "^7.47.0",
     "react-jstree-table": "^0.0.24",
     "react-jvectormap": "0.0.16",
     "react-modal-video": "^2.0.0",
@@ -57,7 +59,8 @@
     "slick-carousel": "^1.8.1",
     "styled-components": "^5.3.6",
     "sweetalert2": "11.4.8",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "yup": "^1.3.2"
   },
   "scripts": {
     "start": "PORT=3002 react-scripts start",

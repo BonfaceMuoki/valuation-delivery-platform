@@ -19,22 +19,24 @@ import { Row, Col, Button } from "reactstrap";
 
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import { useSelector,useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 import { GoogleMapsProvider, useGoogleMap } from "@ubilabs/google-maps-react-hooks";
 import MapWithAutoSearch from "./MapWithAutoSearch";
-import {setValuationLocationDetails} from "../../featuers/authSlice";
+import { setValuationLocationDetails } from "../../featuers/authSlice";
 
-import { selectLocationDetails,
+import {
+  selectLocationDetails,
   selectPropertyDetails,
   setValuationPropertyDetails,
-  selectValuationDetails,selectCurrentRecipient } from "../../featuers/authSlice";
+  selectValuationDetails, selectCurrentRecipient, setRecipientUsernames, setRecipientEmails, setRecipientPhone, setValuationDetails, setReportRecipient, selecteedaccesors
+} from "../../featuers/authSlice";
 import {
-    useUploadValuationReportV2Mutation,
-    useGetUsersQuery,
-    useGetAccesorsListQuery,
-    useGetPropertyTypeListQuery,
-  } from "../../api/commonEndPointsAPI";
+  useUploadValuationReportV2Mutation,
+  useGetUsersQuery,
+  useGetAccesorsListQuery,
+  useGetPropertyTypeListQuery,
+} from "../../api/commonEndPointsAPI";
 import Dropzone from "react-dropzone";
 const LocationForm = (props) => {
   const dispatch = useDispatch();
@@ -62,7 +64,7 @@ const LocationForm = (props) => {
   //     setLocationValues("neighbourHood", locationDetails?.neighbourHood);
   //     setLocationValues("street", locationDetails?.street);
   //     setLocationValues("town", locationDetails?.town);
-      
+
   //   }
   // }, [locationDetails])
   return (
@@ -71,7 +73,7 @@ const LocationForm = (props) => {
         <Col md="6">
           <div className="form-group">
             <label className="form-label" htmlFor="first-name">
-            Location Name
+              Location Name
             </label>
             <div className="form-control-wrap">
               <input
@@ -80,7 +82,7 @@ const LocationForm = (props) => {
                 className="form-control"
                 {...registerlocation("locationName", { required: true })}
                 defaultValue={locationDetails?.locationName}
-               
+
               />
               {locationerrors.locationName && <span className="invalid">{locationerrors.locationName?.message}</span>}
             </div>
@@ -89,7 +91,7 @@ const LocationForm = (props) => {
         <Col md="6">
           <div className="form-group">
             <label className="form-label" htmlFor="last-name">
-            County
+              County
             </label>
             <div className="form-control-wrap">
               <input
@@ -106,7 +108,7 @@ const LocationForm = (props) => {
         <Col md="6">
           <div className="form-group">
             <label className="form-label" htmlFor="email">
-            Town
+              Town
             </label>
             <div className="form-control-wrap">
               <input
@@ -114,11 +116,11 @@ const LocationForm = (props) => {
                 id="email"
                 className="form-control"
                 {...registerlocation("town", {
-                  required: true,                 
+                  required: true,
                 })}
                 defaultValue={locationDetails?.town}
               />
-              {locationerrors.email=== "required" && <span className="invalid">{locationerrors.town?.message}</span> }
+              {locationerrors.email === "required" && <span className="invalid">{locationerrors.town?.message}</span>}
             </div>
           </div>
         </Col>
@@ -142,7 +144,7 @@ const LocationForm = (props) => {
         <Col md="12">
           <div className="form-group">
             <label className="form-label" htmlFor="city">
-            Neighbourhood
+              Neighbourhood
             </label>
             <div className="form-control-wrap">
               <input
@@ -158,7 +160,7 @@ const LocationForm = (props) => {
         </Col>
       </Row>
       <Row className="mt-5">
-      <Col md="12">
+        <Col md="12">
           <div className="form-group">
             <MapWithAutoSearch />
           </div>
@@ -196,7 +198,7 @@ const PropertyDetailsForm = (props) => {
     resolver: yupResolver(propertyDetailsSchema),
   });
   const onSubmitPropertyDetails = async (data) => {
-    console.log(data);   
+    console.log(data);
     dispatch(setValuationPropertyDetails(data));
     props.next();
   }
@@ -209,7 +211,7 @@ const PropertyDetailsForm = (props) => {
 
   return (
     <form onSubmit={handlePropertyDetailsSubmit(onSubmitPropertyDetails)} >
-    <Row className="gy-4">
+      <Row className="gy-4">
         <Col md="6">
           <div className="form-group">
             <label className="form-label" htmlFor="username">
@@ -233,15 +235,15 @@ const PropertyDetailsForm = (props) => {
               Property Type
             </label>
             <div className="form-control-wrap">
-            <RSelect 
-            isMulti 
-            components={animatedComponents}
-            options={options}
-            {...registerproperty("PropertyType", {
-              required: "This field is required"                 
-            })}
+              <RSelect
+                isMulti
+                components={animatedComponents}
+                options={options}
+                {...registerproperty("PropertyType", {
+                  required: "This field is required"
+                })}
 
-            />
+              />
               {properrtyErrors?.PropertyType && <span className="invalid">{properrtyErrors.PropertyType?.message}</span>}
             </div>
           </div>
@@ -249,7 +251,7 @@ const PropertyDetailsForm = (props) => {
         <Col md="12">
           <div className="form-group">
             <label className="form-label" htmlFor="rePassword">
-            Total Built Up Area
+              Total Built Up Area
             </label>
             <div className="form-control-wrap">
               <input
@@ -257,20 +259,21 @@ const PropertyDetailsForm = (props) => {
                 id="totalBuiltUpArea"
                 className="form-control"
                 {...registerproperty("totalBuiltUpArea", {
-                  required: "This field is required"})}
+                  required: "This field is required"
+                })}
                 defaultValue={propertdetails?.landSize}
               />
               {properrtyErrors.landSize && <span className="invalid">{properrtyErrors.landSize?.message}</span>}
             </div>
           </div>
         </Col>
-   
+
       </Row>
       <Row>
         <Col md="6">
-        <div className="form-group">
+          <div className="form-group">
             <label className="form-label" htmlFor="rePassword">
-            Land Size
+              Land Size
             </label>
             <div className="form-control-wrap">
               <input
@@ -278,7 +281,8 @@ const PropertyDetailsForm = (props) => {
                 id="landSize"
                 className="form-control"
                 {...registerproperty("landSize", {
-                  required: "This field is required"})}
+                  required: "This field is required"
+                })}
                 defaultValue={propertdetails?.landSize}
               />
               {properrtyErrors.landSize && <span className="invalid">{properrtyErrors.landSize?.message}</span>}
@@ -286,9 +290,9 @@ const PropertyDetailsForm = (props) => {
           </div>
         </Col>
         <Col md="6">
-        <div className="form-group">
+          <div className="form-group">
             <label className="form-label" htmlFor="rePassword">
-            Tenure
+              Tenure
             </label>
             <div className="form-control-wrap">
               <input
@@ -296,7 +300,8 @@ const PropertyDetailsForm = (props) => {
                 id="tenure"
                 className="form-control"
                 {...registerproperty("tenure", {
-                  required: "This field is required"})}
+                  required: "This field is required"
+                })}
                 defaultValue={propertdetails?.tenure}
               />
               {properrtyErrors.landSize && <span className="invalid">{properrtyErrors.landSize?.message}</span>}
@@ -304,7 +309,7 @@ const PropertyDetailsForm = (props) => {
           </div>
         </Col>
       </Row>
-     
+
       <div className="actions clearfix">
         <ul>
           <li>
@@ -330,7 +335,7 @@ const PropertyValuationForm = (props) => {
     insurenceValue: Yup.number().required("Insurence Value is required").typeError("Insurence value must be a valid number"),
     valuationDate: Yup.string().required("Valuation date is required"),
     annualGRossRentalIncome: Yup.string(),
-    PropertyDescription:Yup.string(),
+    PropertyDescription: Yup.string(),
     InstructionDate: Yup.string().required("Instruction Date is required"),
     recipient: Yup.array().of(Yup.object().shape({
       value: Yup.string(),
@@ -361,12 +366,12 @@ const PropertyValuationForm = (props) => {
   });
 
   const [reportUsersFields, setReportUsersFields] = useState([]);
-  const addReportUser = (nameVal="",phoneVal="",emailVal="") => {
-    setReportUsersFields([...reportUsersFields,{
+  const addReportUser = (nameVal = "", phoneVal = "", emailVal = "") => {
+    setReportUsersFields([...reportUsersFields, {
       formFieldName: "report_user_name",
       fieldEmail: "report_user_email",
       fieldPhoneNumber: "report_user_phone",
-      formFildNameValue:nameVal,
+      formFildNameValue: nameVal,
       fieldEmailValue: emailVal,
       fieldPhoneNumberValue: phoneVal,
       formFieldNamePlace: "Recipient Name",
@@ -374,16 +379,17 @@ const PropertyValuationForm = (props) => {
       fieldPhoneNumberPlace: "Recipient Phone"
     }]);
   }
-  const valauationdetails = useSelector(selectValuationDetails); 
+  const valauationdetails = useSelector(selectValuationDetails);
   const recipientdetails = useSelector(selectCurrentRecipient);
   const [existingAccessors, setExistingAccessors] = useState();
+  const recipientUsernames = useSelector(selectValuationDetails);
   useEffect(() => {
     if (valauationdetails != null) {
-     setRecipientUsernames(valauationdetails?.report_user_name);
-     setRecipientEmails(valauationdetails?.report_user_email);
-     setRecipientPhone(valauationdetails?.report_user_phone);  
-    }else{
-      setReportUsersFields([...reportUsersFields,{
+      setRecipientUsernames(valauationdetails?.report_user_name);
+      setRecipientEmails(valauationdetails?.report_user_email);
+      setRecipientPhone(valauationdetails?.report_user_phone);
+    } else {
+      setReportUsersFields([...reportUsersFields, {
         formFieldName: "report_user_name",
         fieldEmail: "report_user_email",
         fieldPhoneNumber: "report_user_phone",
@@ -393,7 +399,7 @@ const PropertyValuationForm = (props) => {
         formFieldNamePlace: "Recipient Name",
         fieldEmailPlace: "Recipient Email",
         fieldPhoneNumberPlace: "Recipient Phone"
-      }]);      
+      }]);
     }
   }, [valauationdetails, recipientdetails]);
 
@@ -407,17 +413,17 @@ const PropertyValuationForm = (props) => {
   console.log("Accesors List");
   console.log(accesorslist);
   useEffect(() => {
-    if(accesorslist!=undefined){
+    if (accesorslist != undefined) {
       const restructuredData = accesorslist.map(({ id, organization_name }) => ({
         value: id,
         label: organization_name,
-        name:  organization_name
+        name: organization_name
       }));
       setExistingAccessors(restructuredData);
     }
- 
+
   }, [accesorslist]);
-  
+
   console.log("existingAccessors List appended");
 
   console.log(existingAccessors);
@@ -428,7 +434,7 @@ const PropertyValuationForm = (props) => {
     values.splice(index, 1);
     setReportUsersFields(values);
   };
-  const handleRemoveAddedOrgRecipient = (index) =>{
+  const handleRemoveAddedOrgRecipient = (index) => {
     const values = [...recipientUsernames];
     values.splice(index, 1);
     setRecipientUsernames(values);
@@ -438,9 +444,9 @@ const PropertyValuationForm = (props) => {
     delete data.file;
     dispatch(setValuationDetails(data));
     dispatch(setReportRecipient(data.recipient));
-    if(existingAccessors.length > 0){
+    if (existingAccessors.length > 0) {
       props.next();
-    } else{
+    } else {
 
     }
   }
@@ -468,18 +474,18 @@ const PropertyValuationForm = (props) => {
             </label>
             <div className="form-control-wrap">
               {
-                ((existingAccessors!=undefined) >0)&& <RSelect
-                value={selecteedaccesors}
-                isMulti
-                {...registerpropertyValuation("recipient", { required: true })}
-                options={existingAccessors}
-              />
-             
+                ((existingAccessors != undefined) > 0) && <RSelect
+                  value={selecteedaccesors}
+                  isMulti
+                  {...registerpropertyValuation("recipient", { required: true })}
+                  options={existingAccessors}
+                />
+
               }
-               {propertyValuationErrors.recipient && (
+              {propertyValuationErrors.recipient && (
                 <span className="invalid">{propertyValuationErrors.recipient?.message}</span>
               )}
-         
+
             </div>
           </div>
         </Col>
@@ -490,19 +496,19 @@ const PropertyValuationForm = (props) => {
               <div className="form-file">
                 <input className="form-control" type="file" multiple id="customMultipleFiles" />
                 {propertyValuationErrors.recipient && (
-                <span className="invalid">{propertyValuationErrors.file?.message}</span>
-              )}
+                  <span className="invalid">{propertyValuationErrors.file?.message}</span>
+                )}
               </div>
             </div>
           </div>
         </Col>
-        
+
       </Row>
       <Row>
-      <Col md="4">
-      <div className="form-group">
+        <Col md="4">
+          <div className="form-group">
             <label className="form-label" htmlFor="first-name">
-            Market Value
+              Market Value
             </label>
             <div className="form-control-wrap">
               <input
@@ -511,16 +517,16 @@ const PropertyValuationForm = (props) => {
                 className="form-control"
                 {...registerpropertyValuation("marketValue", { required: true })}
                 defaultValue={valauationdetails?.marketValue}
-               
+
               />
               {propertyValuationErrors.marketValue && <span className="invalid">{propertyValuationErrors.marketValue?.message}</span>}
             </div>
           </div>
-      </Col>
-      <Col md="4">
-      <div className="form-group">
+        </Col>
+        <Col md="4">
+          <div className="form-group">
             <label className="form-label" htmlFor="first-name">
-            Forced Sale Value
+              Forced Sale Value
             </label>
             <div className="form-control-wrap">
               <input
@@ -529,16 +535,16 @@ const PropertyValuationForm = (props) => {
                 className="form-control"
                 {...registerpropertyValuation("forcedSaleValue", { required: true })}
                 defaultValue={valauationdetails?.marketValue}
-               
+
               />
               {propertyValuationErrors.forcedSaleValue && <span className="invalid">{propertyValuationErrors.forcedSaleValue?.message}</span>}
             </div>
           </div>
-      </Col>
-      <Col md="4">
-      <div className="form-group">
+        </Col>
+        <Col md="4">
+          <div className="form-group">
             <label className="form-label" htmlFor="first-name">
-            Insurence Value
+              Insurence Value
             </label>
             <div className="form-control-wrap">
               <input
@@ -547,18 +553,18 @@ const PropertyValuationForm = (props) => {
                 className="form-control"
                 {...registerpropertyValuation("insurenceValue", { required: true })}
                 defaultValue={valauationdetails?.insurenceValue}
-               
+
               />
               {propertyValuationErrors.insurenceValue && <span className="invalid">{propertyValuationErrors.insurenceValue?.message}</span>}
             </div>
           </div>
-      </Col>
+        </Col>
       </Row>
       <Row>
-      <Col md="6">
-      <div className="form-group">
+        <Col md="6">
+          <div className="form-group">
             <label className="form-label" htmlFor="first-name">
-            Annual Grooss Income
+              Annual Grooss Income
             </label>
             <div className="form-control-wrap">
               <input
@@ -567,16 +573,16 @@ const PropertyValuationForm = (props) => {
                 className="form-control"
                 {...registerpropertyValuation("annualGRossRentalIncome", { required: true })}
                 defaultValue={valauationdetails?.annualGRossRentalIncome}
-               
+
               />
               {propertyValuationErrors.annualGRossRentalIncome && <span className="invalid">{propertyValuationErrors.annualGRossRentalIncome?.message}</span>}
             </div>
           </div>
-      </Col>
-      <Col md="6">
-      <div className="form-group">
+        </Col>
+        <Col md="6">
+          <div className="form-group">
             <label className="form-label" htmlFor="first-name">
-            Forced Sale Value
+              Forced Sale Value
             </label>
             <div className="form-control-wrap">
               <input
@@ -585,18 +591,18 @@ const PropertyValuationForm = (props) => {
                 className="form-control"
                 {...registerpropertyValuation("forcedSaleValue", { required: true })}
                 defaultValue={valauationdetails?.marketValue}
-               
+
               />
               {propertyValuationErrors.forcedSaleValue && <span className="invalid">{propertyValuationErrors.forcedSaleValue?.message}</span>}
             </div>
           </div>
-      </Col>
+        </Col>
       </Row>
       <Row>
-      <Col md="6">
-      <div className="form-group">
+        <Col md="6">
+          <div className="form-group">
             <label className="form-label" htmlFor="first-name">
-            Valuation Date
+              Valuation Date
             </label>
             <div className="form-control-wrap">
               <input
@@ -605,16 +611,16 @@ const PropertyValuationForm = (props) => {
                 className="form-control"
                 {...registerpropertyValuation("valuationDate", { required: true })}
                 defaultValue={valauationdetails?.valuationDate}
-               
+
               />
               {propertyValuationErrors.valuationDate && <span className="invalid">{propertyValuationErrors.valuationDate?.message}</span>}
             </div>
           </div>
-      </Col>
-      <Col md="6">
-      <div className="form-group">
+        </Col>
+        <Col md="6">
+          <div className="form-group">
             <label className="form-label" htmlFor="first-name">
-            Instruction Date
+              Instruction Date
             </label>
             <div className="form-control-wrap">
               <input
@@ -623,12 +629,12 @@ const PropertyValuationForm = (props) => {
                 className="form-control"
                 {...registerpropertyValuation("InstructionDate", { required: true })}
                 defaultValue={valauationdetails?.InstructionDate}
-               
+
               />
               {propertyValuationErrors.InstructionDate && <span className="invalid">{propertyValuationErrors.InstructionDate?.message}</span>}
             </div>
           </div>
-      </Col>
+        </Col>
       </Row>
       <div className="actions clearfix">
         <ul>
@@ -666,7 +672,7 @@ const ValuationSignatures = (props) => {
     resolver: yupResolver(propertyDetailsSchema),
   });
   const onSubmitPropertyDetails = async (data) => {
-    console.log(data);   
+    console.log(data);
     dispatch(setValuationPropertyDetails(data));
     props.next();
   }
@@ -679,7 +685,7 @@ const ValuationSignatures = (props) => {
 
   return (
     <form onSubmit={handlePropertyDetailsSubmit(onSubmitPropertyDetails)} >
-    <Row className="gy-4">
+      <Row className="gy-4">
         <Col md="6">
           <div className="form-group">
             <label className="form-label" htmlFor="username">
@@ -703,15 +709,15 @@ const ValuationSignatures = (props) => {
               Property Type
             </label>
             <div className="form-control-wrap">
-            <RSelect 
-            isMulti 
-            components={animatedComponents}
-            options={options}
-            {...registerproperty("PropertyType", {
-              required: "This field is required"                 
-            })}
+              <RSelect
+                isMulti
+                components={animatedComponents}
+                options={options}
+                {...registerproperty("PropertyType", {
+                  required: "This field is required"
+                })}
 
-            />
+              />
               {properrtyErrors?.PropertyType && <span className="invalid">{properrtyErrors.PropertyType?.message}</span>}
             </div>
           </div>
@@ -719,7 +725,7 @@ const ValuationSignatures = (props) => {
         <Col md="12">
           <div className="form-group">
             <label className="form-label" htmlFor="rePassword">
-            Total Built Up Area
+              Total Built Up Area
             </label>
             <div className="form-control-wrap">
               <input
@@ -727,20 +733,21 @@ const ValuationSignatures = (props) => {
                 id="totalBuiltUpArea"
                 className="form-control"
                 {...registerproperty("totalBuiltUpArea", {
-                  required: "This field is required"})}
+                  required: "This field is required"
+                })}
                 defaultValue={propertdetails?.landSize}
               />
               {properrtyErrors.landSize && <span className="invalid">{properrtyErrors.landSize?.message}</span>}
             </div>
           </div>
         </Col>
-   
+
       </Row>
       <Row>
         <Col md="6">
-        <div className="form-group">
+          <div className="form-group">
             <label className="form-label" htmlFor="rePassword">
-            Land Size
+              Land Size
             </label>
             <div className="form-control-wrap">
               <input
@@ -748,7 +755,8 @@ const ValuationSignatures = (props) => {
                 id="landSize"
                 className="form-control"
                 {...registerproperty("landSize", {
-                  required: "This field is required"})}
+                  required: "This field is required"
+                })}
                 defaultValue={propertdetails?.landSize}
               />
               {properrtyErrors.landSize && <span className="invalid">{properrtyErrors.landSize?.message}</span>}
@@ -756,9 +764,9 @@ const ValuationSignatures = (props) => {
           </div>
         </Col>
         <Col md="6">
-        <div className="form-group">
+          <div className="form-group">
             <label className="form-label" htmlFor="rePassword">
-            Tenure
+              Tenure
             </label>
             <div className="form-control-wrap">
               <input
@@ -766,7 +774,8 @@ const ValuationSignatures = (props) => {
                 id="tenure"
                 className="form-control"
                 {...registerproperty("tenure", {
-                  required: "This field is required"})}
+                  required: "This field is required"
+                })}
                 defaultValue={propertdetails?.tenure}
               />
               {properrtyErrors.landSize && <span className="invalid">{properrtyErrors.landSize?.message}</span>}
@@ -774,7 +783,7 @@ const ValuationSignatures = (props) => {
           </div>
         </Col>
       </Row>
-     
+
       <div className="actions clearfix">
         <ul>
           <li>
@@ -810,7 +819,7 @@ const ValuationSummary = (props) => {
     resolver: yupResolver(propertyDetailsSchema),
   });
   const onSubmitPropertyDetails = async (data) => {
-    console.log(data);   
+    console.log(data);
     dispatch(setValuationPropertyDetails(data));
     props.next();
   }
@@ -823,7 +832,7 @@ const ValuationSummary = (props) => {
 
   return (
     <form onSubmit={handlePropertyDetailsSubmit(onSubmitPropertyDetails)} >
-    <Row className="gy-4">
+      <Row className="gy-4">
         <Col md="6">
           <div className="form-group">
             <label className="form-label" htmlFor="username">
@@ -847,15 +856,15 @@ const ValuationSummary = (props) => {
               Property Type
             </label>
             <div className="form-control-wrap">
-            <RSelect 
-            isMulti 
-            components={animatedComponents}
-            options={options}
-            {...registerproperty("PropertyType", {
-              required: "This field is required"                 
-            })}
+              <RSelect
+                isMulti
+                components={animatedComponents}
+                options={options}
+                {...registerproperty("PropertyType", {
+                  required: "This field is required"
+                })}
 
-            />
+              />
               {properrtyErrors?.PropertyType && <span className="invalid">{properrtyErrors.PropertyType?.message}</span>}
             </div>
           </div>
@@ -863,7 +872,7 @@ const ValuationSummary = (props) => {
         <Col md="12">
           <div className="form-group">
             <label className="form-label" htmlFor="rePassword">
-            Total Built Up Area
+              Total Built Up Area
             </label>
             <div className="form-control-wrap">
               <input
@@ -871,20 +880,21 @@ const ValuationSummary = (props) => {
                 id="totalBuiltUpArea"
                 className="form-control"
                 {...registerproperty("totalBuiltUpArea", {
-                  required: "This field is required"})}
+                  required: "This field is required"
+                })}
                 defaultValue={propertdetails?.landSize}
               />
               {properrtyErrors.landSize && <span className="invalid">{properrtyErrors.landSize?.message}</span>}
             </div>
           </div>
         </Col>
-   
+
       </Row>
       <Row>
         <Col md="6">
-        <div className="form-group">
+          <div className="form-group">
             <label className="form-label" htmlFor="rePassword">
-            Land Size
+              Land Size
             </label>
             <div className="form-control-wrap">
               <input
@@ -892,7 +902,8 @@ const ValuationSummary = (props) => {
                 id="landSize"
                 className="form-control"
                 {...registerproperty("landSize", {
-                  required: "This field is required"})}
+                  required: "This field is required"
+                })}
                 defaultValue={propertdetails?.landSize}
               />
               {properrtyErrors.landSize && <span className="invalid">{properrtyErrors.landSize?.message}</span>}
@@ -900,9 +911,9 @@ const ValuationSummary = (props) => {
           </div>
         </Col>
         <Col md="6">
-        <div className="form-group">
+          <div className="form-group">
             <label className="form-label" htmlFor="rePassword">
-            Tenure
+              Tenure
             </label>
             <div className="form-control-wrap">
               <input
@@ -910,7 +921,8 @@ const ValuationSummary = (props) => {
                 id="tenure"
                 className="form-control"
                 {...registerproperty("tenure", {
-                  required: "This field is required"})}
+                  required: "This field is required"
+                })}
                 defaultValue={propertdetails?.tenure}
               />
               {properrtyErrors.landSize && <span className="invalid">{properrtyErrors.landSize?.message}</span>}
@@ -918,7 +930,7 @@ const ValuationSummary = (props) => {
           </div>
         </Col>
       </Row>
-     
+
       <div className="actions clearfix">
         <ul>
           <li>

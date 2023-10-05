@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { selectCurrentRoles,selectCurrentUser } from "../../featuers/authSlice";
+import { selectCurrentRoles, selectCurrentUser, selectCurrentToken } from "../../featuers/authSlice";
 import menudata from "./MenuData";
 import Icon from "../../components/icon/Icon";
 import classNames from "classnames";
 import { NavLink, Link } from "react-router-dom";
 
-const menuadmin=menudata.admin;
-const menuvaluer=menudata.valuer;
-const menulender=menudata.lender;
+const menuadmin = menudata.admin;
+const menuvaluer = menudata.valuer;
+const menulender = menudata.lender;
 
 
 const MenuHeading = ({ heading }) => {
-const token = useSelector(selectCurrentToken);
-const user = useSelector(selectCurrentUser);
-const roles = useSelector(selectCurrentRoles);
-const userrole = currentuser?.role_name;
-return (
+  const token = useSelector(selectCurrentToken);
+  const user = useSelector(selectCurrentUser);
+  const currentuser = useSelector(selectCurrentUser);
+  const roles = useSelector(selectCurrentRoles);
+  const userrole = currentuser?.role_name;
+  return (
     <li className="nk-menu-heading">
       <h6 className="overline-title text-primary-alt">{heading}</h6>
     </li>
@@ -39,7 +40,7 @@ const MenuItem = ({ icon, link, text, sub, newTab, sidebarToggle, mobileView, ba
   }
 
   const menuHeight = (el) => {
-   
+
     var totalHeight = [];
     for (var i = 0; i < el.length; i++) {
       var margin =
@@ -195,8 +196,8 @@ const MenuItem = ({ icon, link, text, sub, newTab, sidebarToggle, mobileView, ba
 const MenuSub = ({ icon, link, text, sub, sidebarToggle, mobileView, ...props }) => {
   const currentuser = useSelector(selectCurrentUser);
   const userrole = currentuser?.role_name;
-  const [menu, setMenu ] = useState([]);
-  
+  const [menu, setMenu] = useState([]);
+
   useEffect(() => {
     if (userrole === "Super Admin") {
       setMenu(menuadmin);
@@ -229,7 +230,7 @@ const MenuSub = ({ icon, link, text, sub, sidebarToggle, mobileView, ...props })
 const Menu = ({ sidebarToggle, mobileView }) => {
   const currentuser = useSelector(selectCurrentUser);
   const userrole = currentuser?.role_name;
-  const [menu, setMenu ] = useState([]);  
+  const [menu, setMenu] = useState([]);
   useEffect(() => {
     if (userrole === "Super Admin") {
       setMenu(menuadmin);
@@ -239,7 +240,7 @@ const Menu = ({ sidebarToggle, mobileView }) => {
       setMenu(menulender);
     }
   }, [userrole]);
-  
+
   return (
     <ul className="nk-menu">
       {menu.map((item) =>

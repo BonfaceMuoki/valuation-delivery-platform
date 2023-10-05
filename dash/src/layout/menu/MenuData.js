@@ -40,7 +40,7 @@ const menuadmin = [
       },
       {
         text: "Reports - New Report",
-        link: "/valuation-firm/submit-report",
+        link: "/upload-new-report",
       },
     ],
   },
@@ -180,7 +180,7 @@ const menuvaluer = [
     ],
   },
 ];
-const menu={'admin':menuadmin,'valuer':menuvaluer,'lender':menulender};
+const menu = { 'admin': menuadmin, 'valuer': menuvaluer, 'lender': menulender };
 // const userrole = currentuser?.role_name;
 // const [menu, setMenu ] = useState([]);
 // setMenu(menuadmin);

@@ -9,20 +9,18 @@ import { setupListeners } from '@reduxjs/toolkit/query';
 import { api } from "features/apiSlice"
 import 'react-toastify/dist/ReactToastify.css';
 import { PersistGate } from 'redux-persist/integration/react';
-import { store ,persistor} from 'features/store';
+import { store, persistor } from 'features/store';
 import { persistStore } from 'redux-persist';
-
-import { persistStore } from 'redux-persist';
-import { ToastContainer} from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <Provider store={store}>
-    <PersistGate loading={null} persistor={persistor}>
-    <ToastContainer />
-    <App />
-    </PersistGate>
+      <PersistGate loading={null} persistor={persistor}>
+        <ToastContainer />
+        <App />
+      </PersistGate>
     </Provider>
   </React.StrictMode>
 );

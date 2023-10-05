@@ -13,6 +13,7 @@ import {
   Button,
   Icon,
   PreviewCard,
+
 } from "../components/Component";
 import { useGetAccesorInviteDetailsQuery } from "../api/auth/inviteAccesorApiSlice";
 import { useRegisterAccesorMutation } from "../api/auth/inviteAccesorApiSlice";
@@ -21,10 +22,54 @@ import Head from "../layout/head/Head";
 import AuthFooter from "../pages/auth/AuthFooter";
 
 import { Row, Col } from "reactstrap";
+import { toast } from "react-toastify";
 
 // 👇 Styled React Route Dom Link Component
+const CloseButton = () => {
 
+  return (
+    <span className="btn-trigger toast-close-button" role="button">
+      <Icon name="cross"></Icon>
+    </span>
+  );
+};
 function AcceptAccesorInviteSignup() {
+  const toastMessage = (message, type) => {
+    if (type == "success") {
+      toast.success(message, {
+        position: "top-right",
+        autoClose: true,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: false,
+        closeButton: <CloseButton />,
+      });
+    } else if (type == "error") {
+      toast.error(message, {
+        position: "top-right",
+        autoClose: true,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: false,
+        closeButton: <CloseButton />,
+      });
+    } else if (type == "warning") {
+      toast.warning(message, {
+        position: "top-right",
+        autoClose: true,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: false,
+        closeButton: <CloseButton />,
+      });
+    }
+  };
   const SITE_KEY = process.env.REACT_APP_reCAPTCHA_SITE_KEY;
   const captchaRef = useRef(null);
   const [passState, setPassState] = useState(false);
@@ -107,23 +152,13 @@ function AcceptAccesorInviteSignup() {
 
   if (Object.keys(retrieved).length === 0) {
     return (
-      <Box
-        display={"flex"}
-        flexDirection={"column"}
-        width={isNonMobile ? "50%" : "80%"}
-        sx={{
-          justifyContent: "center",
-          marginRight: "10%",
-          marginLeft: "20%",
-          borderColor: theme.palette.primary,
-          borderRadius: "10px",
-        }}
+      <Block className="nk-block-middle nk-auth-body  wide-xs"
       >
-        <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }} align="center">
+        {/* <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }} align="center">
           {" "}
           Invalid / Expired Invite.
-        </Typography>
-      </Box>
+        </Typography> */}
+      </Block>
     );
   } else {
     return (
@@ -242,9 +277,8 @@ function AcceptAccesorInviteSignup() {
                           ev.preventDefault();
                           setPassState(!passState);
                         }}
-                        className={`form-icon lg form-icon-right passcode-switch ${
-                          passState ? "is-hidden" : "is-shown"
-                        }`}
+                        className={`form-icon lg form-icon-right passcode-switch ${passState ? "is-hidden" : "is-shown"
+                          }`}
                       >
                         <Icon name="eye" className="passcode-icon icon-show"></Icon>
                         <Icon name="eye-off" className="passcode-icon icon-hide"></Icon>
@@ -262,23 +296,22 @@ function AcceptAccesorInviteSignup() {
                   </div>
                 </Col>
                 <Col>
-                
+
                   <div className="form-group">
                     <div className="form-label-group">
                       <label className="form-label" htmlFor="password">
                         Confirm Passwword
                       </label>
-                      
+
                     </div>
                     <div className="form-control-wrap">
                       <a
                         href="#password"
-                    
-                        className={`form-icon lg form-icon-right passcode-switch ${
-                          passState ? "is-hidden" : "is-shown"
-                        }`}
+
+                        className={`form-icon lg form-icon-right passcode-switch ${passState ? "is-hidden" : "is-shown"
+                          }`}
                       >
-                        
+
                       </a>
                       <input
                         type={passState ? "text" : "password"}

@@ -2,9 +2,9 @@ import { apiSlice } from "features/apiSlice"
 import { useSelector } from "react-redux";
 
 export const retrieveValuerInviteSliceApi = apiSlice.injectEndpoints({
-   
+
     endpoints: builder => ({
-        registerUploaderUser: bulder.mutation({
+        registerUploaderUser: builder.mutation({
             query: (formData) => ({
                 url: `/api/auth/register-valuer-user`,
                 method: 'POST',
@@ -14,7 +14,7 @@ export const retrieveValuerInviteSliceApi = apiSlice.injectEndpoints({
                 }
             }),
         }),
-        registerUploader: bulder.mutation({
+        registerUploader: builder.mutation({
             query: (formData) => ({
                 url: `/api/auth/register`,
                 method: 'POST',
@@ -24,7 +24,7 @@ export const retrieveValuerInviteSliceApi = apiSlice.injectEndpoints({
                 }
             }),
         }),
-        requestUploaderAccess: bulder.mutation({
+        requestUploaderAccess: builder.mutation({
             query: (formData) => ({
                 url: `/api/auth/request-valuer-access`,
                 method: 'POST',
@@ -34,7 +34,7 @@ export const retrieveValuerInviteSliceApi = apiSlice.injectEndpoints({
                 }
             }),
         }),
-        requestUploaderRegistrationStatus: bulder.query({
+        requestUploaderRegistrationStatus: builder.query({
             query: (request) => ({
                 url: `/api/admin/get-Valuer-request-registration-status?req=${request}`,
                 method: 'GET',
@@ -43,11 +43,11 @@ export const retrieveValuerInviteSliceApi = apiSlice.injectEndpoints({
                 }
             }),
         }),
-        archiveUploaderRegistrationRequest: bulder.mutation({
+        archiveUploaderRegistrationRequest: builder.mutation({
             query: (formdata) => ({
                 url: `/api/admin/archive-valuer-registration-request`,
                 method: 'POST',
-                body:formdata,
+                body: formdata,
                 headers: {
                     'Accept': 'Application/json'
                 }
@@ -59,9 +59,9 @@ export const retrieveValuerInviteSliceApi = apiSlice.injectEndpoints({
                 method: 'GET',
                 headers: {
                     'Accept': 'Application/json'
-                  }          
+                }
             })
-           
+
         }),
         getValuerInviteDetails: builder.query({
             query: (invite_token) => ({
@@ -69,13 +69,13 @@ export const retrieveValuerInviteSliceApi = apiSlice.injectEndpoints({
                 method: 'GET',
                 headers: {
                     'Accept': 'Application/json'
-                  }          
+                }
             })
-           
+
         })
     })
 })
 
 export const {
-    useGetValuerUserInviteDetailsQuery,useGetValuerInviteDetailsQuery
-} = retrieveValuerInviteSliceApi ;
+    useGetValuerUserInviteDetailsQuery, useGetValuerInviteDetailsQuery
+} = retrieveValuerInviteSliceApi;

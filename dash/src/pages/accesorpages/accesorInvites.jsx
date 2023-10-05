@@ -37,15 +37,59 @@ import {
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
+import { toast } from "react-toastify";
 import CompanySummary from "../../components/CompanySummary";
+const CloseButton = () => {
 
+  return (
+    <span className="btn-trigger toast-close-button" role="button">
+      <Icon name="cross"></Icon>
+    </span>
+  );
+};
 const AccesorInvites = () => {
+  const toastMessage = (message, type) => {
+    if (type == "success") {
+      toast.success(message, {
+        position: "top-right",
+        autoClose: true,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: false,
+        closeButton: <CloseButton />,
+      });
+    } else if (type == "error") {
+      toast.error(message, {
+        position: "top-right",
+        autoClose: true,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: false,
+        closeButton: <CloseButton />,
+      });
+    } else if (type == "warning") {
+      toast.warning(message, {
+        position: "top-right",
+        autoClose: true,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: false,
+        closeButton: <CloseButton />,
+      });
+    }
+  };
   const [modalSm, setModalSm] = useState(false);
   const toggleSm = () => setModalSm(!modalSm);
 
   const [modalOpenCompanyDetails, setModaOpenCompanyDetails] = useState(false);
   const toggleOpenCompanyDetails = () => setModaOpenCompanyDetails(!modalOpenCompanyDetails);
-  
+
   const [currentItems, setcurrentItems] = useState([]);
   const [tableData, setTableData] = useState([]);
 
@@ -168,33 +212,33 @@ const AccesorInvites = () => {
     // rejectValuationFirmRequest();
   };
 
-  const [archiveRequestt]=useArchiveAccesorRegistrationRequestMutation();
-  const archiveRequest = async(row)=>{
-     const formData= new FormData();
-     formData.append("invite",row.id);
-     const result = await archiveRequestt(formData);
-     if ('error' in result) {
-        
-         if ('backendvalerrors' in result.error.data) {
-      
-             // setBackendValErrors(result.error.data.backendvalerrors);
-         }
-     } else {
-         refetchFirmRequests();
-     }
+  const [archiveRequestt] = useArchiveAccesorRegistrationRequestMutation();
+  const archiveRequest = async (row) => {
+    const formData = new FormData();
+    formData.append("invite", row.id);
+    const result = await archiveRequestt(formData);
+    if ('error' in result) {
+
+      if ('backendvalerrors' in result.error.data) {
+
+        // setBackendValErrors(result.error.data.backendvalerrors);
+      }
+    } else {
+      refetchFirmRequests();
+    }
   }
-  const viewCompanyStatus = async (row)=>{  
+  const viewCompanyStatus = async (row) => {
     toggleOpenCompanyDetails();
     setActiveRequest(row.id);
     setFullActiveRequest(row);
- }
- const viewRegistrationStatus = async (row)=>{  
-  setFullActiveRequest(row);
-  setActiveRequest(row.id);
-  setModaOpenCompanyDetails(true);
- 
- 
- }
+  }
+  const viewRegistrationStatus = async (row) => {
+    setFullActiveRequest(row);
+    setActiveRequest(row.id);
+    setModaOpenCompanyDetails(true);
+
+
+  }
   if (tableData.length > 0) {
     console.log("Table Data");
     console.log(tableData);
@@ -213,7 +257,7 @@ const AccesorInvites = () => {
             Company Information
           </ModalHeader>
           <ModalBody>
-         <CompanySummary item={fullActiveRequest} companytypes="Accessor"/>
+            <CompanySummary item={fullActiveRequest} companytypes="Accessor" />
           </ModalBody>
           <ModalFooter className="bg-light"></ModalFooter>
         </Modal>
@@ -541,7 +585,7 @@ const AccesorInvites = () => {
             {/*Head*/}
             {currentItems != undefined &&
               currentItems != null &&
-              currentItems.map((item) => {
+              currentItems.map((item, index) => {
                 return (
                   <DataTableItem key={item.id}>
                     <DataTableRow>
@@ -560,13 +604,12 @@ const AccesorInvites = () => {
                             <span className="tb-lead">
                               {item?.institution_name}{" "}
                               <span
-                                className={`dot dot-${
-                                  item.status === "Active"
-                                    ? "success"
-                                    : item?.status === "Pending"
+                                className={`dot dot-${item.status === "Active"
+                                  ? "success"
+                                  : item?.status === "Pending"
                                     ? "warning"
                                     : "danger"
-                                } d-md-none ms-1`}
+                                  } d-md-none ms-1`}
                               ></span>
                             </span>
                             <span>{item?.invite_email}</span>
