@@ -13,9 +13,9 @@ import {
   RSelect
 } from "../../components/Component";
 import makeAnimated from 'react-select/animated';
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { Steps, Step } from "react-step-builder";
-import { Row, Col, Button } from "reactstrap";
+import { Row, Col, Button, Card } from "reactstrap";
 
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
@@ -23,7 +23,7 @@ import { useSelector, useDispatch } from "react-redux";
 
 import { GoogleMapsProvider, useGoogleMap } from "@ubilabs/google-maps-react-hooks";
 import MapWithAutoSearch from "./MapWithAutoSearch";
-import { setValuationLocationDetails } from "../../featuers/authSlice";
+import { selectCurrentSignatories, setReportSignatories, setValuationLocationDetails } from "../../featuers/authSlice";
 
 import {
   selectLocationDetails,
@@ -38,6 +38,8 @@ import {
   useGetPropertyTypeListQuery,
 } from "../../api/commonEndPointsAPI";
 import Dropzone from "react-dropzone";
+import { Collapse } from "reactstrap";
+import Select from "react-select";
 const LocationForm = (props) => {
   const dispatch = useDispatch();
   const locationDetails = useSelector(selectLocationDetails);
@@ -181,7 +183,8 @@ const LocationForm = (props) => {
 };
 
 const PropertyDetailsForm = (props) => {
-  const propertdetails = useSelector(selectPropertyDetails);
+  const [propertdetails, setPropertdetails] = useState(useSelector(selectPropertyDetails));
+  console.log(propertdetails);
   const dispatch = useDispatch();
   const propertyDetailsSchema = Yup.object().shape({
     PropertyLR: Yup.string().required('The proprty Lr is required'),
@@ -202,11 +205,32 @@ const PropertyDetailsForm = (props) => {
     dispatch(setValuationPropertyDetails(data));
     props.next();
   }
-  const options = [
-    { value: "chocolate", label: "Chocolate" },
-    { value: "strawberry", label: "Strawberry" },
-    { value: "vanilla", label: "Vanilla" },
-  ];
+  //get the registered propertytypes
+  const [selectedPropertyType, setSelectedPropertyType] = useState();
+
+  const [propertytypesList, setpropertytypesList] = useState();
+  useEffect(() => {
+
+  });
+
+  const { data: registeredpropertytypes, isLoading: loadingpropertytypes } = useGetPropertyTypeListQuery();
+  console.log(registeredpropertytypes, "registeredpropertytypes");
+  useEffect(() => {
+
+    if (registeredpropertytypes != undefined) {
+      const restructuredData = registeredpropertytypes.map(({ id, type_name }) => ({
+        id: id,
+        value: id,
+        label: type_name,
+      }));
+      setpropertytypesList(restructuredData);
+    }
+    if (propertdetails != null) {
+      setPropertyDetailsValues("PropertyType", propertdetails?.PropertyType);
+    }
+  }, [loadingpropertytypes, propertdetails]);
+  //get the registered propertytypes
+
   const animatedComponents = makeAnimated();
 
   return (
@@ -223,14 +247,14 @@ const PropertyDetailsForm = (props) => {
                 id="username"
                 className="form-control"
                 {...registerproperty("PropertyLR", { required: true })}
-                defaultValue={propertdetails?.username}
+                defaultValue={propertdetails?.PropertyLR}
               />
               {properrtyErrors.PropertyLR && <span className="invalid">{properrtyErrors.PropertyLR?.message}</span>}
             </div>
           </div>
         </Col>
         <Col md="6">
-          <div className="form-group">
+          {/* <div className="form-group">
             <label className="form-label" htmlFor="password">
               Property Type
             </label>
@@ -245,6 +269,27 @@ const PropertyDetailsForm = (props) => {
 
               />
               {properrtyErrors?.PropertyType && <span className="invalid">{properrtyErrors.PropertyType?.message}</span>}
+            </div>
+          </div> */}
+          <div className="form-group">
+            <label className="form-label" htmlFor="fw-token-address">
+              Property Type
+            </label>
+            <div className="form-control-wrap">
+              {propertytypesList && propertytypesList.length > 0 && (
+                <Controller
+                  name="PropertyType"
+                  control={control}
+                  render={({ field }) => (
+                    <Select isMulti value={propertdetails?.PropertyType} options={propertytypesList} isSearchable={true} isClearable={true} {...field} />
+                  )}
+                />
+              )}
+              {properrtyErrors.PropertyType && (
+                <span className="invalid" style={{ color: "#e85347", fontSize: "11px", fontStyle: "italic" }}>
+                  {properrtyErrors.PropertyType?.message}
+                </span>
+              )}
             </div>
           </div>
         </Col>
@@ -334,15 +379,16 @@ const PropertyValuationForm = (props) => {
     forcedSaleValue: Yup.number().required('Forced Sale value is required').typeError("FSV must be a valid number"),
     insurenceValue: Yup.number().required("Insurence Value is required").typeError("Insurence value must be a valid number"),
     valuationDate: Yup.string().required("Valuation date is required"),
-    annualGRossRentalIncome: Yup.string(),
+    annualGRossRentalIncome: Yup.number().required("Valuation date is required"),
     PropertyDescription: Yup.string(),
     InstructionDate: Yup.string().required("Instruction Date is required"),
     recipient: Yup.array().of(Yup.object().shape({
       value: Yup.string(),
-      label: Yup.string()
+      label: Yup.string(),
+      name: Yup.string()
     })
     ).min(1, "Recipient required").max(1, "Only one recipient is required."),
-    file: Yup
+    reportDocument: Yup
       .mixed()
       .required('Please upload a file')
       .nullable()
@@ -383,8 +429,10 @@ const PropertyValuationForm = (props) => {
   const recipientdetails = useSelector(selectCurrentRecipient);
   const [existingAccessors, setExistingAccessors] = useState();
   const recipientUsernames = useSelector(selectValuationDetails);
+
   useEffect(() => {
     if (valauationdetails != null) {
+      setPropertValuationValues("recipient", valauationdetails?.recipient);
       setRecipientUsernames(valauationdetails?.report_user_name);
       setRecipientEmails(valauationdetails?.report_user_email);
       setRecipientPhone(valauationdetails?.report_user_phone);
@@ -424,9 +472,7 @@ const PropertyValuationForm = (props) => {
 
   }, [accesorslist]);
 
-  console.log("existingAccessors List appended");
 
-  console.log(existingAccessors);
 
 
   const handleRemoveReprtUser = (index) => {
@@ -441,13 +487,15 @@ const PropertyValuationForm = (props) => {
   }
 
   const onSubmitPropertyValuation = async (data) => {
-    delete data.file;
+
+    console.log(data, "data");
+    delete data.reportDocument;
     dispatch(setValuationDetails(data));
     dispatch(setReportRecipient(data.recipient));
     if (existingAccessors.length > 0) {
       props.next();
     } else {
-
+      alert("Please input figure");
     }
   }
   const [image, setImage] = useState();
@@ -467,34 +515,95 @@ const PropertyValuationForm = (props) => {
   return (
     <form onSubmit={handlePropertyValuationsSubmit(onSubmitPropertyValuation)}>
       <Row className="gy-3">
-        <Col md="6">
+        <Col md="12">
           <div className="form-group">
             <label className="form-label" htmlFor="fw-token-address">
               Recipient
             </label>
             <div className="form-control-wrap">
-              {
-                ((existingAccessors != undefined) > 0) && <RSelect
-                  value={selecteedaccesors}
-                  isMulti
-                  {...registerpropertyValuation("recipient", { required: true })}
-                  options={existingAccessors}
+              {existingAccessors && existingAccessors.length > 0 && (
+                <Controller
+                  name="recipient"
+                  control={control}
+                  render={({ field }) => (
+                    <Select isMulti options={existingAccessors} isSearchable={true} isClearable={true} {...field} />
+                  )}
                 />
 
-              }
+              )}
+              {propertyValuationErrors.recipient?.message}
               {propertyValuationErrors.recipient && (
                 <span className="invalid">{propertyValuationErrors.recipient?.message}</span>
               )}
-
             </div>
           </div>
         </Col>
-        <Col md="6">
+
+      </Row>
+      <Row className="mt-3">
+        <Col md="12">
+          <div className="form-group">
+            <label className="form-label">Recipients within The receiving Organization</label>
+            <table className="table table-bordered table-responsive">
+              <thead>
+                <tr>
+
+                  <th scope="col">Name</th>
+                  <th scope="col">Email</th>
+                  <th scope="col">Phone</th>
+                  <th scope="col">
+                    <Button color="primary" >
+                      +
+                    </Button>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+
+                  <td>Mark</td>
+                  <td>Otto</td>
+                  <td>Otto</td>
+                  <td>
+                    <Button color="danger" >
+                      -
+                    </Button>
+                  </td>
+                </tr>
+                <tr>
+
+                  <td>Jacob</td>
+                  <td>Thornton</td>
+                  <td>Otto</td>
+                  <td>
+                    <Button color="danger" >
+                      -
+                    </Button></td>
+                </tr>
+                <tr>
+
+                  <td>Larry</td>
+                  <td>the Bird</td>
+                  <td>Otto</td>
+                  <td>
+                    <Button color="danger" >
+                      -
+                    </Button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </Col>
+
+      </Row>
+      <Row className="mt-3">
+        <Col md="12">
           <div className="form-group">
             <label className="form-label">Report Document(Only PDF)</label>
             <div className="form-control-wrap">
               <div className="form-file">
-                <input className="form-control" type="file" multiple id="customMultipleFiles" />
+                <input className="form-control" type="file"   {...registerpropertyValuation("reportDocument", { required: true })} multiple id="customMultipleFiles" />
+                {propertyValuationErrors.file?.message}
                 {propertyValuationErrors.recipient && (
                   <span className="invalid">{propertyValuationErrors.file?.message}</span>
                 )}
@@ -504,7 +613,7 @@ const PropertyValuationForm = (props) => {
         </Col>
 
       </Row>
-      <Row>
+      <Row className="mt-3">
         <Col md="4">
           <div className="form-group">
             <label className="form-label" htmlFor="first-name">
@@ -519,6 +628,7 @@ const PropertyValuationForm = (props) => {
                 defaultValue={valauationdetails?.marketValue}
 
               />
+              {propertyValuationErrors.marketValue?.message}
               {propertyValuationErrors.marketValue && <span className="invalid">{propertyValuationErrors.marketValue?.message}</span>}
             </div>
           </div>
@@ -531,12 +641,13 @@ const PropertyValuationForm = (props) => {
             <div className="form-control-wrap">
               <input
                 type="text"
-                id="first-name"
+                id="forcedSaleValue"
                 className="form-control"
                 {...registerpropertyValuation("forcedSaleValue", { required: true })}
-                defaultValue={valauationdetails?.marketValue}
+                defaultValue={valauationdetails?.forcedSaleValue}
 
               />
+              {propertyValuationErrors?.forcedSaleValue?.message}
               {propertyValuationErrors.forcedSaleValue && <span className="invalid">{propertyValuationErrors.forcedSaleValue?.message}</span>}
             </div>
           </div>
@@ -554,14 +665,16 @@ const PropertyValuationForm = (props) => {
                 {...registerpropertyValuation("insurenceValue", { required: true })}
                 defaultValue={valauationdetails?.insurenceValue}
 
+
               />
+              {propertyValuationErrors?.insurenceValue?.message}
               {propertyValuationErrors.insurenceValue && <span className="invalid">{propertyValuationErrors.insurenceValue?.message}</span>}
             </div>
           </div>
         </Col>
       </Row>
-      <Row>
-        <Col md="6">
+      <Row className="mt-3">
+        <Col md="12">
           <div className="form-group">
             <label className="form-label" htmlFor="first-name">
               Annual Grooss Income
@@ -569,36 +682,19 @@ const PropertyValuationForm = (props) => {
             <div className="form-control-wrap">
               <input
                 type="text"
-                id="first-name"
+                id="annualGRossRentalIncome"
                 className="form-control"
                 {...registerpropertyValuation("annualGRossRentalIncome", { required: true })}
                 defaultValue={valauationdetails?.annualGRossRentalIncome}
 
               />
+              {propertyValuationErrors?.annualGRossRentalIncome?.message}
               {propertyValuationErrors.annualGRossRentalIncome && <span className="invalid">{propertyValuationErrors.annualGRossRentalIncome?.message}</span>}
             </div>
           </div>
         </Col>
-        <Col md="6">
-          <div className="form-group">
-            <label className="form-label" htmlFor="first-name">
-              Forced Sale Value
-            </label>
-            <div className="form-control-wrap">
-              <input
-                type="text"
-                id="first-name"
-                className="form-control"
-                {...registerpropertyValuation("forcedSaleValue", { required: true })}
-                defaultValue={valauationdetails?.marketValue}
-
-              />
-              {propertyValuationErrors.forcedSaleValue && <span className="invalid">{propertyValuationErrors.forcedSaleValue?.message}</span>}
-            </div>
-          </div>
-        </Col>
       </Row>
-      <Row>
+      <Row className="mt-3">
         <Col md="6">
           <div className="form-group">
             <label className="form-label" htmlFor="first-name">
@@ -613,6 +709,7 @@ const PropertyValuationForm = (props) => {
                 defaultValue={valauationdetails?.valuationDate}
 
               />
+              {propertyValuationErrors.valuationDate?.message}
               {propertyValuationErrors.valuationDate && <span className="invalid">{propertyValuationErrors.valuationDate?.message}</span>}
             </div>
           </div>
@@ -631,6 +728,28 @@ const PropertyValuationForm = (props) => {
                 defaultValue={valauationdetails?.InstructionDate}
 
               />
+              {propertyValuationErrors.InstructionDate?.message}
+              {propertyValuationErrors.InstructionDate && <span className="invalid">{propertyValuationErrors.InstructionDate?.message}</span>}
+            </div>
+          </div>
+        </Col>
+      </Row>
+      <Row className="mt-3">
+        <Col md="12">
+          <div className="form-group">
+            <label className="form-label" htmlFor="first-name">
+              Property Description
+            </label>
+            <div className="form-control-wrap">
+              <input
+                type="text"
+                id="PropertyDescription"
+                className="form-control"
+                {...registerpropertyValuation("PropertyDescription", { required: true })}
+                defaultValue={valauationdetails?.PropertyDescription}
+
+              />
+              {propertyValuationErrors.InstructionDate?.message}
               {propertyValuationErrors.InstructionDate && <span className="invalid">{propertyValuationErrors.InstructionDate?.message}</span>}
             </div>
           </div>
@@ -655,135 +774,71 @@ const PropertyValuationForm = (props) => {
 };
 
 const ValuationSignatures = (props) => {
-  const propertdetails = useSelector(selectPropertyDetails);
+  const reportsignatories = useSelector(selectCurrentSignatories);
+  console.log(reportsignatories, "reportsignatories");
   const dispatch = useDispatch();
-  const propertyDetailsSchema = Yup.object().shape({
-    PropertyLR: Yup.string().required('The proprty Lr is required'),
-    PropertyType: Yup.array().of(Yup.object().shape({
+  const signatoriesSchema = Yup.object().shape({
+    repportSinatories: Yup.array().of(Yup.object().shape({
+      id: Yup.string(),
       value: Yup.string(),
       label: Yup.string()
     })
-    ).min(1, "Property tYPE required").max(1, "Only one Property Type is required."),
-    totalBuiltUpArea: Yup.number().required('Total Builtup area is required'),
-    tenure: Yup.string().required('Tenure is required'),
-    landSize: Yup.number().required('Land size is required')
+    ).min(2, "Signatories are required").max(2, "Only one Property Type is required.")
   });
-  const { register: registerproperty, control, setValue: setPropertyDetailsValues, handleSubmit: handlePropertyDetailsSubmit, formState: { errors: properrtyErrors, isValid: propertyDetailsIsValid } } = useForm({
-    resolver: yupResolver(propertyDetailsSchema),
+  const { register: registerSignatories, control, setValue: setSignatoriesValues, handleSubmit: handleSignatories, formState: { errors: signatoriesErrors } } = useForm({
+    resolver: yupResolver(signatoriesSchema),
   });
-  const onSubmitPropertyDetails = async (data) => {
+  const onSubmitSignatories = async (data) => {
     console.log(data);
-    dispatch(setValuationPropertyDetails(data));
+    dispatch(setReportSignatories(data));
     props.next();
   }
-  const options = [
-    { value: "chocolate", label: "Chocolate" },
-    { value: "strawberry", label: "Strawberry" },
-    { value: "vanilla", label: "Vanilla" },
-  ];
+  //get the registered signatories
+  const [signatoriesList, setSignatoriesList] = useState();
+  const { data: registeredusers, isLoading: loadingusers } = useGetUsersQuery();
+  console.log(registeredusers, "registeredusers");
+  useEffect(() => {
+    if (registeredusers != undefined) {
+      const restructuredData = registeredusers.map(({ id, full_name }) => ({
+        id: id,
+        value: id,
+        label: full_name,
+      }));
+      setSignatoriesList(restructuredData);
+    }
+    if (reportsignatories != null) {
+      setSignatoriesValues("signatories", reportsignatories?.signatories);
+    }
+  }, [loadingusers, reportsignatories]);
+  //get the registered signnaries
   const animatedComponents = makeAnimated();
-
   return (
-    <form onSubmit={handlePropertyDetailsSubmit(onSubmitPropertyDetails)} >
+    <form onSubmit={handleSignatories(onSubmitSignatories)} >
       <Row className="gy-4">
-        <Col md="6">
-          <div className="form-group">
-            <label className="form-label" htmlFor="username">
-              Property LR
-            </label>
-            <div className="form-control-wrap">
-              <input
-                type="text"
-                id="username"
-                className="form-control"
-                {...registerproperty("PropertyLR", { required: true })}
-                defaultValue={propertdetails?.username}
-              />
-              {properrtyErrors.PropertyLR && <span className="invalid">{properrtyErrors.PropertyLR?.message}</span>}
-            </div>
-          </div>
-        </Col>
-        <Col md="6">
-          <div className="form-group">
-            <label className="form-label" htmlFor="password">
-              Property Type
-            </label>
-            <div className="form-control-wrap">
-              <RSelect
-                isMulti
-                components={animatedComponents}
-                options={options}
-                {...registerproperty("PropertyType", {
-                  required: "This field is required"
-                })}
-
-              />
-              {properrtyErrors?.PropertyType && <span className="invalid">{properrtyErrors.PropertyType?.message}</span>}
-            </div>
-          </div>
-        </Col>
         <Col md="12">
           <div className="form-group">
-            <label className="form-label" htmlFor="rePassword">
-              Total Built Up Area
+            <label className="form-label" htmlFor="fw-token-address">
+              Signatories
             </label>
             <div className="form-control-wrap">
-              <input
-                type="totalBuiltUpArea"
-                id="totalBuiltUpArea"
-                className="form-control"
-                {...registerproperty("totalBuiltUpArea", {
-                  required: "This field is required"
-                })}
-                defaultValue={propertdetails?.landSize}
-              />
-              {properrtyErrors.landSize && <span className="invalid">{properrtyErrors.landSize?.message}</span>}
-            </div>
-          </div>
-        </Col>
-
-      </Row>
-      <Row>
-        <Col md="6">
-          <div className="form-group">
-            <label className="form-label" htmlFor="rePassword">
-              Land Size
-            </label>
-            <div className="form-control-wrap">
-              <input
-                type="landSize"
-                id="landSize"
-                className="form-control"
-                {...registerproperty("landSize", {
-                  required: "This field is required"
-                })}
-                defaultValue={propertdetails?.landSize}
-              />
-              {properrtyErrors.landSize && <span className="invalid">{properrtyErrors.landSize?.message}</span>}
-            </div>
-          </div>
-        </Col>
-        <Col md="6">
-          <div className="form-group">
-            <label className="form-label" htmlFor="rePassword">
-              Tenure
-            </label>
-            <div className="form-control-wrap">
-              <input
-                type="tenure"
-                id="tenure"
-                className="form-control"
-                {...registerproperty("tenure", {
-                  required: "This field is required"
-                })}
-                defaultValue={propertdetails?.tenure}
-              />
-              {properrtyErrors.landSize && <span className="invalid">{properrtyErrors.landSize?.message}</span>}
+              {signatoriesList && signatoriesList.length > 0 && (
+                <Controller
+                  name="signatories"
+                  control={control}
+                  render={({ field }) => (
+                    <Select isMulti value={reportsignatories?.signatories} options={signatoriesList} isSearchable={true} isClearable={true} {...field} />
+                  )}
+                />
+              )}
+              {signatoriesErrors.signatories && (
+                <span className="invalid" style={{ color: "#e85347", fontSize: "11px", fontStyle: "italic" }}>
+                  {signatoriesErrors.signatories?.message}
+                </span>
+              )}
             </div>
           </div>
         </Col>
       </Row>
-
       <div className="actions clearfix">
         <ul>
           <li>
@@ -803,139 +858,266 @@ const ValuationSignatures = (props) => {
 };
 const ValuationSummary = (props) => {
   const propertdetails = useSelector(selectPropertyDetails);
-  const dispatch = useDispatch();
-  const propertyDetailsSchema = Yup.object().shape({
-    PropertyLR: Yup.string().required('The proprty Lr is required'),
-    PropertyType: Yup.array().of(Yup.object().shape({
-      value: Yup.string(),
-      label: Yup.string()
-    })
-    ).min(1, "Property tYPE required").max(1, "Only one Property Type is required."),
-    totalBuiltUpArea: Yup.number().required('Total Builtup area is required'),
-    tenure: Yup.string().required('Tenure is required'),
-    landSize: Yup.number().required('Land size is required')
-  });
-  const { register: registerproperty, control, setValue: setPropertyDetailsValues, handleSubmit: handlePropertyDetailsSubmit, formState: { errors: properrtyErrors, isValid: propertyDetailsIsValid } } = useForm({
-    resolver: yupResolver(propertyDetailsSchema),
-  });
-  const onSubmitPropertyDetails = async (data) => {
-    console.log(data);
-    dispatch(setValuationPropertyDetails(data));
-    props.next();
-  }
-  const options = [
-    { value: "chocolate", label: "Chocolate" },
-    { value: "strawberry", label: "Strawberry" },
-    { value: "vanilla", label: "Vanilla" },
-  ];
-  const animatedComponents = makeAnimated();
-
+  const [isOpen, setIsOpen] = useState("1");
   return (
-    <form onSubmit={handlePropertyDetailsSubmit(onSubmitPropertyDetails)} >
-      <Row className="gy-4">
-        <Col md="6">
-          <div className="form-group">
-            <label className="form-label" htmlFor="username">
-              Property LR
-            </label>
-            <div className="form-control-wrap">
-              <input
-                type="text"
-                id="username"
-                className="form-control"
-                {...registerproperty("PropertyLR", { required: true })}
-                defaultValue={propertdetails?.username}
-              />
-              {properrtyErrors.PropertyLR && <span className="invalid">{properrtyErrors.PropertyLR?.message}</span>}
-            </div>
+    <>
+      <div className="accordion">
+        <div className="accordion-item">
+          <div
+            className="accordion-head"
+            onClick={() => setIsOpen("1")}
+          >
+            <h6 className="title">Location Details</h6>
+            <span className="accordion-icon"></span>
           </div>
-        </Col>
-        <Col md="6">
-          <div className="form-group">
-            <label className="form-label" htmlFor="password">
-              Property Type
-            </label>
-            <div className="form-control-wrap">
-              <RSelect
-                isMulti
-                components={animatedComponents}
-                options={options}
-                {...registerproperty("PropertyType", {
-                  required: "This field is required"
-                })}
+          <Collapse
+            className="accordion-body"
+            isOpen={isOpen === "1" ? true : false}
+          >
+            <div className="accordion-inner">
+              <Card className="card-bordered">
+                <div className="card-inner">
+                  <div className="rating-card">
+                    <div className="d-flex align-center justify-content-between py-1 " style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                      <span className="text-muted">Location Name:</span>
 
-              />
-              {properrtyErrors?.PropertyType && <span className="invalid">{properrtyErrors.PropertyType?.message}</span>}
-            </div>
-          </div>
-        </Col>
-        <Col md="12">
-          <div className="form-group">
-            <label className="form-label" htmlFor="rePassword">
-              Total Built Up Area
-            </label>
-            <div className="form-control-wrap">
-              <input
-                type="totalBuiltUpArea"
-                id="totalBuiltUpArea"
-                className="form-control"
-                {...registerproperty("totalBuiltUpArea", {
-                  required: "This field is required"
-                })}
-                defaultValue={propertdetails?.landSize}
-              />
-              {properrtyErrors.landSize && <span className="invalid">{properrtyErrors.landSize?.message}</span>}
-            </div>
-          </div>
-        </Col>
+                    </div>
+                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                      <span className="text-muted">County</span>
 
-      </Row>
-      <Row>
-        <Col md="6">
-          <div className="form-group">
-            <label className="form-label" htmlFor="rePassword">
-              Land Size
-            </label>
-            <div className="form-control-wrap">
-              <input
-                type="landSize"
-                id="landSize"
-                className="form-control"
-                {...registerproperty("landSize", {
-                  required: "This field is required"
-                })}
-                defaultValue={propertdetails?.landSize}
-              />
-              {properrtyErrors.landSize && <span className="invalid">{properrtyErrors.landSize?.message}</span>}
-            </div>
-          </div>
-        </Col>
-        <Col md="6">
-          <div className="form-group">
-            <label className="form-label" htmlFor="rePassword">
-              Tenure
-            </label>
-            <div className="form-control-wrap">
-              <input
-                type="tenure"
-                id="tenure"
-                className="form-control"
-                {...registerproperty("tenure", {
-                  required: "This field is required"
-                })}
-                defaultValue={propertdetails?.tenure}
-              />
-              {properrtyErrors.landSize && <span className="invalid">{properrtyErrors.landSize?.message}</span>}
-            </div>
-          </div>
-        </Col>
-      </Row>
+                    </div>
+                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                      <span className="text-muted">Town</span>
 
-      <div className="actions clearfix">
+                    </div>
+                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                      <span className="text-muted">Street</span>
+                    </div>
+                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                      <span className="text-muted">Neighbourhood</span>
+                    </div>
+                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                      <span className="text-muted">GPS Location Name</span>
+                    </div>
+                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                      <span className="text-muted">GPS Latitude</span>
+                    </div>
+                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                      <span className="text-muted">GPS Longitude</span>
+                    </div>
+                  </div>
+
+                </div>
+              </Card>
+            </div>
+          </Collapse>
+        </div>
+        <div className="accordion-item">
+          <div
+            className="accordion-head collapsed"
+            onClick={() => setIsOpen("2")}
+          >
+            <h6 className="title">
+              Property Details
+            </h6>
+            <span className="accordion-icon"></span>
+          </div>
+          <Collapse
+            className="accordion-body"
+            isOpen={isOpen === "2" ? true : false}
+          >
+            <div className="accordion-inner">
+              <Card className="card-bordered">
+                <div className="card-inner">
+                  <div className="rating-card">
+                    <div className="d-flex align-center justify-content-between py-1 " style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                      <span className="text-muted">Property LR:</span>
+
+                    </div>
+                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                      <span className="text-muted">Property Type:</span>
+
+                    </div>
+                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                      <span className="text-muted">Total Built Up Area:</span>
+
+                    </div>
+                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                      <span className="text-muted">Land Size:</span>
+                    </div>
+                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                      <span className="text-muted">Tenure</span>
+                    </div>
+
+                  </div>
+
+                </div>
+              </Card>
+            </div>
+          </Collapse>
+        </div>
+        <div className="accordion-item">
+          <div
+            className="accordion-head collapsed"
+            onClick={() => setIsOpen("3")}
+          >
+            <h6 className="title">
+              Valuation Details
+            </h6>
+            <span className="accordion-icon"></span>
+          </div>
+          <Collapse
+            className="accordion-body"
+            isOpen={isOpen === "3" ? true : false}
+          >
+            <div className="accordion-inner">
+              <Card className="card-bordered">
+                <div className="card-inner">
+                  <div className="rating-card">
+                    <div className="d-flex align-center justify-content-between py-1 " style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                      <span className="text-muted">Recipient:</span>
+
+                    </div>
+                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                      <span className="text-muted">Market Value:</span>
+
+                    </div>
+                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                      <span className="text-muted">Forced Sale Value:</span>
+
+                    </div>
+                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                      <span className="text-muted">Insurence Value:</span>
+                    </div>
+                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                      <span className="text-muted">Annual Grooss Income:</span>
+                    </div>
+                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                      <span className="text-muted">Valuation Date:</span>
+                    </div>
+                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                      <span className="text-muted">Instruction Date</span>
+                    </div>
+                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                      <span className="text-muted">Property Description:</span>
+                    </div>
+                  </div>
+
+                </div>
+              </Card>
+            </div>
+          </Collapse>
+        </div>
+        <div className="accordion-item">
+          <div
+            className="accordion-head collapsed"
+            onClick={() => setIsOpen("4")}
+          >
+            <h6 className="title">Recipients Within Recipient Organization</h6>
+            <span className="accordion-icon"></span>
+          </div>
+          <Collapse
+            className="accordion-body"
+            isOpen={isOpen === "4" ? true : false}
+          >
+            <div className="accordion-inner">
+              <Card className="card-bordered">
+                <div className="card-inner">
+                  <table className="table table-responsive">
+                    <thead>
+                      <tr>
+                        <th scope="col">Full Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Phone</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+
+                        <td>Mark</td>
+                        <td>Otto</td>
+                        <td>@mdo</td>
+                      </tr>
+                      <tr>
+
+                        <td>Jacob</td>
+                        <td>Thornton</td>
+                        <td>@fat</td>
+                      </tr>
+                      <tr>
+
+                        <td>Larry</td>
+                        <td>the Bird</td>
+                        <td>@twitter</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+            </div>
+          </Collapse>
+        </div>
+        <div className="accordion-item">
+          <div
+            className="accordion-head collapsed"
+            onClick={() => setIsOpen("4")}
+          >
+            <h6 className="title">Signatories.</h6>
+            <span className="accordion-icon"></span>
+          </div>
+          <Collapse
+            className="accordion-body"
+            isOpen={isOpen === "4" ? true : false}
+          >
+            <div className="accordion-inner">
+              <Card className="card-bordered">
+                <div className="card-inner">
+                  <table className="table table-responsive">
+                    <thead>
+                      <tr>
+                        <th scope="col">Full Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Phone</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+
+                        <td>Mark</td>
+                        <td>Otto</td>
+                        <td>@mdo</td>
+                      </tr>
+                      <tr>
+
+                        <td>Jacob</td>
+                        <td>Thornton</td>
+                        <td>@fat</td>
+                      </tr>
+                      <tr>
+
+                        <td>Larry</td>
+                        <td>the Bird</td>
+                        <td>@twitter</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+            </div>
+          </Collapse>
+        </div>
+
+      </div>
+      <div className="actions clearfix m-20">
         <ul>
           <li>
             <Button color="primary" type="submit">
-              Next
+              Submit Report To Lender
+            </Button>
+          </li>
+          <li>
+            <Button color="primary" type="submit">
+              Send Report to Signatories
             </Button>
           </li>
           <li>
@@ -945,7 +1127,7 @@ const ValuationSummary = (props) => {
           </li>
         </ul>
       </div>
-    </form>
+    </ >
   );
 };
 
@@ -958,6 +1140,7 @@ const Header = (props) => {
           <a href="#wizard-01-h-0" onClick={(ev) => ev.preventDefault()}>
             <span className="number">  Step 1</span><h5>Property Location  </h5>
           </a>
+
         </li>
         <li className={props.current >= 2 ? "done" : ""}>
           <a href="#wizard-01-h-1" onClick={(ev) => ev.preventDefault()}>
@@ -966,26 +1149,26 @@ const Header = (props) => {
         </li>
         <li className={props.current >= 3 ? "done" : ""}>
           <a href="#wizard-01-h-2" onClick={(ev) => ev.preventDefault()}>
-            <span className="current-info audible">current step: </span>
-            <span className="number">03</span> <h5>Step 3</h5>
+            {/* <span className="current-info audible">current step: </span> */}
+            <span className="number">03</span> <h5>Valuation Details</h5>
           </a>
         </li>
         <li className={props.current >= 4 ? "done" : ""}>
           <a href="#wizard-01-h-2" onClick={(ev) => ev.preventDefault()}>
-            <span className="current-info audible">current step: </span>
-            <span className="number">04</span> <h5>Step 4</h5>
+            {/* <span className="current-info audible">current step: </span> */}
+            <span className="number">04</span> <h5>Signatories</h5>
           </a>
         </li>
         <li className={props.current >= 5 ? "done" : ""}>
           <a href="#wizard-01-h-2" onClick={(ev) => ev.preventDefault()}>
-            <span className="current-info audible">current step: </span>
-            <span className="number">05</span> <h5>Step 5</h5>
+
+            <span className="number">05</span> <h5>Summary</h5>
           </a>
         </li>
         <li className={props.current === 6 ? "last done" : "last"}>
           <a href="#wizard-01-h-2" onClick={(ev) => ev.preventDefault()}>
-            <span className="current-info audible">current step: </span>
-            <span className="number">06</span> <h5>Step 6</h5>
+            {/* <span className="current-info audible"> </span> */}
+            <span className="number">06</span> <h5>Success</h5>
           </a>
         </li>
       </ul>

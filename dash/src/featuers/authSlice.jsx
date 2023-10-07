@@ -51,7 +51,7 @@ const authSlice = createSlice({
             state.reportRecepient = action.payload;
         },
         setReportSignatories: (state, action) => {
-            state.reportSignatories = action.payload.signees;
+            state.reportSignatories = action.payload;
         },
         setSelectedPropertyType: (state, action) => {
             state.selectedPropertyType = action.payload;
