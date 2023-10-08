@@ -407,14 +407,12 @@ const PropertyValuationForm = (props) => {
           return value[0].size <= 1024 * 1024 * 2;
         }
         return true;
-
       })
       .test('fileType', 'Only PDF files are allowed', (value) => {
         if (value[0]) {
           return ['application/pdf', 'pdf'].includes(value[0].type);
         }
         return true;
-
       })
   });
   const { register: registerpropertyValuation, control, setValue: setPropertValuationValues, getValues: getValuationFormValuation, handleSubmit: handlePropertyValuationsSubmit, formState: { errors: propertyValuationErrors, isValid: propertyValuationIsValid } } = useForm({
@@ -552,12 +550,7 @@ const PropertyValuationForm = (props) => {
         ///save placeholder
       }
     }
-
-
   }
-
-
-
   // Function to add a new recipient row
   const addRecipient = () => {
     setReceivingUsers([...receivingUsers, {}]);
@@ -569,15 +562,10 @@ const PropertyValuationForm = (props) => {
     updatedRecipients.splice(index, 1);
     setReceivingUsers(updatedRecipients);
     dispatch(upDateRecipientRecipients(index));
-
     // console.log(valauationdetails, "valauationdetailsaup");
-
     // const updatedsavedrecivingusers= [...receivingUsers];
     // updatedRecipients.splice(index, 1);
     // setReceivingUsers(updatedRecipients);
-
-
-
   };
 
   const token = useSelector(selectCurrentToken);
@@ -707,7 +695,7 @@ const PropertyValuationForm = (props) => {
             <label className="form-label">Report Document(Only PDF)</label>
             <div className="form-control-wrap">
               <div className="form-file">
-                <input className="form-control" type="file" multiple id="customMultipleFiles" onChange={handleImage} />
+                <input className="form-control"  {...registerpropertyValuation("reportDocument", { required: true })} type="file" multiple id="customMultipleFiles" onChange={handleImage} />
                 {propertyValuationErrors.file?.message}
                 {propertyValuationErrors.recipient && (
                   <span className="invalid">{propertyValuationErrors.file?.message}</span>
@@ -765,7 +753,6 @@ const PropertyValuationForm = (props) => {
                 className="form-control"
                 {...registerpropertyValuation("forcedSaleValue", { required: true })}
                 defaultValue={valauationdetails?.forcedSaleValue}
-
               />
               {propertyValuationErrors?.forcedSaleValue?.message}
               {propertyValuationErrors.forcedSaleValue && <span className="invalid">{propertyValuationErrors.forcedSaleValue?.message}</span>}
@@ -784,8 +771,6 @@ const PropertyValuationForm = (props) => {
                 className="form-control"
                 {...registerpropertyValuation("insurenceValue", { required: true })}
                 defaultValue={valauationdetails?.insurenceValue}
-
-
               />
               {propertyValuationErrors?.insurenceValue?.message}
               {propertyValuationErrors.insurenceValue && <span className="invalid">{propertyValuationErrors.insurenceValue?.message}</span>}
@@ -867,7 +852,6 @@ const PropertyValuationForm = (props) => {
                 className="form-control"
                 {...registerpropertyValuation("PropertyDescription", { required: true })}
                 defaultValue={valauationdetails?.PropertyDescription}
-
               />
               {propertyValuationErrors.InstructionDate?.message}
               {propertyValuationErrors.InstructionDate && <span className="invalid">{propertyValuationErrors.InstructionDate?.message}</span>}
@@ -894,6 +878,26 @@ const PropertyValuationForm = (props) => {
 };
 
 const ValuationSignatures = (props) => {
+  const token = useSelector(selectCurrentToken);
+  const downloadReport = () => {
+    const headers = {
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/json',
+    };
+    axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/uploader/donwload-cached-image?file=${ccurrentuploadedfile?.file_name}`, { headers, responseType: 'blob' })
+      .then(response => {
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = ccurrentuploadedfile?.file_name; // Replace with the actual filename
+        a.click();
+        window.URL.revokeObjectURL(url);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  }
   const myreportdocdetails = localStorage.getItem('my_reportdocument');
   console.log("myreportdocdetails", myreportdocdetails);
   const reportsignatories = useSelector(selectCurrentSignatories);
@@ -983,7 +987,7 @@ const ValuationSignatures = (props) => {
   );
 };
 const ValuationSummary = (props) => {
-
+  const { data: ccurrentuploadedfile, refetch: refetchUploadedFile } = useGetCurrentUploadedFileQuery();
   const propertdetails = useSelector(selectPropertyDetails);
   const locationdetails = useSelector(selectLocationDetails);
   const valuationdetails = useSelector(selectValuationDetails);
@@ -995,7 +999,26 @@ const ValuationSummary = (props) => {
   console.log(valuationdetails, "valutiondetails");
   console.log(signatories, "signatories");
   console.log(recipientrecipients, "recipientrecipient");
-
+  const token = useSelector(selectCurrentToken);
+  const downloadReport = () => {
+    const headers = {
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/json',
+    };
+    axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/uploader/donwload-cached-image?file=${ccurrentuploadedfile?.file_name}`, { headers, responseType: 'blob' })
+      .then(response => {
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = ccurrentuploadedfile?.file_name; // Replace with the actual filename
+        a.click();
+        window.URL.revokeObjectURL(url);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  }
 
   const [isOpen, setIsOpen] = useState("1");
   return (
@@ -1153,7 +1176,17 @@ const ValuationSummary = (props) => {
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Report Uploaded:</span>
+                      {
+                        (ccurrentuploadedfile && ccurrentuploadedfile.file_name != '') &&
+                        <Alert color="primary">
+                          {/* <a
+                href={`${process.env.REACT_APP_API_BASE_URL}/api/uploader/donwload-cached-image?file=${ccurrentuploadedfile.file_name}`}
+              > */}
+                          <Button color="primary" onClick={downloadReport} >Preview Uploaded Report Document</Button>
+                          {/* </a> */}
 
+                        </Alert>
+                      }
                     </div>
 
 
