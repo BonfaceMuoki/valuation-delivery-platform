@@ -19,6 +19,7 @@ class CommonController extends Controller
         $all = ReportConsumer::all();
         return response()->json($all, 201);
     } 
+
     public function getAllUsers(){
 
         $user = auth()->user();

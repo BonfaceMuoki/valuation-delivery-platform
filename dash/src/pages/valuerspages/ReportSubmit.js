@@ -23,8 +23,9 @@ import { useSelector, useDispatch } from "react-redux";
 
 import { GoogleMapsProvider, useGoogleMap } from "@ubilabs/google-maps-react-hooks";
 import MapWithAutoSearch from "./MapWithAutoSearch";
-import { selectCurrentSignatories, setReportSignatories, setValuationLocationDetails, upDateRecipientRecipients } from "../../featuers/authSlice";
-
+import { selectCurrentSignatories, selectCurrentToken, setReportSignatories, setValuationLocationDetails, upDateRecipientRecipients } from "../../featuers/authSlice";
+import { Document, Page } from 'react-pdf';
+import { Alert } from "reactstrap";
 import {
   selectLocationDetails,
   selectPropertyDetails,
@@ -40,6 +41,9 @@ import {
 import Dropzone from "react-dropzone";
 import { Collapse } from "reactstrap";
 import Select from "react-select";
+import { useCacheReportDocumentMutation, useDownLoadCachedFileMutation, useGetCurrentUploadedFileQuery } from "../../api/uploader/uploaderApiEndpoints";
+import Swal from "sweetalert2";
+import axios from 'axios';
 const LocationForm = (props) => {
   const dispatch = useDispatch();
   const locationDetails = useSelector(selectLocationDetails);
@@ -374,6 +378,12 @@ const PropertyDetailsForm = (props) => {
 };
 
 const PropertyValuationForm = (props) => {
+  const propertd = useSelector(selectPropertyDetails);
+  const { data: ccurrentuploadedfile, refetch: refetchUploadedFile } = useGetCurrentUploadedFileQuery();
+
+
+
+
   const propertyValuationValidationSchema = Yup.object().shape({
     marketValue: Yup.string().required('Market Value is required'),
     forcedSaleValue: Yup.number().required('Forced Sale value is required').typeError("FSV must be a valid number"),
@@ -407,7 +417,7 @@ const PropertyValuationForm = (props) => {
 
       })
   });
-  const { register: registerpropertyValuation, control, setValue: setPropertValuationValues, handleSubmit: handlePropertyValuationsSubmit, formState: { errors: propertyValuationErrors, isValid: propertyValuationIsValid } } = useForm({
+  const { register: registerpropertyValuation, control, setValue: setPropertValuationValues, getValues: getValuationFormValuation, handleSubmit: handlePropertyValuationsSubmit, formState: { errors: propertyValuationErrors, isValid: propertyValuationIsValid } } = useForm({
     resolver: yupResolver(propertyValuationValidationSchema),
   });
 
@@ -514,13 +524,36 @@ const PropertyValuationForm = (props) => {
   const [uploadedFile, setUploadedFile] = useState();
   const [uploadedFileD, setUploadedFileD] = useState();
   const dispatch = useDispatch();
-  const handleImage = (e) => {
 
-    setImage(e.target.files[0]);
-    if (e.target.files[0]) {
-      setUploadedFile(e.target.files[0].name);
-      setUploadedFileD(e.target.files[0]);
+  const [selectedFile, setSelectedFile] = useState(null);
+
+  const [cacheReportDocument, setCachedREport] = useCacheReportDocumentMutation();
+  const handleImage = async (e) => {
+    let selectedRecipient = getValuationFormValuation('recipient');
+    if (selectedRecipient == null) {
+      Swal.fire({
+        icon: "warning",
+        title: "Uploading Image",
+        text: "Please choose a recipient first",
+        focusConfirm: false,
+      });
+    } else {
+      const formdataFile = new FormData();
+      const file = e.target.files[0];
+      if (file && (file instanceof Blob || file instanceof File)) {
+        setSelectedFile(file);
+        ///save placeholder
+        formdataFile.append("report_pdf", e.target.files[0]);
+        formdataFile.append("recipient", selectedRecipient[0].value);
+        formdataFile.append("lrnumber", propertd?.PropertyLR);
+        const result = await cacheReportDocument(formdataFile);
+        refetchUploadedFile();
+        console.log(result);
+        ///save placeholder
+      }
     }
+
+
   }
 
 
@@ -547,6 +580,26 @@ const PropertyValuationForm = (props) => {
 
   };
 
+  const token = useSelector(selectCurrentToken);
+  const downloadReport = () => {
+    const headers = {
+      'Authorization': `Bearer ${token}`,
+      'Accept': 'application/json',
+    };
+    axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/uploader/donwload-cached-image?file=${ccurrentuploadedfile?.file_name}`, { headers, responseType: 'blob' })
+      .then(response => {
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = ccurrentuploadedfile?.file_name; // Replace with the actual filename
+        a.click();
+        window.URL.revokeObjectURL(url);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  }
 
   return (
     <form onSubmit={handlePropertyValuationsSubmit(onSubmitPropertyValuation)}>
@@ -554,7 +607,7 @@ const PropertyValuationForm = (props) => {
         <Col md="12">
           <div className="form-group">
             <label className="form-label" htmlFor="fw-token-address">
-              Recipient
+              Recipient Organization
             </label>
             <div className="form-control-wrap">
               {existingAccessors && existingAccessors.length > 0 && (
@@ -654,7 +707,7 @@ const PropertyValuationForm = (props) => {
             <label className="form-label">Report Document(Only PDF)</label>
             <div className="form-control-wrap">
               <div className="form-file">
-                <input className="form-control" type="file"   {...registerpropertyValuation("reportDocument", { required: true })} multiple id="customMultipleFiles" />
+                <input className="form-control" type="file" multiple id="customMultipleFiles" onChange={handleImage} />
                 {propertyValuationErrors.file?.message}
                 {propertyValuationErrors.recipient && (
                   <span className="invalid">{propertyValuationErrors.file?.message}</span>
@@ -664,6 +717,21 @@ const PropertyValuationForm = (props) => {
           </div>
         </Col>
 
+      </Row>
+      <Row className="mt-5">
+        <Col md="12">
+          {
+            (ccurrentuploadedfile && ccurrentuploadedfile.file_name != '') &&
+            <Alert color="primary">
+              {/* <a
+                href={`${process.env.REACT_APP_API_BASE_URL}/api/uploader/donwload-cached-image?file=${ccurrentuploadedfile.file_name}`}
+              > */}
+              <Button color="primary" onClick={downloadReport} >Preview Uploaded Report Document</Button>
+              {/* </a> */}
+
+            </Alert>
+          }
+        </Col>
       </Row>
       <Row className="mt-3">
         <Col md="4">
@@ -826,6 +894,8 @@ const PropertyValuationForm = (props) => {
 };
 
 const ValuationSignatures = (props) => {
+  const myreportdocdetails = localStorage.getItem('my_reportdocument');
+  console.log("myreportdocdetails", myreportdocdetails);
   const reportsignatories = useSelector(selectCurrentSignatories);
   // console.log(reportsignatories, "reportsignatories");
   const dispatch = useDispatch();
@@ -919,11 +989,13 @@ const ValuationSummary = (props) => {
   const valuationdetails = useSelector(selectValuationDetails);
   const signatories = useSelector(selectCurrentSignatories);
   const recipientrecipients = valuationdetails?.recipientss;
+  const reportdocument = localStorage.getItem('my_reportdocument');
   console.log(propertdetails, "propertdetails");
   console.log(locationdetails, "locationdetails");
   console.log(valuationdetails, "valutiondetails");
   console.log(signatories, "signatories");
   console.log(recipientrecipients, "recipientrecipient");
+
 
   const [isOpen, setIsOpen] = useState("1");
   return (
@@ -1079,6 +1151,12 @@ const ValuationSummary = (props) => {
                       <span className="text-muted">Property Description:</span>
                       {valuationdetails.PropertyDescription}
                     </div>
+                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                      <span className="text-muted">Report Uploaded:</span>
+
+                    </div>
+
+
                   </div>
 
                 </div>
