@@ -23,7 +23,7 @@ import { useSelector, useDispatch } from "react-redux";
 
 import { GoogleMapsProvider, useGoogleMap } from "@ubilabs/google-maps-react-hooks";
 import MapWithAutoSearch from "./MapWithAutoSearch";
-import { selectCurrentSignatories, setReportSignatories, setValuationLocationDetails } from "../../featuers/authSlice";
+import { selectCurrentSignatories, setReportSignatories, setValuationLocationDetails, upDateRecipientRecipients } from "../../featuers/authSlice";
 
 import {
   selectLocationDetails,
@@ -184,7 +184,7 @@ const LocationForm = (props) => {
 
 const PropertyDetailsForm = (props) => {
   const [propertdetails, setPropertdetails] = useState(useSelector(selectPropertyDetails));
-  console.log(propertdetails);
+  // console.log(propertdetails);
   const dispatch = useDispatch();
   const propertyDetailsSchema = Yup.object().shape({
     PropertyLR: Yup.string().required('The proprty Lr is required'),
@@ -201,7 +201,7 @@ const PropertyDetailsForm = (props) => {
     resolver: yupResolver(propertyDetailsSchema),
   });
   const onSubmitPropertyDetails = async (data) => {
-    console.log(data);
+    // console.log(data);
     dispatch(setValuationPropertyDetails(data));
     props.next();
   }
@@ -214,7 +214,7 @@ const PropertyDetailsForm = (props) => {
   });
 
   const { data: registeredpropertytypes, isLoading: loadingpropertytypes } = useGetPropertyTypeListQuery();
-  console.log(registeredpropertytypes, "registeredpropertytypes");
+  // console.log(registeredpropertytypes, "registeredpropertytypes");
   useEffect(() => {
 
     if (registeredpropertytypes != undefined) {
@@ -411,7 +411,7 @@ const PropertyValuationForm = (props) => {
     resolver: yupResolver(propertyValuationValidationSchema),
   });
 
-  const [reportUsersFields, setReportUsersFields] = useState([]);
+  const [reportUsersFields, setReportUsersFields] = useState([{}]);
   const addReportUser = (nameVal = "", phoneVal = "", emailVal = "") => {
     setReportUsersFields([...reportUsersFields, {
       formFieldName: "report_user_name",
@@ -425,7 +425,10 @@ const PropertyValuationForm = (props) => {
       fieldPhoneNumberPlace: "Recipient Phone"
     }]);
   }
-  const valauationdetails = useSelector(selectValuationDetails);
+  const [receivingUsers, setReceivingUsers] = useState([]);
+  const [valauationdetails, sevalauationdetails] = useState(useSelector(selectValuationDetails));
+
+  // console.log(valauationdetails, "valauationdetails");
   const recipientdetails = useSelector(selectCurrentRecipient);
   const [existingAccessors, setExistingAccessors] = useState();
   const recipientUsernames = useSelector(selectValuationDetails);
@@ -436,6 +439,15 @@ const PropertyValuationForm = (props) => {
       setRecipientUsernames(valauationdetails?.report_user_name);
       setRecipientEmails(valauationdetails?.report_user_email);
       setRecipientPhone(valauationdetails?.report_user_phone);
+      if (valauationdetails?.recipientss && valauationdetails?.recipientss != null) {
+        // console.log(valauationdetails?.recipientss, "avail recipients");
+        const newReceivingUsers = valauationdetails?.recipientss.map(() => ({}));
+        // setReceivingUsers(newReceivingUsers);
+      }
+
+
+
+
     } else {
       setReportUsersFields([...reportUsersFields, {
         formFieldName: "report_user_name",
@@ -458,8 +470,8 @@ const PropertyValuationForm = (props) => {
     isError: errorLodingAccesors,
     error: loadingAccesorError
   } = useGetAccesorsListQuery();
-  console.log("Accesors List");
-  console.log(accesorslist);
+  // console.log("Accesors List");
+  // console.log(accesorslist);
   useEffect(() => {
     if (accesorslist != undefined) {
       const restructuredData = accesorslist.map(({ id, organization_name }) => ({
@@ -488,7 +500,7 @@ const PropertyValuationForm = (props) => {
 
   const onSubmitPropertyValuation = async (data) => {
 
-    console.log(data, "data");
+    // console.log(data, "data");
     delete data.reportDocument;
     dispatch(setValuationDetails(data));
     dispatch(setReportRecipient(data.recipient));
@@ -510,6 +522,30 @@ const PropertyValuationForm = (props) => {
       setUploadedFileD(e.target.files[0]);
     }
   }
+
+
+
+  // Function to add a new recipient row
+  const addRecipient = () => {
+    setReceivingUsers([...receivingUsers, {}]);
+  };
+
+  // Function to remove a recipient row
+  const removeRecipient = (index) => {
+    const updatedRecipients = [...receivingUsers];
+    updatedRecipients.splice(index, 1);
+    setReceivingUsers(updatedRecipients);
+    dispatch(upDateRecipientRecipients(index));
+
+    // console.log(valauationdetails, "valauationdetailsaup");
+
+    // const updatedsavedrecivingusers= [...receivingUsers];
+    // updatedRecipients.splice(index, 1);
+    // setReceivingUsers(updatedRecipients);
+
+
+
+  };
 
 
   return (
@@ -547,49 +583,65 @@ const PropertyValuationForm = (props) => {
             <table className="table table-bordered table-responsive">
               <thead>
                 <tr>
-
-                  <th scope="col">Name</th>
-                  <th scope="col">Email</th>
-                  <th scope="col">Phone</th>
-                  <th scope="col">
-                    <Button color="primary" >
-                      +
-                    </Button>
-                  </th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th><Button color="primary" onClick={addRecipient}>+</Button></th>
                 </tr>
               </thead>
               <tbody>
-                <tr>
+                {receivingUsers.map((receivingUsers, index) => (
+                  <tr key={index}>
+                    <td>
+                      <div className="form-group">
+                        <div className="form-control-wrap">
+                          <Controller
+                            name={`recipientss[${index}].name`}
+                            // defaultValue={(valauationdetails?.recipientss[index]?.name) ? valauationdetails?.recipientss[index]?.name : ''}
+                            control={control}
+                            render={({ field }) => (
+                              <input type="text" {...field} className="form-control" />
+                            )}
+                          />
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="form-group">
+                        <div className="form-control-wrap">
+                          <Controller
+                            name={`recipientss[${index}].email`}
+                            control={control}
 
-                  <td>Mark</td>
-                  <td>Otto</td>
-                  <td>Otto</td>
-                  <td>
-                    <Button color="danger" >
-                      -
-                    </Button>
-                  </td>
-                </tr>
-                <tr>
-
-                  <td>Jacob</td>
-                  <td>Thornton</td>
-                  <td>Otto</td>
-                  <td>
-                    <Button color="danger" >
-                      -
-                    </Button></td>
-                </tr>
-                <tr>
-
-                  <td>Larry</td>
-                  <td>the Bird</td>
-                  <td>Otto</td>
-                  <td>
-                    <Button color="danger" >
-                      -
-                    </Button></td>
-                </tr>
+                            // defaultValue={(valauationdetails?.recipientss[index]?.email) ? valauationdetails?.recipientss[index]?.email : ''}
+                            render={({ field }) => (
+                              <input type="text" {...field} className="form-control" />
+                            )}
+                          />
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="form-group">
+                        <div className="form-control-wrap">
+                          <Controller
+                            name={`recipientss[${index}].phone`}
+                            // defaultValue={(valauationdetails?.recipientss[index]?.phone) ? valauationdetails?.recipientss[index]?.phone : ''}
+                            control={control}
+                            render={({ field }) => (
+                              <input type="text" {...field} className="form-control" />
+                            )}
+                          />
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <button type="button" onClick={() => removeRecipient(index)} className="btn btn-danger">
+                        -
+                      </button>
+                    </td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>
@@ -775,13 +827,15 @@ const PropertyValuationForm = (props) => {
 
 const ValuationSignatures = (props) => {
   const reportsignatories = useSelector(selectCurrentSignatories);
-  console.log(reportsignatories, "reportsignatories");
+  // console.log(reportsignatories, "reportsignatories");
   const dispatch = useDispatch();
   const signatoriesSchema = Yup.object().shape({
     repportSinatories: Yup.array().of(Yup.object().shape({
       id: Yup.string(),
       value: Yup.string(),
-      label: Yup.string()
+      label: Yup.string(),
+      email: Yup.string(),
+      phone: Yup.string()
     })
     ).min(2, "Signatories are required").max(2, "Only one Property Type is required.")
   });
@@ -789,20 +843,22 @@ const ValuationSignatures = (props) => {
     resolver: yupResolver(signatoriesSchema),
   });
   const onSubmitSignatories = async (data) => {
-    console.log(data);
+    // console.log(data);
     dispatch(setReportSignatories(data));
     props.next();
   }
   //get the registered signatories
   const [signatoriesList, setSignatoriesList] = useState();
   const { data: registeredusers, isLoading: loadingusers } = useGetUsersQuery();
-  console.log(registeredusers, "registeredusers");
+  // console.log(registeredusers, "registeredusers");
   useEffect(() => {
     if (registeredusers != undefined) {
-      const restructuredData = registeredusers.map(({ id, full_name }) => ({
+      const restructuredData = registeredusers.map(({ id, full_name, email, phone }) => ({
         id: id,
         value: id,
         label: full_name,
+        email: email,
+        phone: phone,
       }));
       setSignatoriesList(restructuredData);
     }
@@ -857,7 +913,18 @@ const ValuationSignatures = (props) => {
   );
 };
 const ValuationSummary = (props) => {
+
   const propertdetails = useSelector(selectPropertyDetails);
+  const locationdetails = useSelector(selectLocationDetails);
+  const valuationdetails = useSelector(selectValuationDetails);
+  const signatories = useSelector(selectCurrentSignatories);
+  const recipientrecipients = valuationdetails?.recipientss;
+  console.log(propertdetails, "propertdetails");
+  console.log(locationdetails, "locationdetails");
+  console.log(valuationdetails, "valutiondetails");
+  console.log(signatories, "signatories");
+  console.log(recipientrecipients, "recipientrecipient");
+
   const [isOpen, setIsOpen] = useState("1");
   return (
     <>
@@ -880,27 +947,31 @@ const ValuationSummary = (props) => {
                   <div className="rating-card">
                     <div className="d-flex align-center justify-content-between py-1 " style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Location Name:</span>
-
+                      {locationdetails.locationName}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">County</span>
-
+                      {locationdetails.county}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Town</span>
-
+                      {locationdetails.town}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Street</span>
+                      {locationdetails.street}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Neighbourhood</span>
+                      {locationdetails.neighbourHood}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">GPS Location Name</span>
+                      {locationdetails.locationName}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">GPS Latitude</span>
+
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">GPS Longitude</span>
@@ -932,21 +1003,23 @@ const ValuationSummary = (props) => {
                   <div className="rating-card">
                     <div className="d-flex align-center justify-content-between py-1 " style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Property LR:</span>
-
+                      {propertdetails.PropertyLR}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Property Type:</span>
-
+                      {propertdetails.PropertyType[0].label}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Total Built Up Area:</span>
-
+                      {propertdetails.totalBuiltUpArea}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Land Size:</span>
+                      {propertdetails.landSize}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Tenure</span>
+                      {propertdetails.tenure}
                     </div>
 
                   </div>
@@ -976,30 +1049,35 @@ const ValuationSummary = (props) => {
                   <div className="rating-card">
                     <div className="d-flex align-center justify-content-between py-1 " style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Recipient:</span>
-
+                      {valuationdetails.recipient[0].label}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Market Value:</span>
-
+                      {valuationdetails.marketValue}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Forced Sale Value:</span>
-
+                      {valuationdetails.forcedSaleValue}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Insurence Value:</span>
+                      {valuationdetails.insurenceValue}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Annual Grooss Income:</span>
+                      {valuationdetails.annualGRossRentalIncome}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Valuation Date:</span>
+                      {valuationdetails.valuationDate}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Instruction Date</span>
+                      {valuationdetails.InstructionDate}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Property Description:</span>
+                      {valuationdetails.PropertyDescription}
                     </div>
                   </div>
 
@@ -1032,24 +1110,20 @@ const ValuationSummary = (props) => {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
+                      {
+                        recipientrecipients.map((rec, index) => {
+                          return (
+                            <tr key={index}>
 
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
-                      </tr>
-                      <tr>
+                              <td>{rec.name}</td>
+                              <td>{rec.email}</td>
+                              <td>{rec.phone}</td>
+                            </tr>
 
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                      </tr>
-                      <tr>
+                          );
+                        })
+                      }
 
-                        <td>Larry</td>
-                        <td>the Bird</td>
-                        <td>@twitter</td>
-                      </tr>
                     </tbody>
                   </table>
                 </div>
@@ -1081,24 +1155,18 @@ const ValuationSummary = (props) => {
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
+                      {
+                        signatories.signatories.map((rec, index) => {
+                          return (
+                            <tr key={index}>
+                              <td>{rec?.label}</td>
+                              <td>{rec?.email}</td>
+                              <td>{rec?.phone}</td>
+                            </tr>
 
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
-                      </tr>
-                      <tr>
-
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                      </tr>
-                      <tr>
-
-                        <td>Larry</td>
-                        <td>the Bird</td>
-                        <td>@twitter</td>
-                      </tr>
+                          );
+                        })
+                      }
                     </tbody>
                   </table>
                 </div>

@@ -70,12 +70,21 @@ const authSlice = createSlice({
         },
         setSelectedAccesors: (state, action) => {
             state.selectedAccesors = action.payload;
+        },
+        upDateRecipientRecipients: (state, action) => {
+            let recipients = state.valuationValuationDetails.recipientss;;
+            if (recipients) {
+                const updatedRecipients = [...recipients];
+                updatedRecipients.splice(action.payload, 1);
+                state.valuationValuationDetails.recipientss = updatedRecipients;
+            }
+
         }
 
     },
 })
 
-export const { setSelectedAccesors, setRecipientUsernames, setRecipientPhone, setRecipientEmails, setSelectedRecipient, setSelectedPropertyType, setReportSignatories, setReportRecipient, updateUserDetails, setCredentials, logOut, setMode, setfetchvaluationreports, setValuationLocationDetails, setValuationPropertyDetails, setValuationDetails } = authSlice.actions
+export const { upDateRecipientRecipients, setSelectedAccesors, setRecipientUsernames, setRecipientPhone, setRecipientEmails, setSelectedRecipient, setSelectedPropertyType, setReportSignatories, setReportRecipient, updateUserDetails, setCredentials, logOut, setMode, setfetchvaluationreports, setValuationLocationDetails, setValuationPropertyDetails, setValuationDetails } = authSlice.actions
 
 export default authSlice.reducer
 export const selectCurrentUser = (state) => state.auth.user
