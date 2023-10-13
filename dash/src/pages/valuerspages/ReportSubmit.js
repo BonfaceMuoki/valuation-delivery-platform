@@ -523,6 +523,7 @@ const PropertyValuationForm = (props) => {
 
   const onSubmitPropertyValuation = async (data) => {
     //
+    console.log(data, "sub");
     let revisedarray = data.recipientss.concat(data.recipientssold);
     //
     // console.log(data, "data");
