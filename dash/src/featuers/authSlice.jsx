@@ -17,7 +17,8 @@ const initialState = {
     recipientUsernames: null,
     recipientEmails: null,
     recipientPhones: null,
-    selectedAccesors: null
+    selectedAccesors: null,
+    gpsDetails: null,
 };
 const authSlice = createSlice({
     name: 'auth',
@@ -79,12 +80,15 @@ const authSlice = createSlice({
                 state.valuationValuationDetails.recipientss = updatedRecipients;
             }
 
+        },
+        setGpsDetails: (state, action) => {
+            state.gpsDetails = action.payload;
         }
 
     },
 })
 
-export const { upDateRecipientRecipients, setSelectedAccesors, setRecipientUsernames, setRecipientPhone, setRecipientEmails, setSelectedRecipient, setSelectedPropertyType, setReportSignatories, setReportRecipient, updateUserDetails, setCredentials, logOut, setMode, setfetchvaluationreports, setValuationLocationDetails, setValuationPropertyDetails, setValuationDetails } = authSlice.actions
+export const { setGpsDetails, upDateRecipientRecipients, setSelectedAccesors, setRecipientUsernames, setRecipientPhone, setRecipientEmails, setSelectedRecipient, setSelectedPropertyType, setReportSignatories, setReportRecipient, updateUserDetails, setCredentials, logOut, setMode, setfetchvaluationreports, setValuationLocationDetails, setValuationPropertyDetails, setValuationDetails } = authSlice.actions
 
 export default authSlice.reducer
 export const selectCurrentUser = (state) => state.auth.user
@@ -100,3 +104,4 @@ export const selectValuationDetails = (state) => state.auth.valuationValuationDe
 export const selectSelectedPropertyType = (state) => state.auth.selectedPropertyType
 export const selectSelectedRecipient = (state) => state.auth.selectedRecipient
 export const selecteedaccesors = (state) => state.auth.selectedAccesors
+export const selectGPSDetails = (state) => state.auth.gpsDetails

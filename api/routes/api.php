@@ -100,7 +100,6 @@ Route::group([
 
     Route::post('/upload-cached-report-document', [ValuerController::class, 'uploadCachedReportDoc']);
     Route::get('/get-current-uploaded-file', [ValuerController::class, 'getCurrentUploadedFile']);
-
     Route::get('/donwload-cached-image', [ValuerController::class, 'donwloadCachedImage']);
 
     Route::post('/upload-valuation-report-v2', [ValuerController::class, 'uploadReportV2']);

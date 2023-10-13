@@ -1,11 +1,34 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { GoogleMap, LoadScript, Autocomplete, Marker } from '@react-google-maps/api';
+import { setGpsDetails, selectGPSDetails } from '../../featuers/authSlice';
 
 const MapWithAutoSearch = () => {
-  const [center, setCenter] = useState({ lat: -1.224680, lng: 36.899250}); // Default center is San Francisco, CA
+  const gpsd = useSelector(selectGPSDetails);
+  let defaultLong = -1.224680;
+  let defaultLat = 36.899250;
+  const [center, setCenter] = useState({ lat: defaultLat, lng: defaultLong });
+  useEffect(() => {
+    if (gpsd != null) {
+      if (gpsd.type === "custom") {
+        console.log(gpsd);
+        defaultLong = gpsd?.details?.long;
+        defaultLat = gpsd?.details?.lat;
+        setCenter({ lat: defaultLat, lng: defaultLong });
+      } else if (gpsd.type === "auto") {
+        console.log(gpsd?.details?.long);
+        defaultLong = gpsd?.details?.long;
+        defaultLat = gpsd?.details?.lat;
+        setCenter({ lat: defaultLat, lng: defaultLong });
+      }
+    }
+  }, [gpsd]);
+
+
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [markers, setMarkers] = useState([]);
   const autocompleteRef = useRef(null);
+  const dispatch = useDispatch();
 
   const onLoad = (autocomplete) => {
     autocompleteRef.current = autocomplete;
@@ -14,22 +37,42 @@ const MapWithAutoSearch = () => {
   const onPlaceChanged = () => {
     if (autocompleteRef.current !== null) {
       const place = autocompleteRef.current.getPlace();
+      console.log(place);
       if (place.geometry) {
         setCenter({
           lat: place.geometry.location.lat(),
           lng: place.geometry.location.lng(),
         });
+        dispatch(setGpsDetails({
+          type: 'auto', details: {
+            lat: place.geometry.location.lat(),
+            long: place.geometry.location.lng(),
+            name: place.address_components[1]?.long_name,
+            formatted_address: place.geometry.formatted_address
+          }
+        }));
         setSelectedPlace(place);
       }
     }
   };
 
   const onMapClick = (event) => {
+    console.log(event);
     const { latLng } = event;
     const latitude = latLng.lat();
     const longitude = latLng.lng();
+    // const formatedname = formatted_address
+
+    dispatch(setGpsDetails({
+      type: 'auto', details: {
+        lat: place.geometry.location.lat(),
+        long: place.geometry.location.lng(),
+        name: 'Custom Picked Name',
+        formatted_address: 'Custom Picked Name'
+      }
+    }));
     setSelectedPlace({
-      name: `Custom Location`,
+      name: `Custom Picked Name`,
       geometry: {
         location: {
           lat: () => latitude,
@@ -84,17 +127,19 @@ const MapWithAutoSearch = () => {
               position: 'absolute',
               left: '50%',
               marginLeft: '-120px',
-              marginTop:"5px"
+              marginTop: "5px"
             }}
           />
         </Autocomplete>
       </GoogleMap>
-      {selectedPlace && (
+      {gpsd != null && (
         <div style={{ marginTop: '10px' }}>
           <h2>Selected Location:</h2>
-          <p>Name: {selectedPlace.name}</p>
-          <p>Latitude: {selectedPlace.geometry.location.lat()}</p>
-          <p>Longitude: {selectedPlace.geometry.location.lng()}</p>
+          <p>Name: {gpsd?.details?.name}</p>
+          {/* <p>Conty: {selectedPlace?.address_components[1]?.long_name}</p>
+          <p>Formated Place: {selectedPlace.formatted_address}</p> */}
+          <p>Latitude: {gpsd?.details?.lat}</p>
+          <p>Longitude: {gpsd?.details?.long}</p>
         </div>
       )}
     </LoadScript>

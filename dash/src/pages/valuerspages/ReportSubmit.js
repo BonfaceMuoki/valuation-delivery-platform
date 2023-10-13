@@ -6,31 +6,30 @@ import {
   BlockHead,
   BlockHeadContent,
   BlockTitle,
-  BlockDes,
-  BackTo,
-  PreviewCard,
-  Icon,
-  RSelect
+  PreviewCard
 } from "../../components/Component";
 import makeAnimated from 'react-select/animated';
 import { useForm, Controller } from "react-hook-form";
 import { Steps, Step } from "react-step-builder";
 import { Row, Col, Button, Card } from "reactstrap";
-
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
 import { useSelector, useDispatch } from "react-redux";
-
 import { GoogleMapsProvider, useGoogleMap } from "@ubilabs/google-maps-react-hooks";
 import MapWithAutoSearch from "./MapWithAutoSearch";
 import { selectCurrentSignatories, selectCurrentToken, setReportSignatories, setValuationLocationDetails, upDateRecipientRecipients } from "../../featuers/authSlice";
-import { Document, Page } from 'react-pdf';
 import { Alert } from "reactstrap";
 import {
   selectLocationDetails,
   selectPropertyDetails,
   setValuationPropertyDetails,
-  selectValuationDetails, selectCurrentRecipient, setRecipientUsernames, setRecipientEmails, setRecipientPhone, setValuationDetails, setReportRecipient, selecteedaccesors
+  selectValuationDetails,
+  selectCurrentRecipient,
+  setRecipientUsernames,
+  setRecipientEmails,
+  setRecipientPhone,
+  setValuationDetails,
+  setReportRecipient
 } from "../../featuers/authSlice";
 import {
   useUploadValuationReportV2Mutation,
@@ -38,14 +37,17 @@ import {
   useGetAccesorsListQuery,
   useGetPropertyTypeListQuery,
 } from "../../api/commonEndPointsAPI";
-import Dropzone from "react-dropzone";
 import { Collapse } from "reactstrap";
 import Select from "react-select";
-import { useCacheReportDocumentMutation, useDownLoadCachedFileMutation, useGetCurrentUploadedFileQuery } from "../../api/uploader/uploaderApiEndpoints";
+import { useCacheReportDocumentMutation, useDownLoadCachedFileMutation, useGetCurrentUploadedFileQuery, useSubmitValuationReportMutation } from "../../api/uploader/uploaderApiEndpoints";
 import Swal from "sweetalert2";
 import axios from 'axios';
+import { selectGPSDetails } from "../../featuers/authSlice";
+
+
 const LocationForm = (props) => {
   const dispatch = useDispatch();
+  const gpsdetails = useSelector(selectGPSDetails);
   const locationDetails = useSelector(selectLocationDetails);
 
   const locationValidationSchema = Yup.object().shape({
@@ -59,9 +61,21 @@ const LocationForm = (props) => {
     resolver: yupResolver(locationValidationSchema),
   });
   const onSubmitLocation = async (data) => {
+    console.log(gpsdetails, "gpsdetails");
+    if (gpsdetails === null) {
+      Swal.fire({
+        icon: "warning",
+        title: "GPS Details Needed",
+        text: "Please chose a place on the map",
+        focusConfirm: false,
+      });
+    } else {
+      dispatch(setValuationLocationDetails(data));
+      props.next();
+    }
 
-    dispatch(setValuationLocationDetails(data));
-    props.next();
+
+
   }
   // useEffect(() => {
   //   if (locationDetails != null) {
@@ -185,7 +199,6 @@ const LocationForm = (props) => {
     </form>
   );
 };
-
 const PropertyDetailsForm = (props) => {
   const [propertdetails, setPropertdetails] = useState(useSelector(selectPropertyDetails));
   // console.log(propertdetails);
@@ -376,7 +389,6 @@ const PropertyDetailsForm = (props) => {
     </form>
   );
 };
-
 const PropertyValuationForm = (props) => {
   const propertd = useSelector(selectPropertyDetails);
   const { data: ccurrentuploadedfile, refetch: refetchUploadedFile } = useGetCurrentUploadedFileQuery();
@@ -439,6 +451,7 @@ const PropertyValuationForm = (props) => {
   // console.log(valauationdetails, "valauationdetails");
   const recipientdetails = useSelector(selectCurrentRecipient);
   const [existingAccessors, setExistingAccessors] = useState();
+  const [existingRecipientRecipients, setExistingRecipientRecipients] = useState();
   const recipientUsernames = useSelector(selectValuationDetails);
 
   useEffect(() => {
@@ -447,8 +460,10 @@ const PropertyValuationForm = (props) => {
       setRecipientUsernames(valauationdetails?.report_user_name);
       setRecipientEmails(valauationdetails?.report_user_email);
       setRecipientPhone(valauationdetails?.report_user_phone);
+      console.log(valauationdetails?.recipientss, "avail recipients");
       if (valauationdetails?.recipientss && valauationdetails?.recipientss != null) {
-        // console.log(valauationdetails?.recipientss, "avail recipients");
+
+        setExistingRecipientRecipients(valauationdetails?.recipientss);
         const newReceivingUsers = valauationdetails?.recipientss.map(() => ({}));
         // setReceivingUsers(newReceivingUsers);
       }
@@ -507,9 +522,12 @@ const PropertyValuationForm = (props) => {
   }
 
   const onSubmitPropertyValuation = async (data) => {
-
+    //
+    let revisedarray = data.recipientss.concat(data.recipientssold);
+    //
     // console.log(data, "data");
     delete data.reportDocument;
+    data.recipientss = revisedarray;
     dispatch(setValuationDetails(data));
     dispatch(setReportRecipient(data.recipient));
     if (existingAccessors.length > 0) {
@@ -553,7 +571,9 @@ const PropertyValuationForm = (props) => {
   }
   // Function to add a new recipient row
   const addRecipient = () => {
+
     setReceivingUsers([...receivingUsers, {}]);
+
   };
 
   // Function to remove a recipient row
@@ -562,10 +582,30 @@ const PropertyValuationForm = (props) => {
     updatedRecipients.splice(index, 1);
     setReceivingUsers(updatedRecipients);
     dispatch(upDateRecipientRecipients(index));
+
     // console.log(valauationdetails, "valauationdetailsaup");
     // const updatedsavedrecivingusers= [...receivingUsers];
     // updatedRecipients.splice(index, 1);
     // setReceivingUsers(updatedRecipients);
+
+
+
+  };
+  // Function to add a new recipient row
+  // Function to remove a recipient row
+  const removeRecipientold = (index) => {
+
+    const updatedexistingRecipientRecipients = [...existingRecipientRecipients];
+    updatedexistingRecipientRecipients.splice(index, 1);
+    setExistingRecipientRecipients(updatedexistingRecipientRecipients);
+
+    dispatch(upDateRecipientRecipients(index));
+
+    // console.log(valauationdetails, "valauationdetailsaup");
+    // const updatedsavedrecivingusers= [...receivingUsers];
+    // updatedRecipients.splice(index, 1);
+    // setReceivingUsers(updatedRecipients);
+
   };
 
   const token = useSelector(selectCurrentToken);
@@ -631,6 +671,61 @@ const PropertyValuationForm = (props) => {
                 </tr>
               </thead>
               <tbody>
+
+                {
+                  (existingRecipientRecipients != null) &&
+                  existingRecipientRecipients.map((existingRecipientRecipient, index) => (
+                    <tr key={index}>
+                      <td>
+                        <div className="form-group">
+                          <div className="form-control-wrap">
+                            <Controller
+                              name={`recipientssold[${index}].name`}
+                              defaultValue={(existingRecipientRecipient?.name) ? existingRecipientRecipient?.name : ''}
+                              control={control}
+                              render={({ field }) => (
+                                <input type="text" {...field} className="form-control" />
+                              )}
+                            />
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="form-group">
+                          <div className="form-control-wrap">
+                            <Controller
+                              name={`recipientssold[${index}].email`}
+                              control={control}
+
+                              defaultValue={(existingRecipientRecipient?.email) ? existingRecipientRecipient?.email : ''}
+                              render={({ field }) => (
+                                <input type="text" {...field} className="form-control" />
+                              )}
+                            />
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="form-group">
+                          <div className="form-control-wrap">
+                            <Controller
+                              name={`recipientssold[${index}].phone`}
+                              defaultValue={(existingRecipientRecipient?.phone) ? existingRecipientRecipient?.phone : ''}
+                              control={control}
+                              render={({ field }) => (
+                                <input type="text" {...field} className="form-control" />
+                              )}
+                            />
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <button type="button" onClick={() => removeRecipientold(index)} className="btn btn-danger">
+                          -
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
                 {receivingUsers.map((receivingUsers, index) => (
                   <tr key={index}>
                     <td>
@@ -876,7 +971,6 @@ const PropertyValuationForm = (props) => {
     </form>
   );
 };
-
 const ValuationSignatures = (props) => {
   const token = useSelector(selectCurrentToken);
   const downloadReport = () => {
@@ -999,6 +1093,7 @@ const ValuationSummary = (props) => {
   console.log(valuationdetails, "valutiondetails");
   console.log(signatories, "signatories");
   console.log(recipientrecipients, "recipientrecipient");
+  const [submitvaluationreport, { errors: errorsuploadingreport }] = useSubmitValuationReportMutation();
   const token = useSelector(selectCurrentToken);
   const downloadReport = () => {
     const headers = {
@@ -1018,6 +1113,40 @@ const ValuationSummary = (props) => {
       .catch(error => {
         console.error('Error:', error);
       });
+  }
+  const handleSubmitValuationReport = async (type) => {
+    const formdata = new FormData();
+    formdata.append("e_location_name", locationdetails.locationName);
+    formdata.append("e_location_county", locationdetails.county);
+    formdata.append("e_location_town", locationdetails.town);
+    formdata.append("e_location_street", locationdetails.street);
+    formdata.append("e_location_neighbourhood", locationdetails.neighbourHood);
+    formdata.append("a_location_lat", locationdetails.latitude);
+    formdata.append("a_location_long", locationdetails.longitude);
+    formdata.append("a_location_city", locationdetails.acity);
+    formdata.append("a_location_town", locationdetails.atown);
+    formdata.append("a_location_street", locationdetails.astreet);
+    formdata.append("propertyLR", propertdetails.PropertyLR);
+    formdata.append("propertyType", propertdetails.PropertyType[0].value);
+    formdata.append("totalBultUpArea", propertdetails.totalBuiltUpArea);
+    formdata.append("landSize", propertdetails.landSize);
+    formdata.append("tenure", propertdetails.tenure);
+    formdata.append("recipientOrg", valuationdetails.recipient[0].id);
+    formdata.append("recipientUsers", valuationdetails.recipientrecipients);
+    formdata.append("marketValue", valuationdetails.marketValue);
+    formdata.append("forcedSaleValue", valuationdetails.forcedSaleValue);
+    formdata.append("insurenceValue", valuationdetails.insurenceValue);
+    formdata.append("annualGrossVRevenue", valuationdetails.annualGRossRentalIncome);
+    formdata.append("valuationDate", valuationdetails.valuationDate);
+    formdata.append("instructionDate", valuationdetails.instructionDate);
+    formdata.append("propertyDescription", valuationdetails.propertyDescription);
+    formdata.append("signatories", valuationdetails.signatories);
+    if (type === "1") {
+      formdata.append("signatureNeeded", 1);
+    } else {
+      formdata.append("signatureNeeded", 0);
+    }
+    const submitvaluationreportresutlt = await submitvaluationreport(formdata);
   }
 
   const [isOpen, setIsOpen] = useState("1");
@@ -1290,12 +1419,12 @@ const ValuationSummary = (props) => {
       <div className="actions clearfix m-20">
         <ul>
           <li>
-            <Button color="primary" type="submit">
+            <Button color="primary" type="submit" onClick={() => handleSubmitValuationReport('1')}>
               Submit Report To Lender
             </Button>
           </li>
           <li>
-            <Button color="primary" type="submit">
+            <Button color="primary" type="submit" onClick={() => handleSubmitValuationReport('0')}>
               Send Report to Signatories
             </Button>
           </li>
@@ -1309,7 +1438,15 @@ const ValuationSummary = (props) => {
     </ >
   );
 };
-
+const Success = (props) => {
+  return (
+    <div className="d-flex justify-content-center align-items-center p-3">
+      <BlockTitle tag="h6" className="text-center">
+        Thank you for submitting form
+      </BlockTitle>
+    </div>
+  );
+};
 
 const Header = (props) => {
   return (
@@ -1354,21 +1491,9 @@ const Header = (props) => {
     </div>
   );
 };
-
-const Success = (props) => {
-  return (
-    <div className="d-flex justify-content-center align-items-center p-3">
-      <BlockTitle tag="h6" className="text-center">
-        Thank you for submitting form
-      </BlockTitle>
-    </div>
-  );
-};
-
 const config = {
   before: Header,
 };
-
 const ReportSubmit = () => {
   return (
     <React.Fragment>
@@ -1400,5 +1525,4 @@ const ReportSubmit = () => {
     </React.Fragment>
   );
 };
-
 export default ReportSubmit;

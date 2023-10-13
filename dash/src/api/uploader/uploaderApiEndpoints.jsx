@@ -14,6 +14,16 @@ export const uploaderApiEndpoints = apiSlice.injectEndpoints({
                 }
             })
         }),
+        submitValuationReport: builder.mutation({
+            query: (formData) => ({
+                url: '/api/uploader/upload-valuation-report',
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'Application/json'
+                }
+            })
+        }),
         downLoadCachedFile: builder.mutation({
             query: (file) => {
                 if (file) {
@@ -44,5 +54,6 @@ export const uploaderApiEndpoints = apiSlice.injectEndpoints({
 export const {
     useCacheReportDocumentMutation,
     useGetCurrentUploadedFileQuery,
-    useDownLoadCachedFileMutation
+    useDownLoadCachedFileMutation,
+    useSubmitValuationReportMutation,
 } = uploaderApiEndpoints;
