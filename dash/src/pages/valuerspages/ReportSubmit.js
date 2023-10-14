@@ -17,7 +17,7 @@ import * as Yup from 'yup';
 import { useSelector, useDispatch } from "react-redux";
 import { GoogleMapsProvider, useGoogleMap } from "@ubilabs/google-maps-react-hooks";
 import MapWithAutoSearch from "./MapWithAutoSearch";
-import { selectCurrentSignatories, selectCurrentToken, setReportSignatories, setValuationLocationDetails, upDateRecipientRecipients } from "../../featuers/authSlice";
+import { upDateRecipientRecipientsProperty, selectCurrentSignatories, selectCurrentToken, setReportSignatories, setValuationLocationDetails, upDateRecipientRecipients, selectRecipientRecipients, setRecipientRecipients } from "../../featuers/authSlice";
 import { Alert } from "reactstrap";
 import {
   selectLocationDetails,
@@ -390,11 +390,14 @@ const PropertyDetailsForm = (props) => {
   );
 };
 const PropertyValuationForm = (props) => {
+
+  const dispatch = useDispatch();
+
+  let recipientrecipientsList = useSelector(selectRecipientRecipients);
+  console.log(recipientrecipientsList, "recipientrecipientsList");
+  const [rerender, setRerender] = useState(false);
   const propertd = useSelector(selectPropertyDetails);
   const { data: ccurrentuploadedfile, refetch: refetchUploadedFile } = useGetCurrentUploadedFileQuery();
-
-
-
 
   const propertyValuationValidationSchema = Yup.object().shape({
     marketValue: Yup.string().required('Market Value is required'),
@@ -430,62 +433,21 @@ const PropertyValuationForm = (props) => {
   const { register: registerpropertyValuation, control, setValue: setPropertValuationValues, getValues: getValuationFormValuation, handleSubmit: handlePropertyValuationsSubmit, formState: { errors: propertyValuationErrors, isValid: propertyValuationIsValid } } = useForm({
     resolver: yupResolver(propertyValuationValidationSchema),
   });
-
-  const [reportUsersFields, setReportUsersFields] = useState([{}]);
-  const addReportUser = (nameVal = "", phoneVal = "", emailVal = "") => {
-    setReportUsersFields([...reportUsersFields, {
-      formFieldName: "report_user_name",
-      fieldEmail: "report_user_email",
-      fieldPhoneNumber: "report_user_phone",
-      formFildNameValue: nameVal,
-      fieldEmailValue: emailVal,
-      fieldPhoneNumberValue: phoneVal,
-      formFieldNamePlace: "Recipient Name",
-      fieldEmailPlace: "Recipient Email",
-      fieldPhoneNumberPlace: "Recipient Phone"
-    }]);
-  }
   const [receivingUsers, setReceivingUsers] = useState([]);
-  const [valauationdetails, sevalauationdetails] = useState(useSelector(selectValuationDetails));
+  let valauationdetails = useSelector(selectValuationDetails);
 
   // console.log(valauationdetails, "valauationdetails");
   const recipientdetails = useSelector(selectCurrentRecipient);
   const [existingAccessors, setExistingAccessors] = useState();
-  const [existingRecipientRecipients, setExistingRecipientRecipients] = useState();
-  const recipientUsernames = useSelector(selectValuationDetails);
-
   useEffect(() => {
+    // setValauationdetails();
     if (valauationdetails != null) {
       setPropertValuationValues("recipient", valauationdetails?.recipient);
       setRecipientUsernames(valauationdetails?.report_user_name);
       setRecipientEmails(valauationdetails?.report_user_email);
       setRecipientPhone(valauationdetails?.report_user_phone);
-      console.log(valauationdetails?.recipientss, "avail recipients");
-      if (valauationdetails?.recipientss && valauationdetails?.recipientss != null) {
-
-        setExistingRecipientRecipients(valauationdetails?.recipientss);
-        const newReceivingUsers = valauationdetails?.recipientss.map(() => ({}));
-        // setReceivingUsers(newReceivingUsers);
-      }
-
-
-
-
-    } else {
-      setReportUsersFields([...reportUsersFields, {
-        formFieldName: "report_user_name",
-        fieldEmail: "report_user_email",
-        fieldPhoneNumber: "report_user_phone",
-        formFildNameValue: "",
-        fieldEmailValue: "",
-        fieldPhoneNumberValue: "",
-        formFieldNamePlace: "Recipient Name",
-        fieldEmailPlace: "Recipient Email",
-        fieldPhoneNumberPlace: "Recipient Phone"
-      }]);
     }
   }, [valauationdetails, recipientdetails]);
-
   const {
     data: accesorslist,
     isLoading: loadingAccesors,
@@ -506,43 +468,36 @@ const PropertyValuationForm = (props) => {
     }
 
   }, [accesorslist]);
-
-
-
-
-  const handleRemoveReprtUser = (index) => {
-    const values = [...reportUsersFields];
-    values.splice(index, 1);
-    setReportUsersFields(values);
-  };
-  const handleRemoveAddedOrgRecipient = (index) => {
-    const values = [...recipientUsernames];
-    values.splice(index, 1);
-    setRecipientUsernames(values);
-  }
-
   const onSubmitPropertyValuation = async (data) => {
-    //
-    console.log(data, "sub");
-    let revisedarray = data.recipientss.concat(data.recipientssold);
+    console.log(data, "recipientrecipientsListrecipientrecipientsList");
+    let revisedarray = null;
+    if (data.recipientss) {
+      let ind = 0;
+      for (const recipientObject of data.recipientss) {
+        // Dispatch an action for each recipientObject
+
+        dispatch(setRecipientRecipients(data.recipientss[ind]));
+
+        ind++;
+      }
+
+
+    }
+
+
     //
     // console.log(data, "data");
     delete data.reportDocument;
-    data.recipientss = revisedarray;
     dispatch(setValuationDetails(data));
     dispatch(setReportRecipient(data.recipient));
+
+
     if (existingAccessors.length > 0) {
       props.next();
     } else {
       alert("Please input figure");
     }
   }
-  const [image, setImage] = useState();
-  const [uploadedFile, setUploadedFile] = useState();
-  const [uploadedFileD, setUploadedFileD] = useState();
-  const dispatch = useDispatch();
-
-  const [selectedFile, setSelectedFile] = useState(null);
 
   const [cacheReportDocument, setCachedREport] = useCacheReportDocumentMutation();
   const handleImage = async (e) => {
@@ -572,42 +527,27 @@ const PropertyValuationForm = (props) => {
   }
   // Function to add a new recipient row
   const addRecipient = () => {
-
     setReceivingUsers([...receivingUsers, {}]);
+    // setRecipientRecipients({ 'name': '', 'email': '', 'phone': '' });
 
   };
-
   // Function to remove a recipient row
   const removeRecipient = (index) => {
     const updatedRecipients = [...receivingUsers];
     updatedRecipients.splice(index, 1);
     setReceivingUsers(updatedRecipients);
     dispatch(upDateRecipientRecipients(index));
-
-    // console.log(valauationdetails, "valauationdetailsaup");
-    // const updatedsavedrecivingusers= [...receivingUsers];
-    // updatedRecipients.splice(index, 1);
-    // setReceivingUsers(updatedRecipients);
-
-
-
   };
-  // Function to add a new recipient row
-  // Function to remove a recipient row
   const removeRecipientold = (index) => {
-
-    const updatedexistingRecipientRecipients = [...existingRecipientRecipients];
-    updatedexistingRecipientRecipients.splice(index, 1);
-    setExistingRecipientRecipients(updatedexistingRecipientRecipients);
-
     dispatch(upDateRecipientRecipients(index));
-
-    // console.log(valauationdetails, "valauationdetailsaup");
-    // const updatedsavedrecivingusers= [...receivingUsers];
-    // updatedRecipients.splice(index, 1);
-    // setReceivingUsers(updatedRecipients);
+    console.log(valauationdetails, "valauationdetailsaupold");
 
   };
+  const updateOldRecipientProperty = (index, property, updatedValue) => {
+
+    dispatch(upDateRecipientRecipientsProperty({ 'index': index, 'property': property, 'value': updatedValue }));
+  
+  }
 
   const token = useSelector(selectCurrentToken);
   const downloadReport = () => {
@@ -674,8 +614,8 @@ const PropertyValuationForm = (props) => {
               <tbody>
 
                 {
-                  (existingRecipientRecipients != null) &&
-                  existingRecipientRecipients.map((existingRecipientRecipient, index) => (
+                  (recipientrecipientsList != null) &&
+                  recipientrecipientsList.map((existingRecipientRecipient, index) => (
                     <tr key={index}>
                       <td>
                         <div className="form-group">
@@ -685,9 +625,19 @@ const PropertyValuationForm = (props) => {
                               defaultValue={(existingRecipientRecipient?.name) ? existingRecipientRecipient?.name : ''}
                               control={control}
                               render={({ field }) => (
-                                <input type="text" {...field} className="form-control" />
+                                <input
+                                  type="text"
+                                  {...field}
+                                  className="form-control"
+                                  onChange={(e) => {
+                                    const updatedValue = e.target.value;
+                                    updateOldRecipientProperty(index, 1, updatedValue);
+                                    field.onChange(e);
+                                  }}
+                                />
                               )}
                             />
+
                           </div>
                         </div>
                       </td>
@@ -700,7 +650,13 @@ const PropertyValuationForm = (props) => {
 
                               defaultValue={(existingRecipientRecipient?.email) ? existingRecipientRecipient?.email : ''}
                               render={({ field }) => (
-                                <input type="text" {...field} className="form-control" />
+                                <input type="text" {...field} className="form-control"
+                                  onChange={(e) => {
+                                    const updatedValue = e.target.value;
+                                    updateOldRecipientProperty(index, 2, updatedValue);
+                                    field.onChange(e);
+                                  }}
+                                />
                               )}
                             />
                           </div>
@@ -714,7 +670,12 @@ const PropertyValuationForm = (props) => {
                               defaultValue={(existingRecipientRecipient?.phone) ? existingRecipientRecipient?.phone : ''}
                               control={control}
                               render={({ field }) => (
-                                <input type="text" {...field} className="form-control" />
+                                <input type="text" {...field} className="form-control"
+                                  onChange={(e) => {
+                                    const updatedValue = e.target.value;
+                                    updateOldRecipientProperty(index, 3, updatedValue);
+                                    field.onChange(e);
+                                  }} />
                               )}
                             />
                           </div>
@@ -1082,6 +1043,8 @@ const ValuationSignatures = (props) => {
   );
 };
 const ValuationSummary = (props) => {
+  let recipientrecipientsList = useSelector(selectRecipientRecipients);
+  console.log(recipientrecipientsList, "summary recipientrecipientsList");
   const { data: ccurrentuploadedfile, refetch: refetchUploadedFile } = useGetCurrentUploadedFileQuery();
   const propertdetails = useSelector(selectPropertyDetails);
   const locationdetails = useSelector(selectLocationDetails);
@@ -1352,7 +1315,8 @@ const ValuationSummary = (props) => {
                     </thead>
                     <tbody>
                       {
-                        recipientrecipients.map((rec, index) => {
+                        (recipientrecipientsList && recipientrecipientsList != null) &&
+                        recipientrecipientsList.map((rec, index) => {
                           return (
                             <tr key={index}>
 

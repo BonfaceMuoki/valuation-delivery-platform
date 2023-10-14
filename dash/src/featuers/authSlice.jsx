@@ -19,6 +19,7 @@ const initialState = {
     recipientPhones: null,
     selectedAccesors: null,
     gpsDetails: null,
+    recipientRecipients: []
 };
 const authSlice = createSlice({
     name: 'auth',
@@ -72,14 +73,38 @@ const authSlice = createSlice({
         setSelectedAccesors: (state, action) => {
             state.selectedAccesors = action.payload;
         },
-        upDateRecipientRecipients: (state, action) => {
-            let recipients = state.valuationValuationDetails.recipientss;;
-            if (recipients) {
-                const updatedRecipients = [...recipients];
-                updatedRecipients.splice(action.payload, 1);
-                state.valuationValuationDetails.recipientss = updatedRecipients;
+        setRecipientRecipients: (state, action) => {
+
+            let old = state.recipientRecipients;
+
+            console.log(old);
+            if (old === null) {
+                state.recipientRecipients = [[], action.payload];
+            } else {
+                state.recipientRecipients = [...state.recipientRecipients, action.payload];
             }
 
+
+        },
+        upDateRecipientRecipients: (state, action) => {
+            let recipients = state.recipientRecipients;
+            state.recipientRecipients = null;
+            if (recipients) {
+                let updatedRecipients = [...recipients];
+                updatedRecipients.splice(action.payload, 1);
+                state.recipientRecipients = updatedRecipients;
+            }
+
+        }, upDateRecipientRecipientsProperty: (state, action) => {
+            console.log(action.payload, "payload details");
+            if (action.payload.property === 1) {
+                console.log(state.recipientRecipients[action.payload.index], "Name to up");
+                state.recipientRecipients[action.payload.index].name = action.payload.value;
+            } else if (action.payload.property === 2) {
+                state.recipientRecipients[action.payload.index].email = action.payload.value;
+            } else if (action.payload.property === 3) {
+                state.recipientRecipients[action.payload.index].phone = action.payload.value;
+            }
         },
         setGpsDetails: (state, action) => {
             state.gpsDetails = action.payload;
@@ -88,7 +113,7 @@ const authSlice = createSlice({
     },
 })
 
-export const { setGpsDetails, upDateRecipientRecipients, setSelectedAccesors, setRecipientUsernames, setRecipientPhone, setRecipientEmails, setSelectedRecipient, setSelectedPropertyType, setReportSignatories, setReportRecipient, updateUserDetails, setCredentials, logOut, setMode, setfetchvaluationreports, setValuationLocationDetails, setValuationPropertyDetails, setValuationDetails } = authSlice.actions
+export const { setRecipientRecipients, upDateRecipientRecipientsProperty, setGpsDetails, upDateRecipientRecipients, setSelectedAccesors, setRecipientUsernames, setRecipientPhone, setRecipientEmails, setSelectedRecipient, setSelectedPropertyType, setReportSignatories, setReportRecipient, updateUserDetails, setCredentials, logOut, setMode, setfetchvaluationreports, setValuationLocationDetails, setValuationPropertyDetails, setValuationDetails } = authSlice.actions
 
 export default authSlice.reducer
 export const selectCurrentUser = (state) => state.auth.user
@@ -105,3 +130,4 @@ export const selectSelectedPropertyType = (state) => state.auth.selectedProperty
 export const selectSelectedRecipient = (state) => state.auth.selectedRecipient
 export const selecteedaccesors = (state) => state.auth.selectedAccesors
 export const selectGPSDetails = (state) => state.auth.gpsDetails
+export const selectRecipientRecipients = (state) => state.auth.recipientRecipients
