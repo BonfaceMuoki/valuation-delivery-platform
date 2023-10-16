@@ -14,18 +14,19 @@ use App\Models\User;
 use App\Models\ValuationReport;
 use Carbon\Carbon;
 use DB;
-use Endroid\QrCode\Color\Color;
-use Endroid\QrCode\Encoding\Encoding;
-use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelLow;
-use Endroid\QrCode\Label\Label;
-use Endroid\QrCode\QrCode;
-use Endroid\QrCode\RoundBlockSizeMode\RoundBlockSizeModeMargin;
-use Endroid\QrCode\Writer\PngWriter;
+// use Endroid\QrCode\Color\Color;
+// use Endroid\QrCode\Encoding\Encoding;
+// use Endroid\QrCode\ErrorCorrectionLevel\ErrorCorrectionLevelLow;
+// use Endroid\QrCode\Label\Label;
+// use Endroid\QrCode\QrCode;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 use Mail;
 use Mockery\Exception;
 use setasign\Fpdi\Fpdi;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Storage;
 use Validator;
 
 class ValuerController extends Controller
@@ -72,40 +73,43 @@ class ValuerController extends Controller
                     'user_id' => $user->id,
                     'organization_id' => $orgdetails->id,
                 ])->exists();
-
             if ($currently_exists_file) {
                 $record = CachedReport::where(
                     ['user_id' => $user->id,
                         'organization_id' => $orgdetails->id,
                     ])->first();
-                //remove file from folder
-                $fileToDelete = public_path('reports_cached/' . $record->file_name . '');
-                if (file_exists($fileToDelete)) {
-                    unlink($fileToDelete);
-
+                // remove the file first
+                $filePath = 'reports_cached/' . $record->file_name;
+                $msg = "";
+                if (Storage::disk('public')->exists($filePath)) {
+                    Storage::disk('public')->delete($filePath);
+                    // File exists and has been deleted
                 }
+                // remove the file first
+                // add new file
                 $fileName = time() . rand(1, 99) . '.' . $file->extension();
-                $file->move(public_path('reports_cached'), $file->getClientOriginalName());
-                //remove file from folder
+                $file = $request->file('report_pdf');
+                $path = $file->storeAs('reports_cached', $request->report_pdf->getClientOriginalName(), 'public');
+                // add new file
+                // save the file to db
                 $updatedfile = CachedReport::where("id", $record->id)->update(
                     ['recipient_id' => $request->recipient,
                         'propertyLR' => $request->lrnumber,
                         'file_name' => $file->getClientOriginalName(),
                     ]);
-                return response()->json(['file_name' => $fileName, 'uploaded_name' => $file->getClientOriginalName(), 'cached' => $updatedfile], 200);
-
+                // save the file to db
+                return response()->json(['file_name' => $fileName, 'uploaded_name' => $file->getClientOriginalName(), 'cached' => $updatedfile, "message" => $msg], 200);
             } else {
-
                 $exists = CachedReport::where(
                     ['recipient_id' => $request->recipient,
                         'user_id' => $user->id,
                         'propertyLR' => $request->lrnumber,
                         'organization_id' => $orgdetails->id])->exists();
-
-                $fileName = time() . rand(1, 99) . '.' . $file->extension();
-                $file->move(public_path('reports_cached'), $file->getClientOriginalName());
+                $file = $request->file('report_pdf');
+                $fileName = $request->report_pdf->getClientOriginalName();
+                $path = $file->storeAs('reports_cached', $request->report_pdf->getClientOriginalName(), 'public');
                 $cached = CachedReport::create(['propertyLR' => $request->lrnumber, 'recipient_id' => $request->recipient, 'user_id' => $user->id, 'organization_id' => $orgdetails->id, 'file_name' => $file->getClientOriginalName()]);
-                return response()->json(['file_name' => $fileName, 'uploaded_name' => $file->getClientOriginalName(), 'cached' => $cached], 200);
+                return response()->json(['file_name' => $fileName, 'uploaded_name' => $file->getClientOriginalName(), 'cacheds' => $cached], 200);
             }
 
         } else {
@@ -149,14 +153,27 @@ class ValuerController extends Controller
             $user = auth()->user();
             if ($user->hasPermissionTo(Permission::where("slug", "upload report")->first())) {
                 $validator = Validator::make($request->all(), [
-                    'report_description' => 'required|string',
-                    'market_value' => 'required|integer',
-                    'forced_market_value' => 'required|integer',
-                    'property_lr' => 'required|string',
-                    'valuation_date' => 'required|string',
-                    'encumberrence_details' => 'required|string',
-                    'receiving_company_id' => 'required|string',
-                    'report_pdf' => 'required|mimes:pdf|max:2048',
+                    'propertyDescription' => 'required|string',
+                    'marketValue' => 'required|integer',
+                    'forcedSaleValue' => 'required|integer',
+                    'annualGrossVRevenue' => 'required|integer',
+                    'totalBultUpArea' => 'required|integer',
+                    'landSize' => 'required|integer',
+                    'tenure' => 'required|string',
+                    'propertyLR' => 'required|string',
+                    'propertyType' => 'required|string',
+                    'valuationDate' => 'required|string',
+                    'instructionDate' => 'required|string',
+                    'e_location_name' => 'required|string',
+                    'e_location_county' => 'required|string',
+                    'e_location_town' => 'required|string',
+                    'e_location_street' => 'required|string',
+                    'e_location_neighbourhood' => 'required|string',
+                    'a_location_lat' => 'required|string',
+                    'a_location_long' => 'required|string',
+                    'a_location_city' => 'required|string',
+                    'a_location_town' => 'required|string',
+                    'a_location_street' => 'required|string',
                 ]);
                 if ($validator->fails()) {
                     return response()->json(["message" => "Unprocessable data", "backendvalerrors" => $validator->errors()], 422);
@@ -167,27 +184,91 @@ class ValuerController extends Controller
                     if ($orgdetails == null) {
                         return response()->json(['message' => "Unauthorized"], 403);
                     }
-                    $datatosave = $request->except(['report_pdf', 'valuation_data']);
-                    $file = $request->file("report_pdf");
-                    $fileName = time() . rand(1, 99) . '.' . $file->extension();
-                    $file->move(public_path('reports'), $fileName);
 
-                    $datatosave['report_uploading_user'] = $user->id;
-                    $datatosave['valuation_date'] = date('Y-m-d', strtotime($request->valuation_date));
-                    $datatosave['upload_link'] = $fileName;
-                    $datatosave['report_uploading_from'] = $orgdetails->id;
-                    $datatosave['approving_director'] = 0;
-                    $datatosave['receiving_company_read_code'] = 9999;
-                    $datatosave['unique_random_code'] = 999;
-                    $datatosave['receiving_company_id'] = $request->post('receiving_company_id');
+                    // $datatosave = $request->except(['report_pdf', 'valuation_data']);
+                    // $file = $request->file("report_pdf");
+                    // $fileName = time() . rand(1, 99) . '.' . $file->extension();
+                    // $file->move(public_path('reports'), $fileName);
+                    // report object
+                    $signatories = $request->signatories;
+                    // $jsonData = json_decode($request->getContent());
+                    return response()->json(['message' => $jsonData['signatories']], 403);
+                    // return $signatories;
+                    $reporttosave['report_description'] = $request->propertyDescription;
+                    $reporttosave['report_uploading_user'] = $user->user_id;
+                    $reporttosave['report_uploading_from'] = $orgdetails->id;
+                    $reporttosave['market_value'] = $request->marketValue;
+                    $reporttosave['forced_market_value'] = $request->forcedSaleValue;
+                    $reporttosave['property_lr'] = $request->propertyLR;
+                    $reporttosave['valuation_date'] = $request->valuationDate;
+                    $reporttosave['approving_director'] = $signatories[0]->value;
+                    $reporttosave['encumberrence_details'] = $request->propertyDescription;
+                    $reporttosave['receiving_company_id'] = $request->recipientOrg;
+                    $reporttosave['receiving_company_read_code'] = "0009";
+                    $reporttosave['unique_random_code'] = "0009";
+
+                    // $reporttosave['upload_link'] = $request->;
+                    // $reporttosave['download_count'] = $request->;
+                    // $reporttosave['views_count'] = $request->;
+
+                    $reporttosave['insurence_value'] = $request->insurenceValue;
+                    $reporttosave['location_name_auto'] = $request->e_location_name;
+                    $reporttosave['location_name_map'] = $request->a_location_town;
+                    $reporttosave['latitude_auto'] = $request->a_location_lat;
+                    $reporttosave['longitude_auto'] = $request->a_location_long;
+                    $reporttosave['latitude_map'] = $request->a_location_lat;
+                    $reporttosave['longitude_map'] = $request->a_location_long;
+                    $reporttosave['county'] = $request->e_location_county;
+                    $reporttosave['town'] = $request->e_location_town;
+                    $reporttosave['street'] = $request->e_location_street;
+                    $reporttosave['total_built_up_area'] = $request->totalBultUpArea;
+                    $reporttosave['property_type'] = $request->propertyType;
+                    $reporttosave['annual_gross_rental_income'] = $request->annualGrossVRevenue;
+                    $reporttosave['land_size'] = $request->landSize;
+                    $reporttosave['no_of_signatories_to_sign'] = sizeof($request->signatories);
+                    $reporttosave['no_of_signatories_signed'] = 0;
+                    $reporttosave['tenure'] = $request->tenure;
+                    $reporttosave['status'] = 0;
+
+                    // report object
+
+                    //    get cached file
+                    $recordcached = CachedReport::where(
+                        ['user_id' => $user->id,
+                            'organization_id' => $orgdetails->id,
+                        ])->first();
+                    $sourcePath = 'reports_cached/' . $recordcached->file_name;
+                    $destinationFolder = 'reports/';
+                    $fileName = '';
+                    if (Storage::disk('public')->exists($sourcePath)) {
+                        $timestamp = time();
+                        $fileExtension = pathinfo($sourcePath, PATHINFO_EXTENSION);
+                        $fileName = $timestamp . '.' . $fileExtension;
+                        $newFilePath = $destinationFolder . $fileName;
+                        Storage::disk('public')->copy($sourcePath, $newFilePath);
+                    } else {
+                        return response()->json([
+                            'message' => 'Please reupload the report file again',
+                        ], 201);
+                    }
+                    //get cached file
+
+                    // $datatosave['report_uploading_user'] = $user->id;
+                    // $datatosave['valuation_date'] = date('Y-m-d', strtotime($request->valuation_date));
+                    // $datatosave['upload_link'] = $fileName;
+                    // $datatosave['report_uploading_from'] = $orgdetails->id;
+                    // $datatosave['approving_director'] = 0;
+                    // $datatosave['receiving_company_read_code'] = 9999;
+                    // $datatosave['unique_random_code'] = 999;
+                    // $datatosave['receiving_company_id'] = $request->post('receiving_company_id');
                     $lastrow = (ValuationReport::latest()->first()) ? (ValuationReport::latest()->first()) : ['id' => 1];
                     $datatosave['id'] = $lastrow['id'] + 1;
                     $qrcode = $this->generateQRCode($orgdetails, $datatosave);
                     $datatosave['qr_code'] = $qrcode;
                     $reportd = ValuationReport::create($datatosave);
                     //append qr code
-                    $filePath = public_path("reports/" . $fileName);
-                    $outputFilePath = public_path("reports/" . $fileName . "_signed.pdf");
+                    $filePath = Storage::disk($disk)->path($fileName);
+                    $outputFilePath = Storage::disk($disk)->path("reports/" . $fileName . "_signed.pdf");
                     $this->appendQRCODE($filePath, $outputFilePath, $qrcode);
                     //append qr code
                     //generate qr code
@@ -262,10 +343,7 @@ class ValuerController extends Controller
                     if ($orgdetails == null) {
                         return response()->json(['message' => "Unauthorized"], 403);
                     }
-                    $datatosave = $request->except(['report_pdf', 'valuation_data']);
-                    $file = $request->file("report_pdf");
-                    $fileName = time() . rand(1, 99) . '.' . $file->extension();
-                    $file->move(public_path('reports'), $fileName);
+
                     $datatosave['report_uploading_user'] = $user->id;
                     $datatosave['valuation_date'] = date('Y-m-d', strtotime($request->valuation_date));
                     $datatosave['upload_link'] = $fileName;
@@ -372,34 +450,44 @@ class ValuerController extends Controller
 
     public function generateQRCode($orgdetails, $repoertdetais)
     {
-        $writer = new PngWriter();
-        // Create QR code
-        $qrfilelabel = $this->generateValuationCode($repoertdetais['id']);
-        $qrCode = QrCode::create('Valuation Firm:' . $orgdetails['organization_name'] . '
-        Property:' . $orgdetails['organization_phone'] . '
-        ISK NO:' . $orgdetails['organization_phone'] . '
-        VRB No:' . $orgdetails['organization_phone'] . '
-        Market Value:' . number_format((float) $repoertdetais['market_value']) . '
-        Forced Market Value:' . number_format((float) $repoertdetais['forced_market_value']) . '
-        Valuation Date:' . $repoertdetais['valuation_date'] . '
-        Valuation Code:' . $qrfilelabel)
-            ->setEncoding(new Encoding('UTF-8'))
-            ->setErrorCorrectionLevel(new ErrorCorrectionLevelLow())
-            ->setSize(300)
-            ->setMargin(10)
-            ->setRoundBlockSizeMode(new RoundBlockSizeModeMargin())
-            ->setForegroundColor(new Color(0, 0, 0))
-            ->setBackgroundColor(new Color(255, 255, 255));
-        //         $logo = Logo::create(public_path('reportqr_codes'),'symfony.png')
-        // ->setResizeToWidth(50);
-        // Create generic label
-        $label = Label::create('ISK Verified')
-            ->setTextColor(new Color(255, 0, 0));
-        $result = $writer->write($qrCode, null, $label);
-        // Validate the result
-        // $writer->validateResult($result, 'Life is too short to be generating QR codes');
-        $result->saveToFile(public_path('reportqr_codes/' . $qrfilelabel . '.png'));
-        return $qrfilelabel;
+
+        $image = QrCode::format('png')
+            ->size(200)->errorCorrection('H')
+            ->generate('A simple example of QR code!');
+        $output_file = '/reports/img-' . time() . '.png';
+        Storage::disk('public')->put($output_file, $image);
+        // $writer = new PngWriter();
+        // // Create QR code
+        // $qrfilelabel = $this->generateValuationCode($repoertdetais['id']);
+        // // $qrCode = QrCode::create('Valuation Firm:' . $orgdetails['organization_name'] . '
+        // // Property:' . $orgdetails['organization_phone'] . '
+        // // ISK NO:' . $orgdetails['organization_phone'] . '
+        // // VRB No:' . $orgdetails['organization_phone'] . '
+        // // Market Value:' . number_format((float) $repoertdetais['market_value']) . '
+        // // Forced Market Value:' . number_format((float) $repoertdetais['forced_market_value']) . '
+        // // Valuation Date:' . $repoertdetais['valuation_date'] . '
+        // // Valuation Code:' . $qrfilelabel)
+        // $qrCode = QrCode::create('Valuation Firm')
+        //     ->setEncoding(new Encoding('UTF-8'))
+        //     ->setErrorCorrectionLevel(new ErrorCorrectionLevelLow())
+        //     ->setSize(300)
+        //     ->setMargin(10)
+        //     ->setRoundBlockSizeMode(new RoundBlockSizeModeMargin())
+        //     ->setForegroundColor(new Color(0, 0, 0))
+        //     ->setBackgroundColor(new Color(255, 255, 255));
+        // //         $logo = Logo::create(public_path('reportqr_codes'),'symfony.png')
+        // // ->setResizeToWidth(50);
+        // // Create generic label
+        // $label = Label::create('ISK Verified')
+        //     ->setTextColor(new Color(255, 0, 0));
+        // $result = $writer->write($qrCode, null, $label);
+        // // Validate the result
+        // // $writer->validateResult($result, 'Life is too short to be generating QR codes');
+        // $output_file = 'reports/qrc/' . $qrfilelabel . '.png';
+        // Storage::disk('public')->put($output_file, $qrCode);
+
+        // $result->saveToFile($result->storeAs('reportqr_codes' . $qrfilelabel . '.png', 'public'));
+        // return $qrfilelabel;
     }
     public function generateValuationCode($reportid)
     {

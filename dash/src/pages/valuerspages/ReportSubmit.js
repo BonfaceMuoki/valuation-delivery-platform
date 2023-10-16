@@ -513,7 +513,7 @@ const PropertyValuationForm = (props) => {
       const formdataFile = new FormData();
       const file = e.target.files[0];
       if (file && (file instanceof Blob || file instanceof File)) {
-        setSelectedFile(file);
+        // setSelectedFile(file);
         ///save placeholder
         formdataFile.append("report_pdf", e.target.files[0]);
         formdataFile.append("recipient", selectedRecipient[0].value);
@@ -546,7 +546,7 @@ const PropertyValuationForm = (props) => {
   const updateOldRecipientProperty = (index, property, updatedValue) => {
 
     dispatch(upDateRecipientRecipientsProperty({ 'index': index, 'property': property, 'value': updatedValue }));
-  
+
   }
 
   const token = useSelector(selectCurrentToken);
@@ -1050,12 +1050,14 @@ const ValuationSummary = (props) => {
   const locationdetails = useSelector(selectLocationDetails);
   const valuationdetails = useSelector(selectValuationDetails);
   const signatories = useSelector(selectCurrentSignatories);
+  const gpsdetails = useSelector(selectGPSDetails);
+  console.log(gpsdetails, "gpsdetails");
   const recipientrecipients = valuationdetails?.recipientss;
   const reportdocument = localStorage.getItem('my_reportdocument');
   console.log(propertdetails, "propertdetails");
   console.log(locationdetails, "locationdetails");
   console.log(valuationdetails, "valutiondetails");
-  console.log(signatories, "signatories");
+  console.log(signatories.signatories, "signatories");
   console.log(recipientrecipients, "recipientrecipient");
   const [submitvaluationreport, { errors: errorsuploadingreport }] = useSubmitValuationReportMutation();
   const token = useSelector(selectCurrentToken);
@@ -1084,27 +1086,42 @@ const ValuationSummary = (props) => {
     formdata.append("e_location_county", locationdetails.county);
     formdata.append("e_location_town", locationdetails.town);
     formdata.append("e_location_street", locationdetails.street);
+
     formdata.append("e_location_neighbourhood", locationdetails.neighbourHood);
-    formdata.append("a_location_lat", locationdetails.latitude);
-    formdata.append("a_location_long", locationdetails.longitude);
-    formdata.append("a_location_city", locationdetails.acity);
-    formdata.append("a_location_town", locationdetails.atown);
-    formdata.append("a_location_street", locationdetails.astreet);
+    if (gpsdetails.type === "auto") {
+      formdata.append("a_location_lat", gpsdetails.details.lat);
+      formdata.append("a_location_long", gpsdetails.details.long);
+      formdata.append("a_location_city", gpsdetails.details.name);
+      formdata.append("a_location_town", gpsdetails.details.name);
+      formdata.append("a_location_street", gpsdetails.details.name);
+
+    } else if (gpsdetails.type === "custom") {
+      formdata.append("a_location_lat", gpsdetails.details.lat);
+      formdata.append("a_location_long", gpsdetails.details.long);
+      formdata.append("a_location_city", gpsdetails.details.name);
+      formdata.append("a_location_town", gpsdetails.details.name);
+      formdata.append("a_location_street", gpsdetails.details.name);
+    }
+
     formdata.append("propertyLR", propertdetails.PropertyLR);
     formdata.append("propertyType", propertdetails.PropertyType[0].value);
     formdata.append("totalBultUpArea", propertdetails.totalBuiltUpArea);
     formdata.append("landSize", propertdetails.landSize);
     formdata.append("tenure", propertdetails.tenure);
-    formdata.append("recipientOrg", valuationdetails.recipient[0].id);
-    formdata.append("recipientUsers", valuationdetails.recipientrecipients);
+    formdata.append("recipientOrg", valuationdetails.recipient[0].value);
+    formdata.append("recipientUsers", recipientrecipientsList);
     formdata.append("marketValue", valuationdetails.marketValue);
     formdata.append("forcedSaleValue", valuationdetails.forcedSaleValue);
     formdata.append("insurenceValue", valuationdetails.insurenceValue);
     formdata.append("annualGrossVRevenue", valuationdetails.annualGRossRentalIncome);
     formdata.append("valuationDate", valuationdetails.valuationDate);
-    formdata.append("instructionDate", valuationdetails.instructionDate);
-    formdata.append("propertyDescription", valuationdetails.propertyDescription);
-    formdata.append("signatories", valuationdetails.signatories);
+    formdata.append("instructionDate", valuationdetails.InstructionDate);
+    formdata.append("propertyDescription", valuationdetails.PropertyDescription);
+
+
+    formdata.append("signatories", signatories.signatories);
+
+
     if (type === "1") {
       formdata.append("signatureNeeded", 1);
     } else {

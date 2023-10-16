@@ -1,31 +1,31 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Mail\SendPasswordResetMail;
 use App\Mail\SendTenantEmail;
-use App\Models\ClientRegistrationRequests;
-use App\Models\ReportConsumer;
-use App\Models\ValuationFirmRegistrationRequests;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rules\Password;
-use App\Models\User;
-use App\Models\Role;
-use Mockery\Exception;
-use App\Models\Property;
-use App\Models\Organization;
-use Validator;
-use DB;
-use Mail;
-use Illuminate\Support\Str;
-use Carbon\Carbon;
-use Illuminate\Http\Response;
-use App\Models\ValuationFirmInvite;
-use App\Models\ValuerfirmUserInvite;
 use App\Models\AccesorInvite;
 use App\Models\AccesorUserInvite;
-use Illuminate\Support\Facades\Http;
+use App\Models\ClientRegistrationRequests;
+use App\Models\Organization;
 use App\Models\PasswordReset;
-use App\Mail\SendPasswordResetMail;
+use App\Models\Property;
+use App\Models\ReportConsumer;
+use App\Models\Role;
+use App\Models\User;
+use App\Models\ValuationFirmInvite;
+use App\Models\ValuationFirmRegistrationRequests;
+use App\Models\ValuerfirmUserInvite;
+use Carbon\Carbon;
+use DB;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\Password;
+use Mail;
+use Mockery\Exception;
+use Validator;
 
 class AuthController extends Controller
 {
@@ -54,8 +54,8 @@ class AuthController extends Controller
                 'requestAccesorAccess',
                 'SendAccountPasswordResetLink',
                 'verifyResetToken',
-                'ResetPassword'
-            ]
+                'ResetPassword',
+            ],
         ]);
     }
     public function VarifyRecaptchaToken($request)
@@ -80,7 +80,7 @@ class AuthController extends Controller
             'phone_number' => 'required|string',
             'directors_isk_numer' => 'required|string|unique:valuation_firm_registration_requests,isk_number',
             'directors_vrb_numer' => 'required|string|unique:valuation_firm_registration_requests,vrb_number',
-            'full_names' => 'required'
+            'full_names' => 'required',
         ]);
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
@@ -120,7 +120,6 @@ class AuthController extends Controller
 
     }
 
-
     public function requestAccesorAccess(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -128,7 +127,7 @@ class AuthController extends Controller
             'recaptcha_token' => 'required|string',
             'phone_number' => 'required|string',
             'full_names' => 'required',
-            'institution_name' => 'required'
+            'institution_name' => 'required',
         ]);
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
@@ -154,7 +153,6 @@ class AuthController extends Controller
                     } else {
                         return response()->json(['message' => "Failed.Please contact admin"], 422);
                     }
-
 
                 } catch (Exception $exp) {
                     DB::rollBack();
@@ -207,7 +205,6 @@ class AuthController extends Controller
             return response()->json(['message' => 'Failed.' . $exp->getMessage()], 422);
         }
 
-
     }
     public function login(Request $request)
     {
@@ -221,39 +218,37 @@ class AuthController extends Controller
         $isactive = User::where("is_active", '1')->where("email", $request->email)->first();
         if ($isactive != null) {
             //verify token
-            $response = $this->VarifyRecaptchaToken($request);
-            if ($response->successful()) {
-                $data = $response->json();
-                // Process the response data
-                if ($data['success']) {
-                    if ($isactive != null) {
-                        if (!$token = auth()->attempt($validator->validated())) {
-                            return response()->json(['error' => 'Unauthorized'], 401);
-                        }
-                        return $this->createNewToken($token);
-                    } else {
-                        return response()->json(['message' => 'Your account is not active'], 403);
-                    }
-                } else {
-                    $statusCode = $response->status();
-                    return response()->json(['message' => "Failed.  Invalid recaptcha code."], 422);
-                    // reCAPTCHA validation failed
-                    // Handle the validation failure
+            // $response = $this->VarifyRecaptchaToken($request);
+            // if ($response->successful()) {
+            //     $data = $response->json();
+            //     // Process the response data
+            //     if ($data['success']) {
+            if ($isactive != null) {
+                if (!$token = auth()->attempt($validator->validated())) {
+                    return response()->json(['error' => 'Unauthorized'], 401);
                 }
-
+                return $this->createNewToken($token);
             } else {
-
-                // Request to Google reCAPTCHA API failed
-                $statusCode = $response->status();
-                return response()->json(['message' => "Failed. Invalid recaptcha code." . $response], 422);
-                // Handle the error
+                return response()->json(['message' => 'Your account is not active'], 403);
             }
+            //     } else {
+            //         $statusCode = $response->status();
+            //         return response()->json(['message' => "Failed.  Invalid recaptcha code."], 422);
+            //         // reCAPTCHA validation failed
+            //         // Handle the validation failure
+            //     }
+
+            // } else {
+
+            //     // Request to Google reCAPTCHA API failed
+            //     $statusCode = $response->status();
+            //     return response()->json(['message' => "Failed. Invalid recaptcha code." . $response], 422);
+            //     // Handle the error
+            // }
         } else {
             return response()->json(['message' => "Inactive account."], 403);
             // Handle the error
         }
-
-
 
     }
     public function generatePasswordResetToken($request)
@@ -320,7 +315,7 @@ class AuthController extends Controller
             DB::rollBack();
             return response()->json(
                 [
-                    'message' => 'Failed.' . $exp->getMessage()
+                    'message' => 'Failed.' . $exp->getMessage(),
                 ],
                 422
             );
@@ -340,7 +335,7 @@ class AuthController extends Controller
             'full_name' => 'required|string|between:2,100',
             'email' => 'required|string|between:2,100|unique:users',
             'password' => ['required', Password::min(6)->letters()->mixedCase()->numbers()->symbols()->uncompromised()],
-            'password_confirmation' => 'required|same:password'
+            'password_confirmation' => 'required|same:password',
         ]);
         if ($validator->fails()) {
             return response()->json(["message" => "Unprocessable data", "backendvalerrors" => $validator->errors()], 400);
@@ -356,7 +351,7 @@ class AuthController extends Controller
                     [
                         'full_name' => $request->full_name,
                         'email' => $request->email,
-                        'password' => bcrypt($request->password)
+                        'password' => bcrypt($request->password),
                     ]
                 );
                 $uploaderadmin_role = Role::where('slug', 'report uploader admin')->first();
@@ -366,7 +361,7 @@ class AuthController extends Controller
                     'company_name' => 'required|string|between:2,100',
                     'organization_phone' => 'regex:/^([0-9\s\-\+\(\)]*)$/|min:10|unique:organizations',
                     'directors_vrb' => 'required|string|unique:organizations',
-                    'isk_number' => 'required|string|max:100|unique:organizations'
+                    'isk_number' => 'required|string|max:100|unique:organizations',
                 ]);
                 if ($validator->fails()) {
                     return response()->json($validator->errors()->toJson(), 400);
@@ -390,14 +385,14 @@ class AuthController extends Controller
                 if (auth()->user() == null) {
                     return response()->json([
                         'code' => 0,
-                        'message' => 'Unauthorized access'
+                        'message' => 'Unauthorized access',
                     ], 401);
                 } else {
                     $user = User::create(
                         [
                             'full_name' => $request->full_name,
                             'email' => $request->email,
-                            'password' => bcrypt($request->password)
+                            'password' => bcrypt($request->password),
                         ]
                     );
                     $uploader_role = Role::where('slug', 'report uploader')->first();
@@ -417,7 +412,7 @@ class AuthController extends Controller
                     [
                         'full_name' => $request->full_name,
                         'email' => $request->email,
-                        'password' => bcrypt($request->password)
+                        'password' => bcrypt($request->password),
                     ]
                 );
                 $superadmin_role = Role::where('slug', 'super admin')->first();
@@ -427,9 +422,8 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'Account has been created successfully',
                 'user' => $user,
-                'roles' => $user->roles()->get()
+                'roles' => $user->roles()->get(),
             ], 201);
-
 
         } catch (\Exception $exp) {
             DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
@@ -447,7 +441,7 @@ class AuthController extends Controller
             'full_name' => 'required|string|between:2,100',
             'email' => 'required|string|between:2,100|unique:users',
             'password' => ['required', Password::min(6)->letters()->mixedCase()->numbers()->symbols()->uncompromised()],
-            'password_confirmation' => 'required|same:password'
+            'password_confirmation' => 'required|same:password',
         ]);
         if ($validator->fails()) {
             return response()->json(["message" => "Unprocessable data", "backendvalerrors" => $validator->errors()], 400);
@@ -459,7 +453,7 @@ class AuthController extends Controller
                 [
                     'full_name' => $request->full_name,
                     'email' => $request->email,
-                    'password' => bcrypt($request->password)
+                    'password' => bcrypt($request->password),
                 ]
             );
             $accesor_role = Role::where('id', $request->register_as)->first();
@@ -488,7 +482,7 @@ class AuthController extends Controller
             'full_name' => 'required|string|between:2,100',
             'email' => 'required|string|between:2,100|unique:users',
             'password' => ['required', Password::min(6)->letters()->mixedCase()->numbers()->symbols()->uncompromised()],
-            'password_confirmation' => 'required|same:password'
+            'password_confirmation' => 'required|same:password',
         ]);
         if ($validator->fails()) {
             return response()->json(["message" => "Unprocessable data", "backendvalerrors" => $validator->errors()], 400);
@@ -501,7 +495,7 @@ class AuthController extends Controller
                 [
                     'full_name' => $request->full_name,
                     'email' => $request->email,
-                    'password' => bcrypt($request->password)
+                    'password' => bcrypt($request->password),
                 ]
             );
             $uploader_role = Role::where('id', $request->register_as)->first();
@@ -509,14 +503,12 @@ class AuthController extends Controller
             $organization = Organization::where("id", $request->organization)->first();
             $organization->users()->attach($user);
 
-
             ValuerfirmUserInvite::where("invite_token", $request->invite_token)->update(['status' => 1]);
 
             DB::commit();
             return response()->json([
                 'message' => 'Account has been created successfully',
             ], 201);
-
 
         } catch (\Exception $exp) {
             DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
@@ -536,7 +528,7 @@ class AuthController extends Controller
             'full_name' => 'required|string|between:2,100',
             'email' => 'required|string|between:2,100',
             'password' => ['required', Password::min(6)->letters()->mixedCase()->numbers()->symbols()->uncompromised()],
-            'password_confirmation' => 'required|same:password'
+            'password_confirmation' => 'required|same:password',
         ]);
         if ($validator->fails()) {
             return response()->json($validator->errors()->toJson(), 400);
@@ -553,7 +545,7 @@ class AuthController extends Controller
                     [
                         'full_name' => $request->full_name,
                         'email' => $request->email,
-                        'password' => bcrypt($request->password)
+                        'password' => bcrypt($request->password),
                     ]
                 );
                 $uploaderadmin_role = Role::where('slug', 'report accessor admin')->first();
@@ -577,7 +569,6 @@ class AuthController extends Controller
 
                     $organization->users()->attach($user);
 
-
                 } else {
                     $organization->users()->attach($user);
                 }
@@ -587,14 +578,14 @@ class AuthController extends Controller
                 if (auth()->user() == null) {
                     return response()->json([
                         'code' => 0,
-                        'message' => 'Unauthorized access'
+                        'message' => 'Unauthorized access',
                     ], 401);
                 } else {
                     $user = User::create(
                         [
                             'full_name' => $request->full_name,
                             'email' => $request->email,
-                            'password' => bcrypt($request->password)
+                            'password' => bcrypt($request->password),
                         ]
                     );
                     //
@@ -613,15 +604,14 @@ class AuthController extends Controller
                 'message' => 'Account has been created successfully',
                 'organization_d_u' => $user->UploaderOrganization()->get(),
                 'organization_d_a' => $user->AccessorOrganization()->get(),
-                'user' => $user
+                'user' => $user,
             ], 201);
-
 
         } catch (\Exception $exp) {
             DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
             return response()->json([
                 'message' => 'Account has mot been created successfully',
-                'error' => $exp
+                'error' => $exp,
             ], 400);
 
         }
@@ -668,14 +658,13 @@ class AuthController extends Controller
                 'role' => $role,
                 'user_id' => $user,
                 'roles' => $user->roles()->get(["id", "name"]),
-                'permissions' => array_merge($role->permissions()->get(['id', 'slug as name'])->toArray())
+                'permissions' => array_merge($role->permissions()->get(['id', 'slug as name'])->toArray()),
             ]);
 
         } else {
             return response()->json(['message' => 'user not found'], 404);
 
         }
-
 
     }
     /**
@@ -703,7 +692,7 @@ class AuthController extends Controller
             return response()->json(
                 [
                     'user' => null,
-                    'error' => $e->getMessage()
+                    'error' => $e->getMessage(),
                 ]
             );
         }
@@ -723,7 +712,7 @@ class AuthController extends Controller
             'role' => $role,
             'user_id' => $user,
             'roles' => $user->roles()->get(["id", "name"]),
-            'permissions' => array_merge($user->permissions()->get(["id", "slug as name"])->toArray(), $role->permissions()->get(['id', 'slug as name'])->toArray())
+            'permissions' => array_merge($user->permissions()->get(["id", "slug as name"])->toArray(), $role->permissions()->get(['id', 'slug as name'])->toArray()),
         ]);
     }
 
@@ -735,7 +724,7 @@ class AuthController extends Controller
             'invite_completion_login_url' => 'required|url',
             'owner' => 'required',
             'property' => 'required',
-            'unit' => 'required'
+            'unit' => 'required',
         ]);
         if ($validator->fails()) {
             return response()->json(["message" => "Unprocessable data", "errors" => $validator->errors()], 422);
@@ -745,9 +734,8 @@ class AuthController extends Controller
         // If email exists
         $this->sendTenantInviteMail($request->all());
         return response()->json([
-            'message' => 'Check your inbox, we have sent a link to reset email.'
+            'message' => 'Check your inbox, we have sent a link to reset email.',
         ], Response::HTTP_OK);
-
 
     }
     public function sendTenantInviteMail($request)
@@ -781,7 +769,7 @@ class AuthController extends Controller
             'invite_completion_url' => $request['invite_completion_registration_url'],
             'invite_completion_login_url' => $request['invite_completion_login_url'],
             'token' => $token,
-            'created_at' => Carbon::now()
+            'created_at' => Carbon::now(),
         ]);
     }
     public function allUsers()
