@@ -191,8 +191,11 @@ class ValuerController extends Controller
                     // $file->move(public_path('reports'), $fileName);
                     // report object
                     $signatories = $request->signatories;
+                    $recipientusernames = $request->recipientUsersnames;
+                    $recipientuseremails = $request->recipientUsersemails;
+                    $recipientuserphones = $request->recipientUserphones;
                     // $jsonData = json_decode($request->getContent());
-                    return response()->json(['message' => $jsonData['signatories']], 403);
+                    // return response()->json(['message' => $jsonData['signatories']], 403);
                     // return $signatories;
                     $reporttosave['report_description'] = $request->propertyDescription;
                     $reporttosave['report_uploading_user'] = $user->user_id;
@@ -201,7 +204,7 @@ class ValuerController extends Controller
                     $reporttosave['forced_market_value'] = $request->forcedSaleValue;
                     $reporttosave['property_lr'] = $request->propertyLR;
                     $reporttosave['valuation_date'] = $request->valuationDate;
-                    $reporttosave['approving_director'] = $signatories[0]->value;
+                    $reporttosave['approving_director'] = $signatories[0];
                     $reporttosave['encumberrence_details'] = $request->propertyDescription;
                     $reporttosave['receiving_company_id'] = $request->recipientOrg;
                     $reporttosave['receiving_company_read_code'] = "0009";
@@ -225,10 +228,14 @@ class ValuerController extends Controller
                     $reporttosave['property_type'] = $request->propertyType;
                     $reporttosave['annual_gross_rental_income'] = $request->annualGrossVRevenue;
                     $reporttosave['land_size'] = $request->landSize;
-                    $reporttosave['no_of_signatories_to_sign'] = sizeof($request->signatories);
+                    $reporttosave['no_of_signatories_to_sign'] = $signatories[0];
                     $reporttosave['no_of_signatories_signed'] = 0;
-                    $reporttosave['tenure'] = $request->tenure;
+
+                    $tenuredetails = 1;
+                    $reporttosave['tenure'] = 1;
+
                     $reporttosave['status'] = 0;
+                    $reporttosave['report_uploading_user'] = auth()->user()->id;
 
                     // report object
 
@@ -255,7 +262,7 @@ class ValuerController extends Controller
 
                     // $datatosave['report_uploading_user'] = $user->id;
                     // $datatosave['valuation_date'] = date('Y-m-d', strtotime($request->valuation_date));
-                    // $datatosave['upload_link'] = $fileName;
+                    $reporttosave['upload_link'] = $fileName;
                     // $datatosave['report_uploading_from'] = $orgdetails->id;
                     // $datatosave['approving_director'] = 0;
                     // $datatosave['receiving_company_read_code'] = 9999;
@@ -264,11 +271,11 @@ class ValuerController extends Controller
                     $lastrow = (ValuationReport::latest()->first()) ? (ValuationReport::latest()->first()) : ['id' => 1];
                     $datatosave['id'] = $lastrow['id'] + 1;
                     $qrcode = $this->generateQRCode($orgdetails, $datatosave);
-                    $datatosave['qr_code'] = $qrcode;
-                    $reportd = ValuationReport::create($datatosave);
+                    $reporttosave['qr_code'] = $qrcode;
+                    $reportd = ValuationReport::create($reporttosave);
                     //append qr code
-                    $filePath = Storage::disk($disk)->path($fileName);
-                    $outputFilePath = Storage::disk($disk)->path("reports/" . $fileName . "_signed.pdf");
+                    $filePath = Storage::disk("public")->path("reports/" . $fileName);
+                    $outputFilePath = Storage::disk("public")->path("reports/" . $fileName . "_signed.pdf");
                     $this->appendQRCODE($filePath, $outputFilePath, $qrcode);
                     //append qr code
                     //generate qr code
@@ -277,9 +284,9 @@ class ValuerController extends Controller
                     $url = url("/");
                     $upurl = ['url_path' => $url . '/' . $outputFilePath];
                     $index = 0;
-                    $reportusersmails = $request->report_users_email;
-                    $reportusersphones = $request->report_users_phone;
-                    $reportusersnames = $request->report_users_name;
+                    $reportusersmails = explode(",", $request->recipientUsersemails);
+                    $reportusersphones = explode(",", $request->recipientUserphones);
+                    $reportusersnames = explode(",", $request->recipientUsersnames);
                     foreach ($reportusersmails as $reportusermail) {
                         //generate code
                         $accessCode = Str::random(8);
@@ -293,10 +300,12 @@ class ValuerController extends Controller
                         Mail::to($reportusermail)->send(new sendReportAccessMail($reportusersnames[$index],
                             $reportusermail, $reportusersphones[$index], $accessCode, array_merge($reportd->toArray(), $upurl), $orgdetails));
                         $index = $index + 1;
-
                     }
-
                     //close create users
+
+                    //reset everything about report
+
+                    //reset everything about report
                     DB::commit();
                     return response()->json([
                         'message' => 'Report send successfully',
@@ -442,7 +451,7 @@ class ValuerController extends Controller
             $fpdi->SetTextColor(153, 0, 153);
             $left = -0;
             $top = 0;
-            $fpdi->Image(public_path("reportqr_codes/" . $qrcode . ".png"), $top, $left, -350);
+            $fpdi->Image(Storage::disk("public")->path($qrcode), $top, $left, -350);
 
         }
         $fpdi->Output($outputFilePath, 'F');
@@ -456,6 +465,8 @@ class ValuerController extends Controller
             ->generate('A simple example of QR code!');
         $output_file = '/reports/img-' . time() . '.png';
         Storage::disk('public')->put($output_file, $image);
+
+        return $output_file;
         // $writer = new PngWriter();
         // // Create QR code
         // $qrfilelabel = $this->generateValuationCode($repoertdetais['id']);

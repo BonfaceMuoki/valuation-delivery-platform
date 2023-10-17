@@ -21,7 +21,6 @@ export const uploaderApiEndpoints = apiSlice.injectEndpoints({
                 body: formData,
                 headers: {
                     'Accept': 'Application/json',
-                    'Content-Type': 'application/json'
                 }
             })
         }),

@@ -1109,7 +1109,22 @@ const ValuationSummary = (props) => {
     formdata.append("landSize", propertdetails.landSize);
     formdata.append("tenure", propertdetails.tenure);
     formdata.append("recipientOrg", valuationdetails.recipient[0].value);
-    formdata.append("recipientUsers", recipientrecipientsList);
+
+    const recnames = [];
+    const reemails = [];
+    const rephones = [];
+    for (const item of recipientrecipientsList) {
+      recnames.push(item.name);
+      reemails.push(item.email);
+      rephones.push(item.phone);
+    }
+
+    formdata.append("recipientUsersnames", [recnames]);
+    formdata.append("recipientUsersemails", [reemails]);
+    formdata.append("recipientUserphones", [rephones]);
+
+
+
     formdata.append("marketValue", valuationdetails.marketValue);
     formdata.append("forcedSaleValue", valuationdetails.forcedSaleValue);
     formdata.append("insurenceValue", valuationdetails.insurenceValue);
@@ -1118,8 +1133,12 @@ const ValuationSummary = (props) => {
     formdata.append("instructionDate", valuationdetails.InstructionDate);
     formdata.append("propertyDescription", valuationdetails.PropertyDescription);
 
+    const signs = [];
 
-    formdata.append("signatories", signatories.signatories);
+    for (const item of signatories.signatories) {
+      signs.push(item.value);
+    }
+    formdata.append("signatories", signs);
 
 
     if (type === "1") {
@@ -1127,6 +1146,7 @@ const ValuationSummary = (props) => {
     } else {
       formdata.append("signatureNeeded", 0);
     }
+    // console.log(recnames);
     const submitvaluationreportresutlt = await submitvaluationreport(formdata);
   }
 
