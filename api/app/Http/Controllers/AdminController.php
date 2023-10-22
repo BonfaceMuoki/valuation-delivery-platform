@@ -201,6 +201,48 @@ class AdminController extends Controller
             return response()->json(['message' => 'Permission Denie'], 401);
         }
     }
+    public function updatePermission(Request $request)
+    {
+        $user = auth()->user();
+        if ($user->hasPermissionTo(Permission::where("slug", "add permission")->first())) {
+            $validator = Validator::make($request->all(), [
+                'permission_name' => 'required|unique:permissions,name',
+                'permission' => 'required',
+            ]);
+            if ($validator->fails()) {
+                return response()->json(["message" => "Unprocessable data", "errors" => $validator->errors()], 422);
+            }
+            try {
+                DB::beginTransaction();
+                // $permissions = json_decode(stripslashes($request->post('permission_name')), true);
+                // foreach ($permissions as $perm) {
+                //     //check if exists
+                // $found = Permission::where("name", )->get();
+                // if (sizeof($found) == 0) {
+                $permission['name'] = $request->permission_name;
+                $permission['slug'] = strtolower($request->permission_name);
+                $permission['status'] = 1;
+                $perm = Permission::findOrFail($request->permission);
+                $perm->update($permission);
+                // }
+                //check if exists
+
+                // }
+                DB::commit();
+                return response()->json([
+                    'message' => 'Updated successfully',
+                ], 201);
+            } catch (\Exception $exception) {
+                DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
+                return response()->json([
+                    'message' => 'Failed.',
+                    'error' => $exception->getMessage(),
+                ], 400);
+            }
+        } else {
+            return response()->json(['message' => 'Permission Denie'], 401);
+        }
+    }
     public function attachPermissionsToRole(Request $request)
     {
 
@@ -217,11 +259,27 @@ class AdminController extends Controller
     {
 
     }
-    public function getAllPermissions()
+    public function translatePermissionSortColumn($columnalias)
+    {
+        if ($columnalias == "permission_name") {
+            return "name";
+        }
+    }
+    public function getAllPermissions(Request $request)
     {
         $user = auth()->user();
         if ($user->hasPermissionTo(Permission::where("slug", "assign role permission")->first())) {
-            return response()->json(Permission::orderBy('name', 'ASC')->get(), 201);
+            $query = Permission::query();
+            if ($request->filled("sort_column")) {
+
+            }
+            if ($request->filled("search")) {
+                $query->where("name", 'LIKE', '%' . $request->search . '%');
+            }
+            $query->orderBy($this->translatePermissionSortColumn($request->orderby), $request->sortOrder);
+            $results = $query->paginate($request->no_records);
+            return response()->json($results, 201);
+
         } else {
             return response()->json(['message' => 'Permission Denie'], 401);
         }
@@ -314,7 +372,6 @@ class AdminController extends Controller
             return response()->json(["message" => "Unprocessable data", "errors" => $validator->errors()], 422);
         }
         // If email does not exist
-
         // If email exists
         $this->sendValuationInviteMail($request->all());
         return response()->json([

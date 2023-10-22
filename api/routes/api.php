@@ -42,7 +42,6 @@ Route::group([
     Route::get('/refresh', [AuthController::class, 'refresh']);
     Route::get('/user-profile', [AuthController::class, 'userProfile']);
     Route::get('/user-information', [AuthController::class, 'userProfileDetails']);
-
     Route::get('/retrieve-valuer-invite-details', [AuthController::class, 'retrieveValuerInviteDetails']);
     Route::get('/retrieve-valuer-user-invite-details', [AuthController::class, 'retrieveValuerUserInviteDetails']);
     Route::get('/retrieve-accessor-user-invite-details', [AuthController::class, 'retrieveAccesorUserInviteDetails']);
@@ -62,7 +61,6 @@ Route::group([
     Route::get('/downloadvaluationreport/{id}/{signed}', [CommonController::class, 'downloadValuationReport']);
     Route::get('/get-all-users', [CommonController::class, 'getAllUsers']);
     Route::get('/get-all-propertytypes', [CommonController::class, 'getAllProprtyTypes']);
-
 });
 Route::group([
     'middleware' => 'api',
@@ -70,10 +68,15 @@ Route::group([
 ], function ($router) {
     Route::post('/add-role', [AdminController::class, 'addRoles']);
     Route::patch('/update-role/{id}', [AdminController::class, 'updateRole']);
+
     Route::delete('/delete-role/{id}', [AdminController::class, 'deleteRole']);
     Route::get('/get-all-roles', [AdminController::class, 'getAllRoles']);
     Route::get('/get-all-permissions', [AdminController::class, 'getAllPermissions']);
+    Route::get('/get-role-permissions', [AdminController::class, 'getRolePermissions']);
+
     Route::post('/add-permissions', [AdminController::class, 'addPermissions']);
+    Route::post('/update-permission', [AdminController::class, 'updatePermission']);
+
     Route::post('/assign-role-permissions', [AdminController::class, 'assignRolePermissions']);
     Route::post('/send-valuation-firm-invite', [AdminController::class, 'sendValuationFirmInvite']);
     Route::post('/send-accesor-invite', [AdminController::class, 'sendAccesorInvite']);
@@ -84,7 +87,6 @@ Route::group([
     Route::post('/reject-valuation-access-request', [AdminController::class, 'rejectValuationAccessRequest']);
     Route::post('/archive-valuer-registration-request', [AdminController::class, 'archiveValuationAccessRequest']);
     Route::get('/get-Valuer-request-registration-status', [AdminController::class, 'getValuerRequestRegistrationStatus']);
-
     Route::get('/get-accesor-access-requests', [AdminController::class, 'getAccesorAccessRequests']);
     Route::post('/accept-accesor-access-request', [AdminController::class, 'acceptAccesorAccessRequest']);
     Route::post('/reject-accesor-access-request', [AdminController::class, 'rejectAccesorAccessRequest']);
@@ -97,11 +99,9 @@ Route::group([
 ], function ($router) {
     Route::post('/upload-report', [ValuerController::class, 'uploadReport']);
     Route::post('/upload-valuation-report', [ValuerController::class, 'uploadReport']);
-
     Route::post('/upload-cached-report-document', [ValuerController::class, 'uploadCachedReportDoc']);
     Route::get('/get-current-uploaded-file', [ValuerController::class, 'getCurrentUploadedFile']);
     Route::get('/donwload-cached-image', [ValuerController::class, 'donwloadCachedImage']);
-
     Route::post('/upload-valuation-report-v2', [ValuerController::class, 'uploadReportV2']);
     Route::get('/addimage', [ValuerController::class, 'writeToPDF']);
     Route::get('/generate-qr-report', [ValuerController::class, 'generateQRCode']);
@@ -112,7 +112,6 @@ Route::group([
     Route::post('/send-user-invite', [ValuerController::class, 'sendUserInvite']);
     Route::post('/block-user', [ValuerController::class, 'blockUser']);
 });
-
 Route::group([
     'middleware' => 'api',
     'prefix' => 'accesor',
@@ -123,6 +122,5 @@ Route::group([
     Route::get('/get-dashboard', [AccesorController::class, 'AccesorDashboardSummary']);
     Route::post('/send-user-invite', [AccesorController::class, 'sendUserInvite']);
 });
-
 Route::post('/reset-password-request', [PasswordResetRequestController::class, 'sendPasswordResetEmail']);
 Route::post('/change-password', [ChangePasswordController::class, 'passwordResetProcess']);

@@ -29,7 +29,7 @@ export const DataTableBody = ({ compact, className, bodyclass, ...props }) => {
 };
 
 export const DataTableHead = ({ ...props }) => {
-  return <div className="nk-tb-item nk-tb-head">{props.children}</div>;
+  return <div className="nk-tb-item nk-tb-head" style={{ backgroundColor: "#F5F5F5" }}>{props.children}</div>;
 };
 
 export const DataTableRow = ({ className, size, ...props }) => {

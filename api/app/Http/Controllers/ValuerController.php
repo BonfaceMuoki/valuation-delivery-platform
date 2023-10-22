@@ -238,7 +238,6 @@ class ValuerController extends Controller
                     $reporttosave['report_uploading_user'] = auth()->user()->id;
 
                     // report object
-
                     //    get cached file
                     $recordcached = CachedReport::where(
                         ['user_id' => $user->id,
@@ -278,7 +277,7 @@ class ValuerController extends Controller
                     $outputFilePath = Storage::disk("public")->path("reports/" . $fileName . "_signed.pdf");
                     $this->appendQRCODE($filePath, $outputFilePath, $qrcode);
                     //append qr code
-                    //generate qr code
+                    //generate qr code 3620, 2370, 3520
 
                     //create users
                     $url = url("/");
@@ -289,20 +288,21 @@ class ValuerController extends Controller
                     $reportusersnames = explode(",", $request->recipientUsersnames);
                     foreach ($reportusersmails as $reportusermail) {
                         //generate code
-                        $accessCode = Str::random(8);
+                        if ($reportusermail != "" && $reportusermail != null) {
+                            $accessCode = Str::random(8);
+                            $reportuser['name'] = $reportusersnames[$index];
+                            $reportuser['phone'] = $reportusersphones[$index];
+                            $reportuser['email'] = $reportusermail;
+                            $reportuser['access_code'] = $accessCode;
+                            $reportuser['valuation_report_id'] = $reportd->id;
+                            ReportUser::create($reportuser);
+                            Mail::to($reportusermail)->send(new sendReportAccessMail($reportusersnames[$index],
+                                $reportusermail, $reportusersphones[$index], $accessCode, array_merge($reportd->toArray(), $upurl), $orgdetails));
+                            $index = $index + 1;
+                        }
 
-                        $reportuser['name'] = $reportusersnames[$index];
-                        $reportuser['phone'] = $reportusersphones[$index];
-                        $reportuser['email'] = $reportusermail;
-                        $reportuser['access_code'] = $accessCode;
-                        $reportuser['valuation_report_id'] = $reportd->id;
-                        ReportUser::create($reportuser);
-                        Mail::to($reportusermail)->send(new sendReportAccessMail($reportusersnames[$index],
-                            $reportusermail, $reportusersphones[$index], $accessCode, array_merge($reportd->toArray(), $upurl), $orgdetails));
-                        $index = $index + 1;
                     }
                     //close create users
-
                     //reset everything about report
 
                     //reset everything about report

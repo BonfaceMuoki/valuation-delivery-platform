@@ -5,7 +5,7 @@ import RecentInvest from "../components/partials/invest/recent-investment/Recent
 import Notifications from "../components/partials/default/notification/Notification";
 import { DropdownToggle, DropdownMenu, Card, UncontrolledDropdown, DropdownItem } from "reactstrap";
 
-import { useGetAccesorRequestsQuery,useApproveAccesorRequestMutation,useRejectAccesorRequestMutation } from "../api/admin/accesorRequestsSlliceApi";
+import { useGetAccesorRequestsQuery, useApproveAccesorRequestMutation, useRejectAccesorRequestMutation } from "../api/admin/accesorRequestsSlliceApi";
 import {
   Block,
   BlockDes,
@@ -27,6 +27,9 @@ import ValuerAccessInvite from "./valuerspages/valuerAccessInvites";
 
 const ValuerDashboard = () => {
   const [sm, updateSm] = useState(false);
+
+
+
   return (
     <>
       <Head title="Invest Dashboard" />
@@ -49,14 +52,14 @@ const ValuerDashboard = () => {
                 </Button>
                 <div className="toggle-expand-content" style={{ display: sm ? "block" : "none" }}>
                   <ul className="nk-block-tools g-3">
-             
+
                     <li>
                       <Button color="primary" outline className="btn-dim btn-white">
                         <Icon name="mail"></Icon>
                         <span>New Broadcast Message</span>
                       </Button>
                     </li>
-                
+
                   </ul>
                 </div>
               </div>
@@ -84,7 +87,7 @@ const ValuerDashboard = () => {
                 </div>
                 <div className="card-amount">
                   <span className="amount">
-                     4
+                    4
                   </span>
                   <span className="change up text-success">
                     {/* <Icon name="arrow-long-up"></Icon>1.93% */}
@@ -141,13 +144,13 @@ const ValuerDashboard = () => {
                     <div className="invest-data-history">
                       <div className="title">Lenders</div>
                       <div className="amount">
-                         3<span className="currency currency-usd">Lenders</span>
+                        3<span className="currency currency-usd">Lenders</span>
                       </div>
                     </div>
                     <div className="invest-data-history">
                       <div className="title">Courts</div>
                       <div className="amount">
-                         2<span className="currency currency-usd">Courts</span>
+                        2<span className="currency currency-usd">Courts</span>
                       </div>
                     </div>
                   </div>

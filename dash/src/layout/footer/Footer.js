@@ -8,11 +8,11 @@ const Footer = () => {
         <div className="nk-footer-wrap">
           <div className="nk-footer-copyright">
             {" "}
-            &copy; 2022 DashLite. Template by <a href="https://softnio.com">Softnio</a>
+            &copy; {new Date().getFullYear()}  <a href="https://prowiz.tech/">PROWIZ TECHNOLOGIES</a>
           </div>
           <div className="nk-footer-links">
             <ul className="nav nav-sm">
-              <li className="nav-item">
+              {/* <li className="nav-item">
                 <Link to={`${process.env.PUBLIC_URL}/pages/terms-policy`} className="nav-link">
                   Terms
                 </Link>
@@ -26,7 +26,7 @@ const Footer = () => {
                 <Link to={`${process.env.PUBLIC_URL}/pages/terms-policy`} className="nav-link">
                   Help
                 </Link>
-              </li>
+              </li> */}
             </ul>
           </div>
         </div>

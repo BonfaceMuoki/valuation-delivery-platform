@@ -108,12 +108,28 @@ const authSlice = createSlice({
         },
         setGpsDetails: (state, action) => {
             state.gpsDetails = action.payload;
+        },
+        clearValuationReportData: (state, action) => {
+            state.reportDoc = null;
+            state.reportSignatories = null;
+            state.reportRecepient = null;
+            state.selectedPropertyType = null;
+            state.selectedRecipient = null;
+            state.recipientUsernames = null;
+            state.recipientEmails = null;
+            state.recipientPhones = null;
+            state.selectedAccesors = null;
+            state.gpsDetails = null;
+            state.recipientRecipients = null;
+            state.valuationLocationDetails = null;
+            state.valuationPropertynDetails = null;
+            state.valuationValuationDetails = null;
         }
 
     },
 })
 
-export const { setRecipientRecipients, upDateRecipientRecipientsProperty, setGpsDetails, upDateRecipientRecipients, setSelectedAccesors, setRecipientUsernames, setRecipientPhone, setRecipientEmails, setSelectedRecipient, setSelectedPropertyType, setReportSignatories, setReportRecipient, updateUserDetails, setCredentials, logOut, setMode, setfetchvaluationreports, setValuationLocationDetails, setValuationPropertyDetails, setValuationDetails } = authSlice.actions
+export const { clearValuationReportData, setRecipientRecipients, upDateRecipientRecipientsProperty, setGpsDetails, upDateRecipientRecipients, setSelectedAccesors, setRecipientUsernames, setRecipientPhone, setRecipientEmails, setSelectedRecipient, setSelectedPropertyType, setReportSignatories, setReportRecipient, updateUserDetails, setCredentials, logOut, setMode, setfetchvaluationreports, setValuationLocationDetails, setValuationPropertyDetails, setValuationDetails } = authSlice.actions
 
 export default authSlice.reducer
 export const selectCurrentUser = (state) => state.auth.user

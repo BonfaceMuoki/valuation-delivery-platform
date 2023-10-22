@@ -17,7 +17,7 @@ import * as Yup from 'yup';
 import { useSelector, useDispatch } from "react-redux";
 import { GoogleMapsProvider, useGoogleMap } from "@ubilabs/google-maps-react-hooks";
 import MapWithAutoSearch from "./MapWithAutoSearch";
-import { upDateRecipientRecipientsProperty, selectCurrentSignatories, selectCurrentToken, setReportSignatories, setValuationLocationDetails, upDateRecipientRecipients, selectRecipientRecipients, setRecipientRecipients } from "../../featuers/authSlice";
+import { upDateRecipientRecipientsProperty, clearValuationReportData, selectCurrentSignatories, selectCurrentToken, setReportSignatories, setValuationLocationDetails, upDateRecipientRecipients, selectRecipientRecipients, setRecipientRecipients } from "../../featuers/authSlice";
 import { Alert } from "reactstrap";
 import {
   selectLocationDetails,
@@ -43,6 +43,7 @@ import { useCacheReportDocumentMutation, useDownLoadCachedFileMutation, useGetCu
 import Swal from "sweetalert2";
 import axios from 'axios';
 import { selectGPSDetails } from "../../featuers/authSlice";
+import { Spinner } from "reactstrap";
 
 
 const LocationForm = (props) => {
@@ -1043,6 +1044,7 @@ const ValuationSignatures = (props) => {
   );
 };
 const ValuationSummary = (props) => {
+  const dispatch = useDispatch();
   let recipientrecipientsList = useSelector(selectRecipientRecipients);
   console.log(recipientrecipientsList, "summary recipientrecipientsList");
   const { data: ccurrentuploadedfile, refetch: refetchUploadedFile } = useGetCurrentUploadedFileQuery();
@@ -1057,9 +1059,9 @@ const ValuationSummary = (props) => {
   console.log(propertdetails, "propertdetails");
   console.log(locationdetails, "locationdetails");
   console.log(valuationdetails, "valutiondetails");
-  console.log(signatories.signatories, "signatories");
+  console.log(signatories?.signatories, "signatories");
   console.log(recipientrecipients, "recipientrecipient");
-  const [submitvaluationreport, { errors: errorsuploadingreport }] = useSubmitValuationReportMutation();
+  const [submitvaluationreport, { errors: errorsuploadingreport, isLoading: isSubmittingReport }] = useSubmitValuationReportMutation();
   const token = useSelector(selectCurrentToken);
   const downloadReport = () => {
     const headers = {
@@ -1082,33 +1084,33 @@ const ValuationSummary = (props) => {
   }
   const handleSubmitValuationReport = async (type) => {
     const formdata = new FormData();
-    formdata.append("e_location_name", locationdetails.locationName);
-    formdata.append("e_location_county", locationdetails.county);
-    formdata.append("e_location_town", locationdetails.town);
-    formdata.append("e_location_street", locationdetails.street);
+    formdata.append("e_location_name", locationdetails?.locationName);
+    formdata.append("e_location_county", locationdetails?.county);
+    formdata.append("e_location_town", locationdetails?.town);
+    formdata.append("e_location_street", locationdetails?.street);
 
-    formdata.append("e_location_neighbourhood", locationdetails.neighbourHood);
+    formdata.append("e_location_neighbourhood", locationdetails?.neighbourHood);
     if (gpsdetails.type === "auto") {
-      formdata.append("a_location_lat", gpsdetails.details.lat);
-      formdata.append("a_location_long", gpsdetails.details.long);
-      formdata.append("a_location_city", gpsdetails.details.name);
-      formdata.append("a_location_town", gpsdetails.details.name);
-      formdata.append("a_location_street", gpsdetails.details.name);
+      formdata.append("a_location_lat", gpsdetails?.details.lat);
+      formdata.append("a_location_long", gpsdetails?.details.long);
+      formdata.append("a_location_city", gpsdetails?.details.name);
+      formdata.append("a_location_town", gpsdetails?.details.name);
+      formdata.append("a_location_street", gpsdetails?.details.name);
 
     } else if (gpsdetails.type === "custom") {
-      formdata.append("a_location_lat", gpsdetails.details.lat);
-      formdata.append("a_location_long", gpsdetails.details.long);
-      formdata.append("a_location_city", gpsdetails.details.name);
-      formdata.append("a_location_town", gpsdetails.details.name);
-      formdata.append("a_location_street", gpsdetails.details.name);
+      formdata.append("a_location_lat", gpsdetails?.details.lat);
+      formdata.append("a_location_long", gpsdetails?.details.long);
+      formdata.append("a_location_city", gpsdetails?.details.name);
+      formdata.append("a_location_town", gpsdetails?.details.name);
+      formdata.append("a_location_street", gpsdetails?.details.name);
     }
 
-    formdata.append("propertyLR", propertdetails.PropertyLR);
-    formdata.append("propertyType", propertdetails.PropertyType[0].value);
-    formdata.append("totalBultUpArea", propertdetails.totalBuiltUpArea);
-    formdata.append("landSize", propertdetails.landSize);
-    formdata.append("tenure", propertdetails.tenure);
-    formdata.append("recipientOrg", valuationdetails.recipient[0].value);
+    formdata.append("propertyLR", propertdetails?.PropertyLR);
+    formdata.append("propertyType", propertdetails?.PropertyType[0].value);
+    formdata.append("totalBultUpArea", propertdetails?.totalBuiltUpArea);
+    formdata.append("landSize", propertdetails?.landSize);
+    formdata.append("tenure", propertdetails?.tenure);
+    formdata.append("recipientOrg", valuationdetails?.recipient[0].value);
 
     const recnames = [];
     const reemails = [];
@@ -1122,20 +1124,17 @@ const ValuationSummary = (props) => {
     formdata.append("recipientUsersnames", [recnames]);
     formdata.append("recipientUsersemails", [reemails]);
     formdata.append("recipientUserphones", [rephones]);
-
-
-
-    formdata.append("marketValue", valuationdetails.marketValue);
-    formdata.append("forcedSaleValue", valuationdetails.forcedSaleValue);
-    formdata.append("insurenceValue", valuationdetails.insurenceValue);
-    formdata.append("annualGrossVRevenue", valuationdetails.annualGRossRentalIncome);
-    formdata.append("valuationDate", valuationdetails.valuationDate);
-    formdata.append("instructionDate", valuationdetails.InstructionDate);
-    formdata.append("propertyDescription", valuationdetails.PropertyDescription);
+    formdata.append("marketValue", valuationdetails?.marketValue);
+    formdata.append("forcedSaleValue", valuationdetails?.forcedSaleValue);
+    formdata.append("insurenceValue", valuationdetails?.insurenceValue);
+    formdata.append("annualGrossVRevenue", valuationdetails?.annualGRossRentalIncome);
+    formdata.append("valuationDate", valuationdetails?.valuationDate);
+    formdata.append("instructionDate", valuationdetails?.InstructionDate);
+    formdata.append("propertyDescription", valuationdetails?.PropertyDescription);
 
     const signs = [];
 
-    for (const item of signatories.signatories) {
+    for (const item of signatories?.signatories) {
       signs.push(item.value);
     }
     formdata.append("signatories", signs);
@@ -1148,6 +1147,26 @@ const ValuationSummary = (props) => {
     }
     // console.log(recnames);
     const submitvaluationreportresutlt = await submitvaluationreport(formdata);
+    if ("error" in submitvaluationreportresutlt) {
+
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: submitvaluationreportresutlt.error.data.message,
+        focusConfirm: false
+      });
+    } else {
+      dispatch(clearValuationReportData());
+      Swal.fire({
+        icon: "success",
+        title: "Upload Of A valuation report",
+        text: submitvaluationreportresutlt.data.message,
+        focusConfirm: false
+      });
+      // toastMessage(result.data.message, "success");
+
+      // resetInvestmenrForm();
+    }
   }
 
   const [isOpen, setIsOpen] = useState("1");
@@ -1172,34 +1191,35 @@ const ValuationSummary = (props) => {
                   <div className="rating-card">
                     <div className="d-flex align-center justify-content-between py-1 " style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Location Name:</span>
-                      {locationdetails.locationName}
+                      {locationdetails?.locationName}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">County</span>
-                      {locationdetails.county}
+                      {locationdetails?.county}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Town</span>
-                      {locationdetails.town}
+                      {locationdetails?.town}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Street</span>
-                      {locationdetails.street}
+                      {locationdetails?.street}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Neighbourhood</span>
-                      {locationdetails.neighbourHood}
+                      {locationdetails?.neighbourHood}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">GPS Location Name</span>
-                      {locationdetails.locationName}
+                      {locationdetails?.locationName}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">GPS Latitude</span>
-
+                      {gpsdetails?.lat}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">GPS Longitude</span>
+                      {locationdetails?.long}
                     </div>
                   </div>
 
@@ -1228,23 +1248,23 @@ const ValuationSummary = (props) => {
                   <div className="rating-card">
                     <div className="d-flex align-center justify-content-between py-1 " style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Property LR:</span>
-                      {propertdetails.PropertyLR}
+                      {propertdetails?.PropertyLR}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Property Type:</span>
-                      {propertdetails.PropertyType[0].label}
+                      {propertdetails?.PropertyType[0].label}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Total Built Up Area:</span>
-                      {propertdetails.totalBuiltUpArea}
+                      {propertdetails?.totalBuiltUpArea}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Land Size:</span>
-                      {propertdetails.landSize}
+                      {propertdetails?.landSize}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Tenure</span>
-                      {propertdetails.tenure}
+                      {propertdetails?.tenure}
                     </div>
 
                   </div>
@@ -1274,40 +1294,40 @@ const ValuationSummary = (props) => {
                   <div className="rating-card">
                     <div className="d-flex align-center justify-content-between py-1 " style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Recipient:</span>
-                      {valuationdetails.recipient[0].label}
+                      {valuationdetails?.recipient[0]?.label}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Market Value:</span>
-                      {valuationdetails.marketValue}
+                      {valuationdetails?.marketValue}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Forced Sale Value:</span>
-                      {valuationdetails.forcedSaleValue}
+                      {valuationdetails?.forcedSaleValue}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Insurence Value:</span>
-                      {valuationdetails.insurenceValue}
+                      {valuationdetails?.insurenceValue}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Annual Grooss Income:</span>
-                      {valuationdetails.annualGRossRentalIncome}
+                      {valuationdetails?.annualGRossRentalIncome}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Valuation Date:</span>
-                      {valuationdetails.valuationDate}
+                      {valuationdetails?.valuationDate}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Instruction Date</span>
-                      {valuationdetails.InstructionDate}
+                      {valuationdetails?.InstructionDate}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Property Description:</span>
-                      {valuationdetails.PropertyDescription}
+                      {valuationdetails?.PropertyDescription}
                     </div>
                     <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
                       <span className="text-muted">Report Uploaded:</span>
                       {
-                        (ccurrentuploadedfile && ccurrentuploadedfile.file_name != '') &&
+                        (ccurrentuploadedfile && ccurrentuploadedfile?.file_name != '') &&
                         <Alert color="primary">
                           {/* <a
                 href={`${process.env.REACT_APP_API_BASE_URL}/api/uploader/donwload-cached-image?file=${ccurrentuploadedfile.file_name}`}
@@ -1357,9 +1377,9 @@ const ValuationSummary = (props) => {
                           return (
                             <tr key={index}>
 
-                              <td>{rec.name}</td>
-                              <td>{rec.email}</td>
-                              <td>{rec.phone}</td>
+                              <td>{rec?.name}</td>
+                              <td>{rec?.email}</td>
+                              <td>{rec?.phone}</td>
                             </tr>
 
                           );
@@ -1398,7 +1418,7 @@ const ValuationSummary = (props) => {
                     </thead>
                     <tbody>
                       {
-                        signatories.signatories.map((rec, index) => {
+                        signatories?.signatories.map((rec, index) => {
                           return (
                             <tr key={index}>
                               <td>{rec?.label}</td>
@@ -1421,18 +1441,43 @@ const ValuationSummary = (props) => {
       <div className="actions clearfix m-20">
         <ul>
           <li>
-            <Button color="primary" type="submit" onClick={() => handleSubmitValuationReport('1')}>
-              Submit Report To Lender
+            <Button color="primary" type="submit" onClick={() => handleSubmitValuationReport('1')} disabled={isSubmittingReport} >
+              {
+                (!isSubmittingReport) && <span>Submit Report To Lender</span>
+              }
+              {
+                (isSubmittingReport) && <>
+                  <Spinner size="sm" />
+                  <span> Submitting to Lender... </span>
+                </>
+              }
             </Button>
           </li>
           <li>
-            <Button color="primary" type="submit" onClick={() => handleSubmitValuationReport('0')}>
-              Send Report to Signatories
+            <Button color="primary" type="submit" onClick={() => handleSubmitValuationReport('0')} disabled={isSubmittingReport}>
+              {
+                (!isSubmittingReport) && <span>Send Report to Signatories</span>
+              }
+              {
+                (isSubmittingReport) && <>
+                  <Spinner size="sm" />
+                  <span> Submitting to Signatories... </span>
+                </>
+              }
+
             </Button>
           </li>
           <li>
-            <Button color="primary" onClick={props.prev}>
-              Previous
+            <Button color="primary" onClick={props.prev} disabled={isSubmittingReport}>
+              {
+                (!isSubmittingReport) && <span>Previous</span>
+              }
+              {
+                (isSubmittingReport) && <>
+                  <Spinner size="sm" />
+                  <span> Submitting to Signatories... </span>
+                </>
+              }
             </Button>
           </li>
         </ul>

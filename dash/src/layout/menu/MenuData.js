@@ -72,6 +72,10 @@ const menuadmin = [
         text: "Permissions - Permissions List",
         link: "/admin/permissions",
       },
+      {
+        text: "Roles - Role Permissions",
+        link: "/admin/role-permissions",
+      },
     ],
   },
 ];
