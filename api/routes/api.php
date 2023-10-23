@@ -77,6 +77,8 @@ Route::group([
     Route::post('/add-permissions', [AdminController::class, 'addPermissions']);
     Route::post('/update-permission', [AdminController::class, 'updatePermission']);
 
+    Route::delete('/delete-permission/{permission}', [AdminController::class, 'deletePermission']);
+
     Route::post('/assign-role-permissions', [AdminController::class, 'assignRolePermissions']);
     Route::post('/send-valuation-firm-invite', [AdminController::class, 'sendValuationFirmInvite']);
     Route::post('/send-accesor-invite', [AdminController::class, 'sendAccesorInvite']);

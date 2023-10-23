@@ -243,6 +243,32 @@ class AdminController extends Controller
             return response()->json(['message' => 'Permission Denie'], 401);
         }
     }
+    public function deletePermission($permission)
+    {
+        $user = auth()->user();
+        if ($user->hasPermissionTo(Permission::where("slug", "add permission")->first())) {
+
+            try {
+                DB::beginTransaction();
+
+                $perm = Permission::findOrFail($permission);
+                $perm->delete();
+
+                DB::commit();
+                return response()->json([
+                    'message' => 'Deleted successfully',
+                ], 201);
+            } catch (\Exception $exception) {
+                DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
+                return response()->json([
+                    'message' => 'Failed.',
+                    'error' => $exception->getMessage(),
+                ], 400);
+            }
+        } else {
+            return response()->json(['message' => 'Permission Denied'], 401);
+        }
+    }
     public function attachPermissionsToRole(Request $request)
     {
 

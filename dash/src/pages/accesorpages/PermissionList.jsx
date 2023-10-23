@@ -29,7 +29,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import { toast } from "react-toastify";
-import { useGetPermissionsListQuery, useCreatePermissionMutation, useUpdatePermissionMutation } from "../../api/admin/adminActionsApi";
+import { useGetPermissionsListQuery, useCreatePermissionMutation, useUpdatePermissionMutation, useDeletePermissionMutation } from "../../api/admin/adminActionsApi";
 import { Row, Col } from "reactstrap";
 import Select from "react-select";
 
@@ -180,6 +180,7 @@ const PermissionList = () => {
     //form to assin
     const [createPerm, { errors: errorsCreatingPermission }] = useCreatePermissionMutation();
     const [updatePerm, { errors: errorsUpdatingPermission }] = useUpdatePermissionMutation();
+
     const onSubmitAssignPermissionForm = async (data) => {
         console.log(data);
         let result = null;
@@ -219,16 +220,52 @@ const PermissionList = () => {
         setSortOrder((sortOrder === "DESC") ? "ASC" : "DESC");
         refetchPermissions();
     }
-
     //form to assign
     // edit permission
-
     const showEditPermission = (item) => {
         setEditting(true);
         setEditRecord(item);
         setPermissionValue("permissionName", item.name);
         setPermissionValue("permissionSlug", item.slug);
         setShowModalCreatePermission(true);
+    }
+
+    const [deletePermission, { errors: errorsDeletingPermission }] = useDeletePermissionMutation();
+    const fireDeletePermission = (item) => {
+        Swal.fire({
+            title: "Deleting Permission",
+            text: "Are you sure you want to delete " + item.name + " ?",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes! Delete",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                proceedToDelete(item);
+            } else {
+
+            }
+        });
+    }
+    const proceedToDelete = async (data) => {
+        const result = deletePermission(data.id);
+
+        console.log(result, "resultresult");
+        if ("error" in result) {
+            Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: result.error.data.message,
+                focusConfirm: false
+            });
+        } else {
+            Swal.fire({
+                icon: "success",
+                title: "Adding Permission",
+                text: "Deleted Successfully",
+                focusConfirm: false
+            });
+            refetchPermissions();
+        }
     }
     // edit permission
 
@@ -436,7 +473,7 @@ const PermissionList = () => {
                                                                     </DropdownItem>
                                                                 </li>
                                                                 <li className="divider" ></li>
-                                                                <li onClick={() => deletePermission(item)}>
+                                                                <li onClick={() => fireDeletePermission(item)}>
                                                                     <DropdownItem
                                                                         tag="a"
                                                                         href="#suspend"
