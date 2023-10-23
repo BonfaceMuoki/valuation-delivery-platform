@@ -337,7 +337,7 @@ const RoleList = () => {
                                             {item?.slug}
                                         </DataTableRow>
                                         <DataTableRow className="nk-tb-col-tools">
-                                            <ul className="nk-tb-actions gx-1">
+                                            <ul className="nk-tb-actions gx-1" style={{ display: "flex", justifyContent: "left" }}>
                                                 <li>
                                                     <UncontrolledDropdown>
                                                         <DropdownToggle tag="a" className="dropdown-toggle btn btn-icon btn-trigger">
