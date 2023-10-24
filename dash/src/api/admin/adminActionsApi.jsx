@@ -53,6 +53,16 @@ export const retrieveAdminDashboardSliceApi = apiSlice.injectEndpoints({
                 }
             })
         }),
+        updateRolePermission: builder.mutation({
+            query: credentials => ({
+                url: '/api/admin/update-role-permission',
+                method: 'POST',
+                body: { ...credentials },
+                headers: {
+                    'Accept': 'Application/json'
+                }
+            })
+        }),
         getPermissionsList: builder.query({
             query: ({ currentPage, rowsPerPage, searchText, orderColumn, sortOrder }) => {
                 const url = `/api/admin/get-all-permissions?page=${currentPage}&no_records=${rowsPerPage}&search=${searchText}&orderby=${orderColumn}&sortOrder=${sortOrder}`;
@@ -84,5 +94,6 @@ export const {
     useGetAdminDashboardDetailsQuery,
     useCreatePermissionMutation,
     useUpdatePermissionMutation,
-    useDeletePermissionMutation
+    useDeletePermissionMutation,
+    useUpdateRolePermissionMutation
 } = retrieveAdminDashboardSliceApi;

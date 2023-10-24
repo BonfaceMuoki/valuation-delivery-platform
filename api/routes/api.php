@@ -68,6 +68,7 @@ Route::group([
 ], function ($router) {
     Route::post('/add-role', [AdminController::class, 'addRoles']);
     Route::patch('/update-role/{id}', [AdminController::class, 'updateRole']);
+    Route::post('/update-role-permission', [AdminController::class, 'updateRolePermission']);
 
     Route::delete('/delete-role/{id}', [AdminController::class, 'deleteRole']);
     Route::get('/get-all-roles', [AdminController::class, 'getAllRoles']);

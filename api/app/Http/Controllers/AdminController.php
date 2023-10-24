@@ -129,6 +129,33 @@ class AdminController extends Controller
             return response()->json(['message' => 'Permission Denie'], 401);
         }
     }
+    public function updateRolePermission(Request $request)
+    {
+        $user = auth()->user();
+        if ($user->hasPermissionTo(Permission::where("slug", "add role")->first())) {
+            try {
+                DB::beginTransaction();
+                $thisrole = Role::findOrFail($request->role);
+                $thisrole->permissions()->detach();
+                $thisrole->permissions()->sync($request->permmissions);
+
+                DB::commit();
+                return response()->json([
+                    'message' => 'Updated successfully.',
+                ], 201);
+
+            } catch (\Exception $exception) {
+                DB::rollBack(); // Tell Laravel, "It's not you, it's me. Please don't persist to DB"
+                return response()->json([
+                    'message' => 'Failed.' . $exception->getMessage() . '.Please contact admin.',
+                    'error' => $exception,
+                    'payload' => $request->all(),
+                ], 400);
+            }
+        } else {
+            return response()->json(['message' => 'Permission Denie'], 401);
+        }
+    }
     public function addRoles(Request $request)
     {
         $user = auth()->user();
@@ -303,7 +330,16 @@ class AdminController extends Controller
                 $query->where("name", 'LIKE', '%' . $request->search . '%');
             }
             $query->orderBy($this->translatePermissionSortColumn($request->orderby), $request->sortOrder);
-            $results = $query->paginate($request->no_records);
+
+            $results = array();
+            if ($request->no_records == "all") {
+                $allcount = Permission::count();
+
+                $results = $query->paginate($allcount);
+            } else {
+                $results = $query->paginate($request->no_records);
+            }
+
             return response()->json($results, 201);
 
         } else {

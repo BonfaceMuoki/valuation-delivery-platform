@@ -28,7 +28,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 import { toast } from "react-toastify";
-import { useGetRolesListQuery, useGetPermissionsListQuery } from "../../api/admin/adminActionsApi";
+import { useGetRolesListQuery, useGetPermissionsListQuery, useUpdateRolePermissionMutation } from "../../api/admin/adminActionsApi";
 import { findUpper } from "../../utils/Utils";
 import { Row, Col } from "reactstrap";
 import Select from "react-select";
@@ -102,7 +102,7 @@ const RoleList = () => {
         isSuccess: fechingPermissionsSuccessful,
         isError: fetchingPermissionsError,
         error: fetchingPermissionsIsError,
-    } = useGetPermissionsListQuery({ currentPage: 1, rowsPerPage: "", searchText: "", orderColumn: "permission_name", sortOrder: "ASC" });
+    } = useGetPermissionsListQuery({ currentPage: 1, rowsPerPage: "all", searchText: "", orderColumn: "permission_name", sortOrder: "ASC" });
     const [allPermissions, setAllPermissions] = useState();
 
     const [allRolePermissions, setAllRolePermissions] = useState();
@@ -177,13 +177,16 @@ const RoleList = () => {
         resolver: yupResolver(assignrolepermissionsschema),
     });
 
-    const showAssignPermissionModal = (item) => {
+    const [activeRole, setActiveRole] = useState();
 
+    const showAssignPermissionModal = (item) => {
+        setActiveRole(item.id);
         let currentpermissions = item.permissions.map(({ id, name }) => ({
             value: id,
             label: name
         }));
         console.log(currentpermissions, "currentpermissions");
+
         setRoleValue("permissions", currentpermissions);
         setRoleValue("roleName", item.name);
         setRoleValue("roleSlug", item.slug);
@@ -201,9 +204,17 @@ const RoleList = () => {
         }
     }
     //form to assin
-
-    const onSubmitAssignRolePermForm = (data) => {
+    const [updateRolePermission, { errors: errorsUpdatingRolePermission }] = useUpdateRolePermissionMutation();
+    const onSubmitAssignRolePermForm = async (data) => {
         console.log(data);
+        let permissions = data.permissions.map((item, index) => { return parseInt(item.value) });
+        const result = await updateRolePermission({ "role": activeRole, "permmissions": permissions });
+        if ('error' in result) {
+            if ('backendvalerrors' in result.error.data) {
+            }
+        } else {
+            refetchRoles();
+        }
     }
     //form to assign
     if (tableData.length > 0) {
