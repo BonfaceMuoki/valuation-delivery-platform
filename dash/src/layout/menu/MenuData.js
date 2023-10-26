@@ -34,13 +34,16 @@ const menuadmin = [
     text: "Valuations",
     active: false,
     subMenu: [
-      {
-        text: "Reports - My Reports",
-        link: "/valuation-firm/my-reports",
-      },
+
       {
         text: "Reports - New Report",
         link: "/upload-new-report",
+      }, {
+        text: "Reports - My Reports",
+        link: "/valuation-firm/my-reports",
+      }, {
+        text: "Reports - Comparables",
+        link: "/valuation-firm/my-comparables",
       },
     ],
   },
@@ -57,6 +60,7 @@ const menuadmin = [
         text: "Make Payments",
         link: "/valuation-firm/make-payment",
       },
+
     ],
   },
   {
@@ -165,6 +169,9 @@ const menuvaluer = [
       {
         text: "Reports - New Report",
         link: "/upload-new-report",
+      }, {
+        text: "Reports - Comparables",
+        link: "/valuation-firm/my-comparables",
       },
     ],
   },

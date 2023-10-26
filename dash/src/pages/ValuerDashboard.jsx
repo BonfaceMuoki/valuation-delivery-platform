@@ -21,14 +21,16 @@ import {
   TooltipComponent,
 } from "../components/Component";
 import { BalanceBarChart, DepositBarChart, WithdrawBarChart } from "../components/partials/charts/invest/InvestChart";
-import ValuerReports from "./valuerspages/valuerreports";
+import ValuerReports from "./valuerspages/ValuerReports";
 import AccesorInvites from "./accesorpages/accesorInvites";
 import ValuerAccessInvite from "./valuerspages/valuerAccessInvites";
+import { selectCurrentUser } from "../featuers/authSlice";
+import { useSelector } from "react-redux";
 
 const ValuerDashboard = () => {
   const [sm, updateSm] = useState(false);
 
-
+  const user = useSelector(selectCurrentUser);
 
   return (
     <>
@@ -39,7 +41,7 @@ const ValuerDashboard = () => {
             <BlockHeadContent>
               <BlockTitle page>Home Dashboard</BlockTitle>
               <BlockDes className="text-soft">
-                <p>Logged in Super Admin !!!!</p>
+                <p>{user?.role_name} !!!!</p>
               </BlockDes>
             </BlockHeadContent>
             <BlockHeadContent>

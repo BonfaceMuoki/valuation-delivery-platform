@@ -39,7 +39,7 @@ export const dataTableColumns = [
   {
     name: "Salary",
     selector: (row) => row.salary,
-    sortable: true,
+    sortable: false,
     hide: "md",
   },
 ];

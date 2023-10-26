@@ -186,6 +186,7 @@ const ReactDataTable = ({ data, columns, pagination, actions, className, selecta
           </div>
         }
         pagination={pagination}
+        
         paginationComponent={({ currentPage, rowsPerPage, rowCount, onChangePage, onChangeRowsPerPage }) => (
           <DataTablePagination
             customItemPerPage={rowsPerPageS}

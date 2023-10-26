@@ -1,6 +1,6 @@
 import { apiSlice } from "../../featuers/apiSlice"
 export const valuationFirmRequestsSlliceApi = apiSlice.injectEndpoints({
-   
+
     endpoints: builder => ({
         getValuationFirmRequests: builder.query({
             query: () => ({
@@ -8,9 +8,9 @@ export const valuationFirmRequestsSlliceApi = apiSlice.injectEndpoints({
                 method: 'GET',
                 headers: {
                     'Accept': 'Application/json'
-                  }          
+                }
             })
-           
+
         }),
         approveValuationFirmRequest: builder.mutation({
             query: (formdata) => ({
@@ -19,9 +19,9 @@ export const valuationFirmRequestsSlliceApi = apiSlice.injectEndpoints({
                 body: formdata,
                 headers: {
                     'Accept': 'Application/json'
-                  }          
+                }
             })
-           
+
         }),
         rejectValuationFirmRequest: builder.mutation({
             query: (formdata) => ({
@@ -30,14 +30,24 @@ export const valuationFirmRequestsSlliceApi = apiSlice.injectEndpoints({
                 body: formdata,
                 headers: {
                     'Accept': 'Application/json'
-                  }          
+                }
             })
-           
+
+        }),
+        getValuationReports: builder.query({
+            query: ({ currentPage, rowsPerPageS, searchText, orderColumn, sortOrder }) => ({
+                url: `/api/commons/get-reports-list?page=${currentPage}&no_records=${rowsPerPageS}&search=${searchText}&orderby=${orderColumn}&sortOrder=${sortOrder}`,
+                method: 'GET',
+                headers: {
+                    'Accept': 'Application/json'
+                }
+            })
+
         }),
         getPropertyTypeList: builder.query({
             query: () => `/api/commons/get-all-propertytypes`,
             skipCache: true,
-            keepUnusedDataFor:5,
+            keepUnusedDataFor: 5,
             refetchOnFocus: true,
         })
     })
@@ -46,5 +56,6 @@ export const valuationFirmRequestsSlliceApi = apiSlice.injectEndpoints({
 export const {
     useGetValuationFirmRequestsQuery,
     useApproveValuationFirmRequestMutation,
-    useRejectValuationFirmRequestMutation
-} = valuationFirmRequestsSlliceApi ;
+    useRejectValuationFirmRequestMutation,
+    useGetValuationReportsQuery
+} = valuationFirmRequestsSlliceApi;

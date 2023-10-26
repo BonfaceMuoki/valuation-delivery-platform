@@ -91,7 +91,7 @@ const LocationForm = (props) => {
   return (
     <form onSubmit={handleLocationSubmit(onSubmitLocation)}>
       <Row className="gy-4">
-        <Col md="6">
+        <Col md="6" sm="12">
           <div className="form-group">
             <label className="form-label" htmlFor="first-name">
               Location Name
@@ -1543,33 +1543,24 @@ const config = {
 };
 const ReportSubmit = () => {
   return (
-    <React.Fragment>
-      <Head title="New Report Upload" />
-      <Content page="component">
-        <BlockHead size="lg" wide="sm">
-          <BlockHeadContent>
-            <BlockTitle tag="h2" className="fw-normal">
-              Upload New Report
-            </BlockTitle>
-          </BlockHeadContent>
-        </BlockHead>
+    <div style={{ width: "100%", display: 'flex', justifyContent: 'center' }}>
+      <Card className="card-bordered" style={{ height: '60%', width: '80%', marginTop: '140px', marginBottom: '10%', padding: '3%', overflow: "auto" }} >
 
-        <Block size="lg">
-          <PreviewCard>
-            <div className="nk-wizard nk-wizard-simple is-alter wizard clearfix">
-              <Steps config={config}>
-                <Step component={LocationForm} />
-                <Step component={PropertyDetailsForm} />
-                <Step component={PropertyValuationForm} />
-                <Step component={ValuationSignatures} />
-                <Step component={ValuationSummary} />
-                <Step component={Success} />
-              </Steps>
-            </div>
-          </PreviewCard>
-        </Block>
-      </Content>
-    </React.Fragment>
+        <React.Fragment>
+
+          <div className="nk-wizard nk-wizard-simple is-alter wizard clearfix">
+            <Steps config={config}>
+              <Step component={LocationForm} />
+              <Step component={PropertyDetailsForm} />
+              <Step component={PropertyValuationForm} />
+              <Step component={ValuationSignatures} />
+              <Step component={ValuationSummary} />
+              <Step component={Success} />
+            </Steps>
+          </div>
+        </React.Fragment>
+      </Card>
+    </div>
   );
 };
 export default ReportSubmit;

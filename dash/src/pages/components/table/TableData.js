@@ -58,9 +58,9 @@ export const dataTableColumns = [
     hide: "md",
   },
   {
-    name: "Salary",
+    name: "Salar dy",
     selector: (row) => row.salary,
-    sortable: true,
+    sortable: false,
     hide: "md",
   },
 ];
@@ -79,9 +79,8 @@ export const dataTableColumns2 = [
           <span className="tb-lead">
             {row.name}{" "}
             <span
-              className={`dot dot-${
-                row.status === "Active" ? "success" : row.status === "Pending" ? "warning" : "danger"
-              } d-md-none ms-1`}
+              className={`dot dot-${row.status === "Active" ? "success" : row.status === "Pending" ? "warning" : "danger"
+                } d-md-none ms-1`}
             ></span>
           </span>
           <span>{row.email}</span>
@@ -119,33 +118,29 @@ export const dataTableColumns2 = [
       <ul className="list-status d-flex">
         <li>
           <Icon
-            className={`text-${
-              row.emailStatus === "success" ? "success" : row.emailStatus === "pending" ? "info" : "secondary"
-            }`}
-            name={`${
-              row.emailStatus === "success"
-                ? "check-circle"
-                : row.emailStatus === "alert"
+            className={`text-${row.emailStatus === "success" ? "success" : row.emailStatus === "pending" ? "info" : "secondary"
+              }`}
+            name={`${row.emailStatus === "success"
+              ? "check-circle"
+              : row.emailStatus === "alert"
                 ? "alert-circle"
                 : "alarm-alt"
-            }`}
+              }`}
           ></Icon>{" "}
           <span>Email</span>
         </li>
         <li>
           <Icon
-            className={`text-${
-              row.kycStatus === "success"
-                ? "success"
-                : row.kycStatus === "pending"
+            className={`text-${row.kycStatus === "success"
+              ? "success"
+              : row.kycStatus === "pending"
                 ? "info"
                 : row.kycStatus === "warning"
-                ? "warning"
-                : "secondary"
-            }`}
-            name={`${
-              row.kycStatus === "success" ? "check-circle" : row.kycStatus === "pending" ? "alarm-alt" : "alert-circle"
-            }`}
+                  ? "warning"
+                  : "secondary"
+              }`}
+            name={`${row.kycStatus === "success" ? "check-circle" : row.kycStatus === "pending" ? "alarm-alt" : "alert-circle"
+              }`}
           ></Icon>{" "}
           <span>KYC</span>
         </li>
@@ -166,9 +161,8 @@ export const dataTableColumns2 = [
     hide: "sm",
     cell: (row) => (
       <span
-        className={`tb-status ms-1 text-${
-          row.status === "Active" ? "success" : row.status === "Pending" ? "warning" : "danger"
-        }`}
+        className={`tb-status ms-1 text-${row.status === "Active" ? "success" : row.status === "Pending" ? "warning" : "danger"
+          }`}
       >
         {row.status}
       </span>

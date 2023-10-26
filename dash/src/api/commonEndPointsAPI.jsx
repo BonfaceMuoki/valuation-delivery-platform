@@ -27,6 +27,12 @@ export const CommonEnpointsApi = apiSlice.injectEndpoints({
             keepUnusedDataFor:5,
             refetchOnFocus: true,
         }),
+        getAllCounties: builder.query({
+            query: () => `/api/commons/get-all-counties`,
+            skipCache: true,
+            keepUnusedDataFor:5,
+            refetchOnFocus: true,
+        }),
         uploadValuationReportV2: builder.mutation({
             query: (formData) => ({
                 url: '/api/uploader/upload-valuation-report-v2',
@@ -41,6 +47,7 @@ export const CommonEnpointsApi = apiSlice.injectEndpoints({
 })
 
 export const {
+    useGetAllCountiesQuery,
     useGetUsersQuery,
     useGetAccesorsListQuery,
     useGetPropertyTypeListQuery,

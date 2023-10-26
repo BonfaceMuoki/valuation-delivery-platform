@@ -94,7 +94,7 @@ const MapWithAutoSearch = () => {
   return (
     <LoadScript googleMapsApiKey="AIzaSyCuOMviA2dyPVLhh63SgvOdkiUszmAXsdI" libraries={['places']}>
       <GoogleMap
-        mapContainerStyle={{ width: '100%', height: '400px' }}
+        mapContainerStyle={{ width: '100%', height: '200px' }}
         center={center}
         zoom={15}
         onClick={onMapClick}

@@ -24,6 +24,7 @@ import {
     ModalFooter
 } from "reactstrap";
 
+
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
@@ -200,6 +201,12 @@ const RoleList = () => {
             if ('backendvalerrors' in result.error.data) {
             }
         } else {
+            Swal.fire({
+                icon: "success",
+                title: "Update Role Permission",
+                text: result.data.message,
+                focusConfirm: false
+            });
             refetchRoles();
         }
     }
@@ -209,10 +216,17 @@ const RoleList = () => {
         console.log(data);
         let permissions = data.permissions.map((item, index) => { return parseInt(item.value) });
         const result = await updateRolePermission({ "role": activeRole, "permmissions": permissions });
+        console.log(result, "resultresult");
         if ('error' in result) {
             if ('backendvalerrors' in result.error.data) {
             }
         } else {
+            Swal.fire({
+                icon: "success",
+                title: "Update Role Permission",
+                text: result.data.message,
+                focusConfirm: false
+            });
             refetchRoles();
         }
     }

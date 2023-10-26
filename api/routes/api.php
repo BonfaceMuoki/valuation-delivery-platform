@@ -61,6 +61,8 @@ Route::group([
     Route::get('/downloadvaluationreport/{id}/{signed}', [CommonController::class, 'downloadValuationReport']);
     Route::get('/get-all-users', [CommonController::class, 'getAllUsers']);
     Route::get('/get-all-propertytypes', [CommonController::class, 'getAllProprtyTypes']);
+
+    Route::get('/get-all-counties', [CommonController::class, 'getAllCounties']);
 });
 Route::group([
     'middleware' => 'api',

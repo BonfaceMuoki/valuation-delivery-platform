@@ -24,9 +24,13 @@ import {
 import AccesorInvites from "./accesorpages/accesorInvites";
 import ValuerAccessInvite from "./valuerspages/valuerAccessInvites";
 import { useGetAdminDashboardDetailsQuery } from "../api/admin/retrieveAdminDashboardSlice";
+
+import { selectCurrentUser } from "../featuers/authSlice";
+import { useSelector } from "react-redux";
 const AdminDashboard = () => {
     const [sm, updateSm] = useState(false);
     const { data: adminDashboard, isLoading: loadingdashboard } = useGetAdminDashboardDetailsQuery();
+    const user = useSelector(selectCurrentUser);
 
     return (
         <>
@@ -37,7 +41,7 @@ const AdminDashboard = () => {
                         <BlockHeadContent>
                             <BlockTitle page>Home Dashboard</BlockTitle>
                             <BlockDes className="text-soft">
-                                <p>Logged in Super Admin !!!!</p>
+                                <p>Logged in as {user?.role_name} !!!!</p>
                             </BlockDes>
                         </BlockHeadContent>
                         <BlockHeadContent>

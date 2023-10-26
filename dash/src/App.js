@@ -21,6 +21,7 @@ import AuthorizeRouteByRole from "./auth/routes/AuthorizeRouteByRole";
 import Unauthorized from "./pages/errors/Unauthorized";
 import RoleList from "./pages/accesorpages/RoleList";
 import PermissionList from "./pages/accesorpages/PermissionList";
+import ValuerReports from "./pages/valuerspages/ValuerReports";
 
 const App = () => {
   return (
@@ -40,7 +41,7 @@ const App = () => {
               <Route path={`${process.env.PUBLIC_URL}`} element={<Layout />}>
                 {/* common routes */}
                 <Route path="/unauthorized" element={<Unauthorized />}></Route>
-                <Route element={<AuthorizeRoute checkpermission={["view super admin dashbaord", "view valuer dashboard", "view accesor dashboard"]} />}>
+                <Route element={<AuthorizeRoute checkpermission={["view super admin dashbaord", "view valuation firm dashboard", "view accesor dashboard"]} />}>
                   <Route index element={<Homepage />}></Route>
                 </Route>
                 {/* common routes */}
@@ -55,6 +56,9 @@ const App = () => {
                 </Route>
                 <Route element={<AuthorizeRoute checkpermission={["upload report"]} />}>
                   <Route path="/upload-new-report" element={<ReportSubmit />}></Route>
+                </Route>
+                <Route element={<AuthorizeRoute checkpermission={["upload report"]} />}>
+                  <Route path="/valuation-firm/my-reports" element={<ValuerReports />}></Route>
                 </Route>
                 {/* valuer dashboard */}
                 {/* admin dashbooard */}
