@@ -146,7 +146,7 @@ const CustomTitle = ({ row }) => (
 const DownLoadReport = ({ row }) => (
 
   <div className="user-card">
-    <Button color="primary" > <Icon name="download"></Icon> Download</Button>
+    <Button outline color="primary" className="btn-round"  > <Icon name="download"></Icon> Download</Button>
   </div>
 
 );
@@ -378,31 +378,8 @@ const ValuerReports = () => {
       <Card className="card-bordered" style={{ height: '60%', width: '95%', marginTop: '7%', marginBottom: '10%', padding: '3%' }}>
 
         <div className={`dataTables_wrapper dt-bootstrap4 no-footer ${className ? className : ""}`}>
-          <Card className="card-bordered" style={{ padding: '35px 35px 25px 35px' }}>
-            <Row>
-              <Col className="col-12 text-end" sm="12">
-                <div id="DataTables_Table_0_filter" className="dataTables_filter">
-                  <label>
+          <Card className="card-bordered" style={{ padding: '15px 35px 25px 35px' }}>
 
-                    <select
-                      name="DataTables_Table_0_length"
-                      className="form-control "
-                      onChange={(e) => setRowsPerPageS(e.target.value)}
-                      value={rowsPerPageS}
-                    >
-                      <option value="5">5 Records</option>
-                      <option value="10">10 Records</option>
-                      <option value="15">15 Records</option>
-                      <option value="20">20 Records</option>
-                      <option value="25">25 Records</option>
-                      <option value="40">40 Records</option>
-                      <option value="50">50 records</option>
-                    </select>{" "}
-                  </label>
-                </div>
-
-              </Col>
-            </Row>
             <Row>
               <Col>
                 <Nav tabs>
@@ -433,6 +410,9 @@ const ValuerReports = () => {
                       Advanced Search
                     </NavLink>
                   </NavItem>
+                  <NavItem>
+
+                  </NavItem>
 
                 </Nav>
                 <TabContent activeTab={activeTab}>
@@ -459,30 +439,30 @@ const ValuerReports = () => {
                   </TabPane>
                   <TabPane tabId="2">
                     <Row className={`justify-between g-2 ${actions ? "with-export" : ""}`}>
-                      <Col className="col-3 text-start" sm="3" style={{}}>
+                      <Col className="text-start" sm="12" md="3" style={{}}>
                         {existingAccessors && existingAccessors.length > 0 && (
                           <Select options={existingAccessors} isSearchable={true} placeholder="Organization" />)
                         }
                       </Col>
-                      <Col className="col-3 text-start" sm="3" style={{}}>
+                      <Col className="text-start" sm="12" md="3" style={{}}>
                         {propertytypesList && propertytypesList.length > 0 && (
                           <Select options={propertytypesList} isSearchable={true} placeholder="Property Type" />)
                         }
                       </Col>
-                      <Col className="col-3 text-start" sm="3" style={{}}>
+                      <Col className=" text-start" sm="12" md="3" style={{}}>
                         {countiesList && countiesList.length > 0 && (
                           <Select options={countiesList} isSearchable={true} placeholder="County" />)
                         }
                       </Col>
-                      <Col className="col-3 text-start" sm="3" style={{}}>
+                      <Col className="text-start" sm="12" md="3" style={{}}>
                         {signatoriesList && signatoriesList.length > 0 && (
                           <Select options={signatoriesList} isSearchable={true} placeholder="Valuer" />)
                         }
                       </Col>
                     </Row>
                     <hr></hr>
-                    <Row className={`justify-between g-2 ${actions ? "with-export" : ""}`}>
-                      <Col className="col-4 text-start" sm="4" style={{}}>
+                    <Row >
+                      <Col className="text-start" sm="12" md="4" style={{}}>
                         <div className="form-group">
                           Valuation Date <br></br>
                           <div className="form-control-wrap">
@@ -512,7 +492,7 @@ const ValuerReports = () => {
 
                         </div>
                       </Col>
-                      <Col className="col-6 text-start" sm="6" style={{}}>
+                      <Col className="text-start" sm="12" md="6" style={{}}>
                         <span>Search KeyWord</span><br></br>
                         <input
                           style={{ width: '100%' }}
@@ -525,9 +505,9 @@ const ValuerReports = () => {
                           }}
                         />
                       </Col>
-                      <Col className="col-2 text-start" sm="2" style={{}}>
-                        &nbsp;&nbsp;<br></br>
-                        <Button className="btn-round" color="primary" size="md" style={{ width: '100%' }}>
+                      <Col className=" text-end" sm="12" md="2" >
+                        <span></span><br></br>
+                        <Button className="btn-round" color="primary" size="md" >
                           <Icon name="filter"></Icon>   Apply Filters
                         </Button>
                       </Col>
@@ -535,7 +515,32 @@ const ValuerReports = () => {
                   </TabPane>
                 </TabContent></Col>
             </Row>
+
           </Card>
+          <Row style={{ marginTop: "20px" }}>
+            <Col className="text-end" sm="12">
+              <div id="DataTables_Table_0_filter" className="dataTables_filter">
+                <label>
+
+                  <select
+                    name="DataTables_Table_0_length"
+                    className="form-control "
+                    onChange={(e) => setRowsPerPageS(e.target.value)}
+                    value={rowsPerPageS}
+                  >
+                    <option value="5">5 Records</option>
+                    <option value="10">10 Records</option>
+                    <option value="15">15 Records</option>
+                    <option value="20">20 Records</option>
+                    <option value="25">25 Records</option>
+                    <option value="40">40 Records</option>
+                    <option value="50">50 records</option>
+                  </select>{" "}
+                </label>
+              </div>
+
+            </Col>
+          </Row>
           <DataTable
             data={tableData}
             columns={columns}
