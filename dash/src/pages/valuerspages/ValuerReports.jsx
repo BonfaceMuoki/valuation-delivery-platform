@@ -23,6 +23,7 @@ import CopyToClipboard from "react-copy-to-clipboard";
 import DataTablePagination from "../../components/Component";
 import { useGetValuationReportsQuery } from "../../api/admin/valuationFirmRequestsSlice";
 import {
+  Label,
   Card,
   Row, Col, Button, Modal,
   ModalHeader,
@@ -33,9 +34,10 @@ import {
 } from "reactstrap";
 import classnames from "classnames";
 import Select from 'react-select'
+import DatePicker from "react-datepicker";
 
 import { findUpper } from "../../utils/Utils";
-import { useGetAccesorsListQuery, useGetAllCountiesQuery, useGetPropertyTypeListQuery } from "../../api/commonEndPointsAPI";
+import { useGetAccesorsListQuery, useGetAllCountiesQuery, useGetPropertyTypeListQuery, useGetUsersQuery } from "../../api/commonEndPointsAPI";
 
 const Export = ({ data }) => {
   const [modal, setModal] = useState(false);
@@ -334,6 +336,40 @@ const ValuerReports = () => {
     }
   }, [loadingcounties]);
 
+  //get the registered signatories
+  const [signatoriesList, setSignatoriesList] = useState();
+  const { data: registeredusers, isLoading: loadingusers } = useGetUsersQuery();
+  // console.log(registeredusers, "registeredusers");
+  useEffect(() => {
+    if (registeredusers != undefined) {
+      const restructuredData = registeredusers.map(({ id, full_name, email, phone }) => ({
+        id: id,
+        value: id,
+        label: full_name,
+        email: email,
+        phone: phone,
+      }));
+      setSignatoriesList(restructuredData);
+    }
+  }, [loadingusers]);
+  //get the registered signnaries
+
+  const [startDate, setStartDate] = useState(new Date());
+  const [startIconDate, setStartIconDate] = useState(new Date());
+  const [startTime, setStartTime] = useState(new Date());
+  const [month, setMonth] = useState(new Date());
+  const [year, setYear] = useState(new Date());
+  const [rangeStart, setRangeStart] = useState(new Date());
+  const [rangeEnd, setRangeEnd] = useState();
+  const [rangeDate, setRangeDate] = useState({
+    start: new Date(),
+    end: null,
+  });
+
+  const onRangeChange = (dates) => {
+    const [start, end] = dates;
+    setRangeDate({ start: start, end: end });
+  };
 
 
 
@@ -350,7 +386,7 @@ const ValuerReports = () => {
 
                     <select
                       name="DataTables_Table_0_length"
-                      className="custom-select custom-select-sm form-control form-control-sm"
+                      className="form-control "
                       onChange={(e) => setRowsPerPageS(e.target.value)}
                       value={rowsPerPageS}
                     >
@@ -423,53 +459,78 @@ const ValuerReports = () => {
                   </TabPane>
                   <TabPane tabId="2">
                     <Row className={`justify-between g-2 ${actions ? "with-export" : ""}`}>
-                      <Col className="col-2 text-start" sm="2" style={{}}>
-
+                      <Col className="col-3 text-start" sm="3" style={{}}>
                         {existingAccessors && existingAccessors.length > 0 && (
                           <Select options={existingAccessors} isSearchable={true} placeholder="Organization" />)
                         }
-
-
                       </Col>
-                      <Col className="col-2 text-start" sm="2" style={{}}>
+                      <Col className="col-3 text-start" sm="3" style={{}}>
                         {propertytypesList && propertytypesList.length > 0 && (
                           <Select options={propertytypesList} isSearchable={true} placeholder="Property Type" />)
                         }
                       </Col>
-                      <Col className="col-2 text-start" sm="2" style={{}}>
+                      <Col className="col-3 text-start" sm="3" style={{}}>
                         {countiesList && countiesList.length > 0 && (
                           <Select options={countiesList} isSearchable={true} placeholder="County" />)
                         }
                       </Col>
-                      <Col className="col-2 text-start" sm="2" style={{}}>
-                        <input
-                          style={{ width: '100%' }}
-                          type="text"
-                          className="form-control"
-                          placeholder="Organization Name or LR number or Market value or property type "
-                          onChange={(ev) => setSearchText(ev.target.value)}
-                        />
+                      <Col className="col-3 text-start" sm="3" style={{}}>
+                        {signatoriesList && signatoriesList.length > 0 && (
+                          <Select options={signatoriesList} isSearchable={true} placeholder="Valuer" />)
+                        }
                       </Col>
-                      <Col className="col-2 text-start" sm="2" style={{}}>
-                        <input
-                          style={{ width: '100%' }}
-                          type="text"
-                          className="form-control"
-                          placeholder="Organization Name or LR number or Market value or property type "
-                          onChange={(ev) => setSearchText(ev.target.value)}
-                        />
-                      </Col>
-                      <Col className="col-2 text-start" sm="2" style={{}}>
-                        <input
-                          style={{ width: '100%' }}
-                          type="text"
-                          className="form-control"
-                          placeholder="Organization Name or LR number or Market value or property type "
-                          onChange={(ev) => setSearchText(ev.target.value)}
-                        />
-                      </Col>
-                      {/* {actions && <Export data={allthereports} />} */}
+                    </Row>
+                    <hr></hr>
+                    <Row className={`justify-between g-2 ${actions ? "with-export" : ""}`}>
+                      <Col className="col-4 text-start" sm="4" style={{}}>
+                        <div className="form-group">
+                          Valuation Date <br></br>
+                          <div className="form-control-wrap">
+                            <div className="input-daterange date-picker-range input-group">
+                              <DatePicker
+                                selected={rangeStart}
+                                onChange={setRangeStart}
+                                selectsStart
+                                startDate={rangeStart}
+                                endDate={rangeEnd}
+                                wrapperClassName="start-m"
+                                className="form-control"
+                              />{" "}
+                              <div className="input-group-addon">TO</div>
+                              <DatePicker
+                                selected={rangeEnd}
+                                onChange={setRangeEnd}
+                                startDate={rangeStart}
+                                endDate={rangeEnd}
+                                selectsEnd
+                                minDate={rangeStart}
+                                wrapperClassName="end-m"
+                                className="form-control"
+                              />
+                            </div>
+                          </div>
 
+                        </div>
+                      </Col>
+                      <Col className="col-6 text-start" sm="6" style={{}}>
+                        <span>Search KeyWord</span><br></br>
+                        <input
+                          style={{ width: '100%' }}
+                          type="text"
+                          className="form-control"
+                          placeholder="Organization Name or LR number or Market value or property type "
+                          onChange={(ev) => {
+                            setSearchText(ev.target.value);
+                            setCurrentPage(1);
+                          }}
+                        />
+                      </Col>
+                      <Col className="col-2 text-start" sm="2" style={{}}>
+                        &nbsp;&nbsp;<br></br>
+                        <Button className="btn-round" color="primary" size="md" style={{ width: '100%' }}>
+                          <Icon name="filter"></Icon>   Apply Filters
+                        </Button>
+                      </Col>
                     </Row>
                   </TabPane>
                 </TabContent></Col>
