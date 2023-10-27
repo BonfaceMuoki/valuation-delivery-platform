@@ -375,10 +375,10 @@ const ValuerReports = () => {
 
   return (
     <div style={{ width: "100%", display: 'flex', justifyContent: 'center' }}>
-      <Card className="card-bordered" style={{ height: '60%', width: '95%', marginTop: '7%', marginBottom: '10%', padding: '3%' }}>
+      <Card className="card-bordered" style={{ height: '60%', width: '95%', marginTop: '7%', marginBottom: '10%', padding: '3%', }}>
 
         <div className={`dataTables_wrapper dt-bootstrap4 no-footer ${className ? className : ""}`}>
-          <Card className="card-bordered" style={{ padding: '15px 35px 25px 35px' }}>
+          <Card className="card-bordered" style={{ padding: '15px 35px 25px 35px', borderRadius: "45px" }}>
 
             <Row>
               <Col>
@@ -508,7 +508,7 @@ const ValuerReports = () => {
                       <Col className=" text-end" sm="12" md="2" >
                         <span></span><br></br>
                         <Button className="btn-round" color="primary" size="md" >
-                          <Icon name="filter"></Icon>   Apply Filters
+                          Apply  <Icon name="filter"></Icon>
                         </Button>
                       </Col>
                     </Row>
