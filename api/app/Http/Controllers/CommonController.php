@@ -30,7 +30,7 @@ class CommonController extends Controller
         $all = DB::table('county')->get();
         return response()->json($all, 201);
     }
-    public function getAllUsers()
+    public function getAllUsers(Request $request)
     {
 
         $user = auth()->user();
@@ -38,34 +38,45 @@ class CommonController extends Controller
             return response()->json(['message' => 'Unautheticated'], 403);
         }
         if ($user->hasPermissionTo(Permission::where("slug", 'view all Users')->first())) {
+            $query = User::query();
 
-            $users = User::with("roles")->get();
+            $users = $query->paginate($request->rowsPerPage);
+
             return response($users, 200);
 
         } else if ($user->hasPermissionTo(Permission::where("slug", 'view valuation firm users only')->first())) {
 
             $org = $user->UploaderOrganization()->wherePivot("status", 1)->first();
             $orgid = $org->id;
-            $users = User::with("UploaderOrganization")
+
+            $query = User::query();
+            $query->with("UploaderOrganization")
                 ->with("roles")
                 ->whereHas("UploaderOrganization", function ($query) use ($orgid) {
                     $query->where("organization_id", $orgid);
-                })->get();
+                });
+            $users = $query->paginate($request->rowsPerPage);
+
             return response($users, 200);
 
         } else if ($user->hasPermissionTo(Permission::where("slug", 'view accesors users only')->first())) {
             $org = $user->AccessorOrganization()->wherePivot("status", 1)->first();
             $orgid = $org->id;
-            $users = User::with("AccessorOrganization")
+            $query = User::query();
+            $query->with("AccessorOrganization")
                 ->with("roles")
                 ->whereHas("AccessorOrganization", function ($query) use ($orgid) {
                     $query->where("report_consumer_id", $orgid);
-                })->get();
+                });
+            $users = $query->paginate($request->rowsPerPage);
             return response($users, 200);
 
         } else {
 
-            $users = User::with("roles")->get();
+            $query = User::query();
+
+            $users = $query->paginate($request->rowsPerPage);
+
             return response($users, 200);
         }
 

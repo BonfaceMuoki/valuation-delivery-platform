@@ -22,6 +22,8 @@ import Unauthorized from "./pages/errors/Unauthorized";
 import RoleList from "./pages/accesorpages/RoleList";
 import PermissionList from "./pages/accesorpages/PermissionList";
 import ValuerReports from "./pages/valuerspages/ValuerReports";
+import ComingSoonPage from "./pages/ComingSoonPage";
+import UsersList from "./pages/valuerspages/UsersList";
 
 const App = () => {
   return (
@@ -60,6 +62,13 @@ const App = () => {
                 <Route element={<AuthorizeRoute checkpermission={["upload report"]} />}>
                   <Route path="/valuation-firm/my-reports" element={<ValuerReports />}></Route>
                 </Route>
+                <Route element={<AuthorizeRoute checkpermission={["upload report"]} />}>
+                  <Route path="/valuation-firm/my-comparables" element={<ComingSoonPage />}></Route>
+                </Route>
+                <Route element={<AuthorizeRoute checkpermission={["upload report"]} />}>
+                  <Route path="/valuation-firm/my-users" element={<UsersList />}></Route>
+                </Route>
+
                 {/* valuer dashboard */}
                 {/* admin dashbooard */}
                 <Route element={<AuthorizeRouteByRole checkrole={["Super Admin"]} />}>

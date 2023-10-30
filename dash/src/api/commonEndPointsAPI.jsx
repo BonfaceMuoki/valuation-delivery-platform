@@ -3,35 +3,45 @@ import { useSelector } from "react-redux";
 
 
 export const CommonEnpointsApi = apiSlice.injectEndpoints({
-   
+
     endpoints: builder => ({
         getUsers: builder.query({
-            query: () => ({
-                url: `/api/commons/get-all-users`,
+            query: ({ currentPage, rowsPerPage, searchText, orderColumn, sortOrder }) => ({
+                url: `/api/commons/get-all-users?page=${currentPage}&no_records=${rowsPerPage}&search=${searchText}&orderby=${orderColumn}&sortOrder=${sortOrder}`,
                 method: 'GET',
                 headers: {
                     'Accept': 'Application/json'
-                  }          
+                }
             })
-           
+
         }),
         getAccesorsList: builder.query({
             query: () => `/api/commons/get-accesors-list`,
             skipCache: true,
-            keepUnusedDataFor:5,
+            keepUnusedDataFor: 5,
             refetchOnFocus: true,
         }),
         getPropertyTypeList: builder.query({
             query: () => `/api/commons/get-all-propertytypes`,
             skipCache: true,
-            keepUnusedDataFor:5,
+            keepUnusedDataFor: 5,
             refetchOnFocus: true,
         }),
         getAllCounties: builder.query({
             query: () => `/api/commons/get-all-counties`,
             skipCache: true,
-            keepUnusedDataFor:5,
+            keepUnusedDataFor: 5,
             refetchOnFocus: true,
+        }),
+        sendValuationFirmUserInvite: builder.mutation({
+            query: (formData) => ({
+                url: `/api/uploader/send-user-invite`,
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'Application/json'
+                }
+            }),
         }),
         uploadValuationReportV2: builder.mutation({
             query: (formData) => ({
@@ -40,7 +50,7 @@ export const CommonEnpointsApi = apiSlice.injectEndpoints({
                 body: formData,
                 headers: {
                     'Accept': 'Application/json'
-                  }          
+                }
             })
         })
     })
@@ -51,5 +61,6 @@ export const {
     useGetUsersQuery,
     useGetAccesorsListQuery,
     useGetPropertyTypeListQuery,
-    useUploadValuationReportV2Mutation
-} = CommonEnpointsApi ;
+    useUploadValuationReportV2Mutation,
+    useSendValuationFirmUserInviteMutation
+} = CommonEnpointsApi;

@@ -73,45 +73,45 @@ function UploaderUsersList() {
   const editUser = (row) => {
 
   }
-  const [blockThisUser,{isLoading:blockingUser}]=useBlockUserMutation();
+  const [blockThisUser, { isLoading: blockingUser }] = useBlockUserMutation();
   const blockUser = (row) => {
     confirmDialog({
       message: `Are you sure you want to block ${row.full_name}? This will deny them access to reports and any other items concerning your organization.`,
       header: 'Delete Confirmation',
       icon: 'pi pi-info-circle',
       acceptClassName: 'p-button-danger',
-      accept: () => acceptBlockingUser(row.id,0), // Pass row.id as a parameter to accept function
+      accept: () => acceptBlockingUser(row.id, 0), // Pass row.id as a parameter to accept function
       reject: () => { } // Empty reject function for now
     });
   }
-  const unblockUser= (row) => {
+  const unblockUser = (row) => {
     confirmDialog({
       message: `Are you sure you want to block ${row.full_name}? This will deny them access to reports and any other items concerning your organization.`,
       header: 'Delete Confirmation',
       icon: 'pi pi-info-circle',
       acceptClassName: 'p-button-danger',
-      accept: () => acceptBlockingUser(row.id,1), // Pass row.id as a parameter to accept function
+      accept: () => acceptBlockingUser(row.id, 1), // Pass row.id as a parameter to accept function
       reject: () => { } // Empty reject function for now
     });
- 
+
   }
-  const acceptBlockingUser = async(id,status) => {
-   const formData=new FormData();
-   formData.append("user",id);
-   formData.append("status",status);
-   const result= await blockThisUser(formData);
-   if ('error' in result) {
-    toastMessage(result.error.data.message, "error");
-    if ('backendvalerrors' in result.error.data) {
-      // setBackendValErrors(result.error.data.backendvalerrors);
-      resetValuerInviteForm();
-      setBlocked(false);
+  const acceptBlockingUser = async (id, status) => {
+    const formData = new FormData();
+    formData.append("user", id);
+    formData.append("status", status);
+    const result = await blockThisUser(formData);
+    if ('error' in result) {
+      toastMessage(result.error.data.message, "error");
+      if ('backendvalerrors' in result.error.data) {
+        // setBackendValErrors(result.error.data.backendvalerrors);
+        resetValuerInviteForm();
+        setBlocked(false);
+      }
+    } else {
+      toastMessage(result.data.message, "success");
+      refetchUsers();
     }
-  } else {
-    toastMessage(result.data.message, "success");
-    refetchUsers();
-  }
-  
+
 
   }
   const {
@@ -169,14 +169,14 @@ function UploaderUsersList() {
       type: 'actions',
       width: 400,
       renderCell: (params) => {
-        if(params.row.is_active==="1"){
+        if (params.row.is_active === "1") {
           return <>
-          <Button variant='contained'  sx={{width:"20%"}}  onClick={() => viewUserDEtails(params.row)}>view</Button> &nbsp;&nbsp;
-          <Button variant='contained'  sx={{width:"20%"}}  onClick={() => blockUser(params.row)} >Block</Button></>
-        }else if(params.row.is_active==="0"){
+            <Button variant='contained' sx={{ width: "20%" }} onClick={() => viewUserDEtails(params.row)}>view</Button> &nbsp;&nbsp;
+            <Button variant='contained' sx={{ width: "20%" }} onClick={() => blockUser(params.row)} >Block</Button></>
+        } else if (params.row.is_active === "0") {
           return <>
-          <Button variant='contained' sx={{width:"20%"}} onClick={() => viewUserDEtails(params.row)}>view</Button> &nbsp;&nbsp;
-          <Button variant='contained'  sx={{width:"20%"}}  onClick={() => unblockUser(params.row)} >UnBlock</Button></>
+            <Button variant='contained' sx={{ width: "20%" }} onClick={() => viewUserDEtails(params.row)}>view</Button> &nbsp;&nbsp;
+            <Button variant='contained' sx={{ width: "20%" }} onClick={() => unblockUser(params.row)} >UnBlock</Button></>
         }
 
       },
@@ -284,7 +284,7 @@ function UploaderUsersList() {
 
           <Box
             sx={{
-              ml:10,
+              ml: 10,
               width: "95%",
               height: "100px",
               padding: "3px",
@@ -538,7 +538,7 @@ function UploaderUsersList() {
           </form>
         </Box>
       </Modal>
-      
+
       <Box
         gridColumn="span 12"
         gridRow="span 5"
@@ -547,7 +547,7 @@ function UploaderUsersList() {
         borderRadius="0.55rem"
         width="95%"
         height="650px"
-        sx={{ml:2.5,mr:2.5,mt:5}}
+        sx={{ ml: 2.5, mr: 2.5, mt: 5 }}
       >
 
         <DataGrid

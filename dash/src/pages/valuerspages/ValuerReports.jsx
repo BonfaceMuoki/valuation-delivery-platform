@@ -378,7 +378,7 @@ const ValuerReports = () => {
       <Card className="card-bordered" style={{ height: '60%', width: '95%', marginTop: '7%', marginBottom: '10%', padding: '3%', }}>
 
         <div className={`dataTables_wrapper dt-bootstrap4 no-footer ${className ? className : ""}`}>
-          <Card className="card-bordered" style={{ padding: '15px 35px 25px 35px', borderRadius: "45px" }}>
+          <Card className="card-bordered" style={{ padding: '15px 35px 25px 35px', borderRadius: "45px", backgroundColor: "#F2F3F5" }}>
 
             <Row>
               <Col>
@@ -493,6 +493,7 @@ const ValuerReports = () => {
                         </div>
                       </Col>
                       <Col className="text-start" sm="12" md="6" style={{}}>
+
                         <span>Search KeyWord</span><br></br>
                         <input
                           style={{ width: '100%' }}
