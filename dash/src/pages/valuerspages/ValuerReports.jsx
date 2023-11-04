@@ -146,7 +146,12 @@ const CustomTitle = ({ row }) => (
 const DownLoadReport = ({ row }) => (
 
   <div className="user-card">
-    <Button outline color="primary" className="btn-round"  > <Icon name="download"></Icon> Download</Button>
+    <a
+      href={`${process.env.REACT_APP_API_BASE_URL}/api/commons/download-report?report=${row.id}`}
+    >
+      <Button outline color="primary" className="btn-round" > <Icon name="download"></Icon> Download </Button>
+    </a>
+
   </div>
 
 );

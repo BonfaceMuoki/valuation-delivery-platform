@@ -2,17 +2,27 @@ import { apiSlice } from "../../featuers/apiSlice"
 import { useSelector } from "react-redux";
 
 export const inviteValuerApiSlice = apiSlice.injectEndpoints({
-   
-    endpoints: builder => ({      
+
+    endpoints: builder => ({
+        getValuerUserInvites: builder.query({
+            query: (invite_token) => ({
+                url: `/api/commons/get-all-valuer-user-invites`,
+                method: 'GET',
+                headers: {
+                    'Accept': 'Application/json'
+                }
+            })
+
+        }),
         getValuerUserInviteDetails: builder.query({
             query: (invite_token) => ({
                 url: `/api/auth/retrieve-valuer-user-invite-details?invite_token=${invite_token}`,
                 method: 'GET',
                 headers: {
                     'Accept': 'Application/json'
-                  }          
+                }
             })
-           
+
         }),
         registerUploaderUser: builder.mutation({
             query: (formData) => ({
@@ -30,9 +40,9 @@ export const inviteValuerApiSlice = apiSlice.injectEndpoints({
                 method: 'GET',
                 headers: {
                     'Accept': 'Application/json'
-                  }          
+                }
             })
-           
+
         }),
         registerUploader: builder.mutation({
             query: (formData) => ({
@@ -67,7 +77,7 @@ export const inviteValuerApiSlice = apiSlice.injectEndpoints({
             query: (formdata) => ({
                 url: `/api/admin/archive-valuer-registration-request`,
                 method: 'POST',
-                body:formdata,
+                body: formdata,
                 headers: {
                     'Accept': 'Application/json'
                 }
@@ -77,6 +87,7 @@ export const inviteValuerApiSlice = apiSlice.injectEndpoints({
 })
 
 export const {
+    useGetValuerUserInvitesQuery,
     useArchiveUploaderRegistrationRequestMutation,
     useRegisterUploaderMutation,
     useRequestUploaderAccessMutation,
@@ -84,4 +95,4 @@ export const {
     useRegisterUploaderUserMutation,
     useGetValuerUserInviteDetailsQuery,
     useGetValuerInviteDetailsQuery
-} = inviteValuerApiSlice ;
+} = inviteValuerApiSlice;

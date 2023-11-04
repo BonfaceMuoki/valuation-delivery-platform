@@ -22,6 +22,7 @@ import {
     ModalHeader,
     ModalBody,
     ModalFooter,
+    Badge,
     Card, CardHeader, CardFooter, CardImg, CardText, CardBody, CardTitle, CardSubtitle, CardLink
 } from "reactstrap";
 
@@ -34,6 +35,8 @@ import { Row, Col } from "reactstrap";
 import Select from "react-select";
 import { useGetUsersQuery, useSendValuationFirmUserInviteMutation } from "../../api/commonEndPointsAPI";
 import { findUpper } from "../../utils/Utils";
+import { useGetValuerUserInvitesQuery } from "../../api/auth/inviteValuerApiSlice";
+
 
 const CloseButton = () => {
     return (
@@ -42,7 +45,7 @@ const CloseButton = () => {
         </span>
     );
 };
-const UsersList = () => {
+const MyValuersInviteList = () => {
     const toastMessage = (message, type) => {
         if (type == "success") {
             toast.success(message, {
@@ -106,30 +109,35 @@ const UsersList = () => {
     const [editRecord, setEditRecord] = useState(null);
 
     const {
-        data: alluserslist,
+        data: alluserinviteslist,
         isFetching: fetchingUsers,
         isLoading: loadingUsers,
         refetch: refetchUsers,
         isSuccess,
         isError,
         error
-    } = useGetUsersQuery({ currentPage, rowsPerPage, searchText, orderColumn, sortOrder });
-    // console.log(alluserslist, "alluserslist");
+    } = useGetValuerUserInvitesQuery();
+
+    // console.log(alluserinviteslist, "alluserinviteslist");
     useEffect(() => {
-        if (alluserslist != null && alluserslist.data) {
-            setCurrentPage(alluserslist?.current_page);
-            setTotalRecords(alluserslist?.total);
-            setTableData(alluserslist?.data);
+        if (alluserinviteslist != null && alluserinviteslist) {
+            setCurrentPage(1);
+            setTotalRecords(alluserinviteslist.length);
+            setTableData(alluserinviteslist);
         } else {
             setTableData([{}]);
         }
-    }, [alluserslist, searchText, refetchUsers]);
+    }, [alluserinviteslist, searchText, refetchUsers]);
 
     useEffect(() => {
         if (tableData != null) {
             setCurrentItems(tableData);
         }
     }, [tableData]);
+
+    console.log(tableData, "tableDatatableData");
+
+
     // const currentItems = ;
     const frontendbaseurl = process.env.REACT_APP_FRONT_BASE_URL;
     // Change Page
@@ -450,7 +458,7 @@ const UsersList = () => {
                         </Col>
                         <Col md="2" style={{ display: "flex", justifyContent: "flex-end" }} sm="12">
                             <Button color="primary" className="btn-round" size="sm" type="submit" onClick={handleOpenUserDetailsModal} style={{ width: "100%", marginTop: "10px" }}>
-                                <Icon name="plus"></Icon>&nbsp;&nbsp; New User
+                                <Icon name="plus"></Icon>&nbsp;&nbsp; New User Invite
                             </Button>
                         </Col>
 
@@ -493,7 +501,7 @@ const UsersList = () => {
                             <span className="sub-text" style={{ height: "60px", width: "100%", display: "flex", alignItems: "center" }}>  <strong>ISK Number  </strong></span>
                         </DataTableRow>
                         <DataTableRow size="md" className="nk-tb-col-tools text-end">
-                            <span className="sub-text" style={{ height: "60px", width: "100%", display: "flex", alignItems: "center" }}>  <strong>Actions  </strong></span>
+                            <span className="sub-text" style={{ height: "60px", width: "100%", display: "flex", alignItems: "center" }}>  <strong>Status</strong></span>
                         </DataTableRow>
                     </DataTableHead>
                     {/*Head*/}
@@ -526,10 +534,10 @@ const UsersList = () => {
 
                                     </DataTableRow>
                                     <DataTableRow >
-                                        {item?.email}
+                                        {item?.invite_email}
                                     </DataTableRow>
                                     <DataTableRow >
-                                        {item?.phone_number}
+                                        {item?.personal_phone}
                                     </DataTableRow>
                                     <DataTableRow >
                                         {item?.vrb_number}
@@ -539,46 +547,13 @@ const UsersList = () => {
                                     </DataTableRow>
 
                                     <DataTableRow className="nk-tb-col-tools" >
-                                        <ul className="nk-tb-actions gx-1" style={{ display: "flex", justifyContent: "left" }}>
-                                            <li>
-                                                <UncontrolledDropdown>
-                                                    <DropdownToggle tag="a" className="dropdown-toggle btn btn-icon btn-trigger">
-                                                        <Icon name="more-h"></Icon>
-                                                    </DropdownToggle>
-                                                    <DropdownMenu end>
-                                                        <ul className="link-list-opt no-bdr">
-                                                            <React.Fragment>
-                                                                <li onClick={() => showEditPermission(item)}>
-                                                                    <DropdownItem
-                                                                        tag="a"
-                                                                        href="#suspend"
-                                                                        onClick={(ev) => {
-                                                                            ev.preventDefault();
-                                                                        }}
-                                                                    >
-                                                                        <Icon name="edit"></Icon>
-                                                                        <span>Edit</span>
-                                                                    </DropdownItem>
-                                                                </li>
-                                                                <li className="divider" ></li>
-                                                                <li onClick={() => fireDeletePermission(item)}>
-                                                                    <DropdownItem
-                                                                        tag="a"
-                                                                        href="#suspend"
-                                                                        onClick={(ev) => {
-                                                                            ev.preventDefault();
-                                                                        }}
-                                                                    >
-                                                                        <Icon name="trash"></Icon>
-                                                                        <span>Delete</span>
-                                                                    </DropdownItem>
-                                                                </li>
-                                                            </React.Fragment>
-                                                        </ul>
-                                                    </DropdownMenu>
-                                                </UncontrolledDropdown>
-                                            </li>
-                                        </ul>
+                                        {
+                                            (item.status == 0) && <Badge pill color="primary">Uncomplete</Badge>
+                                        }
+                                        {
+                                            (item.status == 1) && <Badge pill color="success" >Complete</Badge>
+                                        }
+
                                     </DataTableRow>
                                 </DataTableItem>
                             );
@@ -606,4 +581,4 @@ const UsersList = () => {
     );
 
 };
-export default UsersList;
+export default MyValuersInviteList;

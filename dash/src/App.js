@@ -24,6 +24,8 @@ import PermissionList from "./pages/accesorpages/PermissionList";
 import ValuerReports from "./pages/valuerspages/ValuerReports";
 import ComingSoonPage from "./pages/ComingSoonPage";
 import UsersList from "./pages/valuerspages/UsersList";
+import AcceptValuerUserInviteSignup from "./auth/AcceptValuerUserInviteSignup";
+import MyValuersInviteList from "./pages/valuerspages/MyValuersInviteList";
 
 const App = () => {
   return (
@@ -37,6 +39,8 @@ const App = () => {
               <Route path="/request-accesor-access" element={<RequestAccesorAccess />} />
               <Route path="/complete-accesor-invite-by-registering" element={<AcceptAccesorInviteSignup />} />
               <Route path="/complete-invite-by-registering" element={<AcceptInviteSignup />} />
+              <Route path="/complete-valuer-user-registration-register" element={<AcceptValuerUserInviteSignup />} />
+
               {/* <Route path="/upload-new-report"  element={<MapWithAutoSearch />}></Route> */}
             </Route>
             <Route element={<ProtectedRoutes />}>
@@ -67,6 +71,9 @@ const App = () => {
                 </Route>
                 <Route element={<AuthorizeRoute checkpermission={["upload report"]} />}>
                   <Route path="/valuation-firm/my-users" element={<UsersList />}></Route>
+                </Route>
+                <Route element={<AuthorizeRoute checkpermission={["upload report"]} />}>
+                  <Route path="/valuation-firm/my-users-invite" element={<MyValuersInviteList />}></Route>
                 </Route>
 
                 {/* valuer dashboard */}

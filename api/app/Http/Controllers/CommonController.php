@@ -8,6 +8,7 @@ use App\Models\PropertyType;
 use App\Models\ReportConsumer;
 use App\Models\User;
 use App\Models\ValuationReport;
+use App\Models\ValuerfirmUserInvite;
 use DB;
 use Illuminate\Http\Request;
 
@@ -20,6 +21,36 @@ class CommonController extends Controller
         ['table' => 'property_types', 'columns' => ['type_name']],
         ['table' => 'users', 'columns' => ['full_name']],
     ];
+    public function getAllValuerUserInvites()
+    {
+        $user = auth()->user();
+        if ($user == null) {
+            return response()->json(['message' => 'Unautheticated'], 403);
+        }
+        if ($user->hasPermissionTo(Permission::where("slug", 'view all Users')->first())) {
+            $query = ValuerfirmUserInvite::query();
+            $users = $query->get();
+            return response($users, 200);
+        } else if ($user->hasPermissionTo(Permission::where("slug", 'view valuation firm users only')->first())) {
+            $org = $user->UploaderOrganization()->wherePivot("status", 1)->first();
+            $orgid = $org->id;
+            $query = ValuerfirmUserInvite::query();
+            $users = $query->get();
+            return response($users, 200);
+        } else if ($user->hasPermissionTo(Permission::where("slug", 'view accesors users only')->first())) {
+            $org = $user->AccessorOrganization()->wherePivot("status", 1)->first();
+            $orgid = $org->id;
+            $query = AccesorUserInvite::query();
+            $users = $query->get();
+            return response($users, 200);
+
+        } else {
+            $query = ValuerfirmUserInvite::query();
+            $users = $query->paginate($request->rowsPerPage);
+            return response($users, 200);
+        }
+
+    }
     public function getAccesorsList()
     {
         $all = ReportConsumer::all();

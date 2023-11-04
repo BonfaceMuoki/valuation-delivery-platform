@@ -148,13 +148,13 @@ const menuvaluer = [
     active: false,
     subMenu: [
       {
-        text: "User List - Valuers",
+        text: "My Registered Valuers",
         link: "/valuation-firm/my-users",
       },
       {
-        text: "User List - Lenders & Courts",
-        link: "/valuation-firm/my-clients",
-      },
+        text: "My Valuer Invites",
+        link: "/valuation-firm/my-users-invite",
+      }
     ],
   },
   {
@@ -163,14 +163,14 @@ const menuvaluer = [
     active: false,
     subMenu: [
       {
-        text: "Reports - My Reports",
+        text: "My Reports",
         link: "/valuation-firm/my-reports",
       },
       {
-        text: "Reports - New Report",
+        text: "New Report",
         link: "/upload-new-report",
       }, {
-        text: "Reports - Comparables",
+        text: "Comparables",
         link: "/valuation-firm/my-comparables",
       },
     ],

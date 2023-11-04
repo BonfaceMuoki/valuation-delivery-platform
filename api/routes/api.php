@@ -32,6 +32,7 @@ Route::group([
     Route::get('/all-users', [AuthController::class, 'allUsers']);
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/register-accesor-user', [AuthController::class, 'registerAccesorUser']);
+    Route::post('/register-valuer-user', [AuthController::class, 'registerValuerUser']);
 
     Route::post('/request-valuer-access', [AuthController::class, 'requestValuerAccess']);
     Route::post('/request-accesor-access', [AuthController::class, 'requestAccesorAccess']);
@@ -53,6 +54,8 @@ Route::group([
     'middleware' => 'api',
     'prefix' => 'commons',
 ], function ($router) {
+
+    Route::get('/get-all-valuer-user-invites', [CommonController::class, 'getAllValuerUserInvites']);
     Route::get('/get-accesors-list', [CommonController::class, 'getAccesorsList']);
     Route::get('/get-accesors-users-list/{accesor}', [CommonController::class, 'getAccesorsUsersList']);
     Route::get('/get-uploaders-list', [CommonController::class, 'getUploadersList']);
@@ -63,6 +66,10 @@ Route::group([
     Route::get('/get-all-propertytypes', [CommonController::class, 'getAllProprtyTypes']);
 
     Route::get('/get-all-counties', [CommonController::class, 'getAllCounties']);
+
+    Route::get('/download-report', [ValuerController::class, 'download']);
+
+    
 });
 Route::group([
     'middleware' => 'api',

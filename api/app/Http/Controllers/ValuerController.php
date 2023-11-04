@@ -35,7 +35,7 @@ class ValuerController extends Controller
     public function __construct()
     {
 
-        $this->middleware('auth:api', ['except' => ['generateQRCode']]);
+        $this->middleware('auth:api', ['except' => ['generateQRCode', 'download']]);
 
     }
     public function donwloadCachedImage(Request $request)
@@ -674,6 +674,8 @@ class ValuerController extends Controller
             'registration_url' => $request['registration_url'],
             'login_url' => $request['login_url'],
             'invite_token' => $token,
+            'isk_number' => $request['isk_number'],
+            'vrb_number' => $request['vrb_number'],
             'created_at' => Carbon::now(),
         ]);
     }
@@ -710,5 +712,18 @@ class ValuerController extends Controller
         } else {
             return response()->json(['message' => 'Forbidden access'], 403);
         }
+    }
+    public function download(Request $request)
+    {
+        try {
+            $myreport = ValuationReport::where("id", $request->report)->first();
+            $myFile_unsigned = $filePath = Storage::disk("public")->path("reports/" . $myreport->upload_link);
+            $exploded_name = explode(".", $myreport->upload_link);
+            $myFile_signed = $filePath = Storage::disk("public")->path("reports/" . $exploded_name[0] . ".pdf_signed.pdf");
+            return response()->download($myFile_signed);
+        } catch (Exception $exp) {
+            return response()->json(['data' => [], 'message' => 'Failed.' . $exp->getMessage(), 'success' => true], 200);
+        }
+
     }
 }
