@@ -10,7 +10,16 @@ import { useLoginMutation } from "../api/auth/authApiSlice";
 import { setCredentials } from "../featuers/authSlice";
 import ReCAPTCHA from "react-google-recaptcha";
 
-import { Block, BlockContent, BlockDes, BlockHead, BlockTitle, Button, Icon, PreviewCard } from "../components/Component";
+import {
+  Block,
+  BlockContent,
+  BlockDes,
+  BlockHead,
+  BlockTitle,
+  Button,
+  Icon,
+  PreviewCard,
+} from "../components/Component";
 import Head from "../layout/head/Head";
 
 import AuthFooter from "../pages/auth/AuthFooter";
@@ -18,7 +27,7 @@ import AuthFooter from "../pages/auth/AuthFooter";
 const Login = () => {
   const navigateto = useNavigate();
   const [passState, setPassState] = useState(false);
-  const toastMessage = (message, type) => { };
+  const toastMessage = (message, type) => {};
   const SITE_KEY = process.env.REACT_APP_reCAPTCHA_SITE_KEY;
   const SECRET_KEY = process.env.REACT_APP_reCAPTCHA_SECRET_KEY;
   const captchaRef = useRef(null);
@@ -61,13 +70,6 @@ const Login = () => {
     <>
       <Head title="Register" />
       <Block className="nk-block-middle nk-auth-body  wide-xs">
-        <div className="brand-logo pb-4 text-center">
-          <BlockHead>
-            <BlockContent>
-              <BlockTitle tag="h4"> Set Your Account Password</BlockTitle>
-            </BlockContent>
-          </BlockHead>
-        </div>
         <PreviewCard className="card-bordered" bodyClass="card-inner-lg">
           <BlockHead>
             <BlockContent>
@@ -153,7 +155,6 @@ const Login = () => {
             <Link to="/request-accesor-access"> Request Accesosor Access</Link>
           </div>
         </PreviewCard>
-
       </Block>
       <AuthFooter />
     </>

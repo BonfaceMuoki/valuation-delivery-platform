@@ -1,23 +1,27 @@
 import React, { useState, useRef, useEffect, useCallback, forwardRef } from "react";
 import Head from "../../layout/head/Head";
 import Content from "../../layout/content/Content";
-import {
-  Block,
-  BlockHead,
-  BlockHeadContent,
-  BlockTitle,
-  PreviewCard
-} from "../../components/Component";
-import makeAnimated from 'react-select/animated';
+import { Block, BlockHead, BlockHeadContent, BlockTitle, PreviewCard } from "../../components/Component";
+import makeAnimated from "react-select/animated";
 import { useForm, Controller } from "react-hook-form";
 import { Steps, Step } from "react-step-builder";
 import { Row, Col, Button, Card } from "reactstrap";
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as Yup from 'yup';
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
 import { GoogleMapsProvider, useGoogleMap } from "@ubilabs/google-maps-react-hooks";
 import MapWithAutoSearch from "./MapWithAutoSearch";
-import { upDateRecipientRecipientsProperty, clearValuationReportData, selectCurrentSignatories, selectCurrentToken, setReportSignatories, setValuationLocationDetails, upDateRecipientRecipients, selectRecipientRecipients, setRecipientRecipients } from "../../featuers/authSlice";
+import {
+  upDateRecipientRecipientsProperty,
+  clearValuationReportData,
+  selectCurrentSignatories,
+  selectCurrentToken,
+  setReportSignatories,
+  setValuationLocationDetails,
+  upDateRecipientRecipients,
+  selectRecipientRecipients,
+  setRecipientRecipients,
+} from "../../featuers/authSlice";
 import { Alert } from "reactstrap";
 import {
   selectLocationDetails,
@@ -29,7 +33,7 @@ import {
   setRecipientEmails,
   setRecipientPhone,
   setValuationDetails,
-  setReportRecipient
+  setReportRecipient,
 } from "../../featuers/authSlice";
 import {
   useUploadValuationReportV2Mutation,
@@ -39,12 +43,16 @@ import {
 } from "../../api/commonEndPointsAPI";
 import { Collapse } from "reactstrap";
 import Select from "react-select";
-import { useCacheReportDocumentMutation, useDownLoadCachedFileMutation, useGetCurrentUploadedFileQuery, useSubmitValuationReportMutation } from "../../api/uploader/uploaderApiEndpoints";
+import {
+  useCacheReportDocumentMutation,
+  useDownLoadCachedFileMutation,
+  useGetCurrentUploadedFileQuery,
+  useSubmitValuationReportMutation,
+} from "../../api/uploader/uploaderApiEndpoints";
 import Swal from "sweetalert2";
-import axios from 'axios';
+import axios from "axios";
 import { selectGPSDetails } from "../../featuers/authSlice";
 import { Spinner } from "reactstrap";
-
 
 const LocationForm = (props) => {
   const dispatch = useDispatch();
@@ -52,13 +60,18 @@ const LocationForm = (props) => {
   const locationDetails = useSelector(selectLocationDetails);
 
   const locationValidationSchema = Yup.object().shape({
-    locationName: Yup.string().required('Location Name is required'),
-    town: Yup.string().required('Town is required'),
-    street: Yup.string().required('Street is required'),
-    county: Yup.string().required('County is required'),
-    neighbourHood: Yup.string().required('Neighbourhood is required'),
+    locationName: Yup.string().required("Location Name is required"),
+    town: Yup.string().required("Town is required"),
+    street: Yup.string().required("Street is required"),
+    county: Yup.string().required("County is required"),
+    neighbourHood: Yup.string().required("Neighbourhood is required"),
   });
-  const { register: registerlocation, setValue: setLocationValues, handleSubmit: handleLocationSubmit, formState: { errors: locationerrors, isValid: locationIsValid } } = useForm({
+  const {
+    register: registerlocation,
+    setValue: setLocationValues,
+    handleSubmit: handleLocationSubmit,
+    formState: { errors: locationerrors, isValid: locationIsValid },
+  } = useForm({
     resolver: yupResolver(locationValidationSchema),
   });
   const onSubmitLocation = async (data) => {
@@ -74,10 +87,7 @@ const LocationForm = (props) => {
       dispatch(setValuationLocationDetails(data));
       props.next();
     }
-
-
-
-  }
+  };
   // useEffect(() => {
   //   if (locationDetails != null) {
   //     setLocationValues("locationName", locationDetails?.locationName);
@@ -103,7 +113,6 @@ const LocationForm = (props) => {
                 className="form-control"
                 {...registerlocation("locationName", { required: true })}
                 defaultValue={locationDetails?.locationName}
-
               />
               {locationerrors.locationName && <span className="invalid">{locationerrors.locationName?.message}</span>}
             </div>
@@ -205,36 +214,43 @@ const PropertyDetailsForm = (props) => {
   // console.log(propertdetails);
   const dispatch = useDispatch();
   const propertyDetailsSchema = Yup.object().shape({
-    PropertyLR: Yup.string().required('The proprty Lr is required'),
-    PropertyType: Yup.array().of(Yup.object().shape({
-      value: Yup.string(),
-      label: Yup.string()
-    })
-    ).min(1, "Property tYPE required").max(1, "Only one Property Type is required."),
-    totalBuiltUpArea: Yup.number().required('Total Builtup area is required'),
-    tenure: Yup.string().required('Tenure is required'),
-    landSize: Yup.number().required('Land size is required')
+    PropertyLR: Yup.string().required("The proprty Lr is required"),
+    PropertyType: Yup.array()
+      .of(
+        Yup.object().shape({
+          value: Yup.string(),
+          label: Yup.string(),
+        })
+      )
+      .min(1, "Property tYPE required")
+      .max(1, "Only one Property Type is required."),
+    totalBuiltUpArea: Yup.number().required("Total Builtup area is required"),
+    tenure: Yup.string().required("Tenure is required"),
+    landSize: Yup.number().required("Land size is required"),
   });
-  const { register: registerproperty, control, setValue: setPropertyDetailsValues, handleSubmit: handlePropertyDetailsSubmit, formState: { errors: properrtyErrors, isValid: propertyDetailsIsValid } } = useForm({
+  const {
+    register: registerproperty,
+    control,
+    setValue: setPropertyDetailsValues,
+    handleSubmit: handlePropertyDetailsSubmit,
+    formState: { errors: properrtyErrors, isValid: propertyDetailsIsValid },
+  } = useForm({
     resolver: yupResolver(propertyDetailsSchema),
   });
   const onSubmitPropertyDetails = async (data) => {
     // console.log(data);
     dispatch(setValuationPropertyDetails(data));
     props.next();
-  }
+  };
   //get the registered propertytypes
   const [selectedPropertyType, setSelectedPropertyType] = useState();
 
   const [propertytypesList, setpropertytypesList] = useState();
-  useEffect(() => {
-
-  });
+  useEffect(() => {});
 
   const { data: registeredpropertytypes, isLoading: loadingpropertytypes } = useGetPropertyTypeListQuery();
   // console.log(registeredpropertytypes, "registeredpropertytypes");
   useEffect(() => {
-
     if (registeredpropertytypes != undefined) {
       const restructuredData = registeredpropertytypes.map(({ id, type_name }) => ({
         id: id,
@@ -252,7 +268,7 @@ const PropertyDetailsForm = (props) => {
   const animatedComponents = makeAnimated();
 
   return (
-    <form onSubmit={handlePropertyDetailsSubmit(onSubmitPropertyDetails)} >
+    <form onSubmit={handlePropertyDetailsSubmit(onSubmitPropertyDetails)}>
       <Row className="gy-4">
         <Col md="6">
           <div className="form-group">
@@ -299,7 +315,14 @@ const PropertyDetailsForm = (props) => {
                   name="PropertyType"
                   control={control}
                   render={({ field }) => (
-                    <Select isMulti value={propertdetails?.PropertyType} options={propertytypesList} isSearchable={true} isClearable={true} {...field} />
+                    <Select
+                      isMulti
+                      value={propertdetails?.PropertyType}
+                      options={propertytypesList}
+                      isSearchable={true}
+                      isClearable={true}
+                      {...field}
+                    />
                   )}
                 />
               )}
@@ -322,7 +345,7 @@ const PropertyDetailsForm = (props) => {
                 id="totalBuiltUpArea"
                 className="form-control"
                 {...registerproperty("totalBuiltUpArea", {
-                  required: "This field is required"
+                  required: "This field is required",
                 })}
                 defaultValue={propertdetails?.landSize}
               />
@@ -330,7 +353,6 @@ const PropertyDetailsForm = (props) => {
             </div>
           </div>
         </Col>
-
       </Row>
       <Row>
         <Col md="6">
@@ -344,7 +366,7 @@ const PropertyDetailsForm = (props) => {
                 id="landSize"
                 className="form-control"
                 {...registerproperty("landSize", {
-                  required: "This field is required"
+                  required: "This field is required",
                 })}
                 defaultValue={propertdetails?.landSize}
               />
@@ -363,7 +385,7 @@ const PropertyDetailsForm = (props) => {
                 id="tenure"
                 className="form-control"
                 {...registerproperty("tenure", {
-                  required: "This field is required"
+                  required: "This field is required",
                 })}
                 defaultValue={propertdetails?.tenure}
               />
@@ -391,7 +413,6 @@ const PropertyDetailsForm = (props) => {
   );
 };
 const PropertyValuationForm = (props) => {
-
   const dispatch = useDispatch();
 
   let recipientrecipientsList = useSelector(selectRecipientRecipients);
@@ -401,37 +422,49 @@ const PropertyValuationForm = (props) => {
   const { data: ccurrentuploadedfile, refetch: refetchUploadedFile } = useGetCurrentUploadedFileQuery();
 
   const propertyValuationValidationSchema = Yup.object().shape({
-    marketValue: Yup.string().required('Market Value is required'),
-    forcedSaleValue: Yup.number().required('Forced Sale value is required').typeError("FSV must be a valid number"),
-    insurenceValue: Yup.number().required("Insurence Value is required").typeError("Insurence value must be a valid number"),
+    marketValue: Yup.string().required("Market Value is required"),
+    forcedSaleValue: Yup.number().required("Forced Sale value is required").typeError("FSV must be a valid number"),
+    insurenceValue: Yup.number()
+      .required("Insurence Value is required")
+      .typeError("Insurence value must be a valid number"),
     valuationDate: Yup.string().required("Valuation date is required"),
     annualGRossRentalIncome: Yup.number().required("Valuation date is required"),
     PropertyDescription: Yup.string(),
     InstructionDate: Yup.string().required("Instruction Date is required"),
-    recipient: Yup.array().of(Yup.object().shape({
-      value: Yup.string(),
-      label: Yup.string(),
-      name: Yup.string()
-    })
-    ).min(1, "Recipient required").max(1, "Only one recipient is required."),
-    reportDocument: Yup
-      .mixed()
-      .required('Please upload a file')
+    recipient: Yup.array()
+      .of(
+        Yup.object().shape({
+          value: Yup.string(),
+          label: Yup.string(),
+          name: Yup.string(),
+        })
+      )
+      .min(1, "Recipient required")
+      .max(1, "Only one recipient is required."),
+    reportDocument: Yup.mixed()
+      .required("Please upload a file")
       .nullable()
-      .test('fileSize', 'File size is too large', (value) => {
+      .test("fileSize", "File size is too large", (value) => {
         if (value[0]) {
           return value[0].size <= 1024 * 1024 * 2;
         }
         return true;
       })
-      .test('fileType', 'Only PDF files are allowed', (value) => {
+      .test("fileType", "Only PDF files are allowed", (value) => {
         if (value[0]) {
-          return ['application/pdf', 'pdf'].includes(value[0].type);
+          return ["application/pdf", "pdf"].includes(value[0].type);
         }
         return true;
-      })
+      }),
   });
-  const { register: registerpropertyValuation, control, setValue: setPropertValuationValues, getValues: getValuationFormValuation, handleSubmit: handlePropertyValuationsSubmit, formState: { errors: propertyValuationErrors, isValid: propertyValuationIsValid } } = useForm({
+  const {
+    register: registerpropertyValuation,
+    control,
+    setValue: setPropertValuationValues,
+    getValues: getValuationFormValuation,
+    handleSubmit: handlePropertyValuationsSubmit,
+    formState: { errors: propertyValuationErrors, isValid: propertyValuationIsValid },
+  } = useForm({
     resolver: yupResolver(propertyValuationValidationSchema),
   });
   const [receivingUsers, setReceivingUsers] = useState([]);
@@ -454,7 +487,7 @@ const PropertyValuationForm = (props) => {
     isLoading: loadingAccesors,
     isSuccess: accesorsLoaded,
     isError: errorLodingAccesors,
-    error: loadingAccesorError
+    error: loadingAccesorError,
   } = useGetAccesorsListQuery();
   // console.log("Accesors List");
   // console.log(accesorslist);
@@ -463,11 +496,10 @@ const PropertyValuationForm = (props) => {
       const restructuredData = accesorslist.map(({ id, organization_name }) => ({
         value: id,
         label: organization_name,
-        name: organization_name
+        name: organization_name,
       }));
       setExistingAccessors(restructuredData);
     }
-
   }, [accesorslist]);
   const onSubmitPropertyValuation = async (data) => {
     console.log(data, "recipientrecipientsListrecipientrecipientsList");
@@ -481,10 +513,7 @@ const PropertyValuationForm = (props) => {
 
         ind++;
       }
-
-
     }
-
 
     //
     // console.log(data, "data");
@@ -492,17 +521,16 @@ const PropertyValuationForm = (props) => {
     dispatch(setValuationDetails(data));
     dispatch(setReportRecipient(data.recipient));
 
-
     if (existingAccessors.length > 0) {
       props.next();
     } else {
       alert("Please input figure");
     }
-  }
+  };
 
   const [cacheReportDocument, setCachedREport] = useCacheReportDocumentMutation();
   const handleImage = async (e) => {
-    let selectedRecipient = getValuationFormValuation('recipient');
+    let selectedRecipient = getValuationFormValuation("recipient");
     if (selectedRecipient == null) {
       Swal.fire({
         icon: "warning",
@@ -525,12 +553,11 @@ const PropertyValuationForm = (props) => {
         ///save placeholder
       }
     }
-  }
+  };
   // Function to add a new recipient row
   const addRecipient = () => {
     setReceivingUsers([...receivingUsers, {}]);
     // setRecipientRecipients({ 'name': '', 'email': '', 'phone': '' });
-
   };
   // Function to remove a recipient row
   const removeRecipient = (index) => {
@@ -542,34 +569,35 @@ const PropertyValuationForm = (props) => {
   const removeRecipientold = (index) => {
     dispatch(upDateRecipientRecipients(index));
     console.log(valauationdetails, "valauationdetailsaupold");
-
   };
   const updateOldRecipientProperty = (index, property, updatedValue) => {
-
-    dispatch(upDateRecipientRecipientsProperty({ 'index': index, 'property': property, 'value': updatedValue }));
-
-  }
+    dispatch(upDateRecipientRecipientsProperty({ index: index, property: property, value: updatedValue }));
+  };
 
   const token = useSelector(selectCurrentToken);
   const downloadReport = () => {
     const headers = {
-      'Authorization': `Bearer ${token}`,
-      'Accept': 'application/json',
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
     };
-    axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/uploader/donwload-cached-image?file=${ccurrentuploadedfile?.file_name}`, { headers, responseType: 'blob' })
-      .then(response => {
-        const blob = new Blob([response.data], { type: 'application/pdf' });
+    axios
+      .get(
+        `${process.env.REACT_APP_API_BASE_URL}/api/uploader/donwload-cached-image?file=${ccurrentuploadedfile?.file_name}`,
+        { headers, responseType: "blob" }
+      )
+      .then((response) => {
+        const blob = new Blob([response.data], { type: "application/pdf" });
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
         a.download = ccurrentuploadedfile?.file_name; // Replace with the actual filename
         a.click();
         window.URL.revokeObjectURL(url);
       })
-      .catch(error => {
-        console.error('Error:', error);
+      .catch((error) => {
+        console.error("Error:", error);
       });
-  }
+  };
 
   return (
     <form onSubmit={handlePropertyValuationsSubmit(onSubmitPropertyValuation)}>
@@ -588,7 +616,6 @@ const PropertyValuationForm = (props) => {
                     <Select isMulti options={existingAccessors} isSearchable={true} isClearable={true} {...field} />
                   )}
                 />
-
               )}
               {propertyValuationErrors.recipient?.message}
               {propertyValuationErrors.recipient && (
@@ -597,7 +624,6 @@ const PropertyValuationForm = (props) => {
             </div>
           </div>
         </Col>
-
       </Row>
       <Row className="mt-3">
         <Col md="12">
@@ -609,13 +635,15 @@ const PropertyValuationForm = (props) => {
                   <th>Name</th>
                   <th>Email</th>
                   <th>Phone</th>
-                  <th><Button color="primary" onClick={addRecipient}>+</Button></th>
+                  <th>
+                    <Button color="primary" onClick={addRecipient}>
+                      +
+                    </Button>
+                  </th>
                 </tr>
               </thead>
               <tbody>
-
-                {
-                  (recipientrecipientsList != null) &&
+                {recipientrecipientsList != null &&
                   recipientrecipientsList.map((existingRecipientRecipient, index) => (
                     <tr key={index}>
                       <td>
@@ -623,7 +651,7 @@ const PropertyValuationForm = (props) => {
                           <div className="form-control-wrap">
                             <Controller
                               name={`recipientssold[${index}].name`}
-                              defaultValue={(existingRecipientRecipient?.name) ? existingRecipientRecipient?.name : ''}
+                              defaultValue={existingRecipientRecipient?.name ? existingRecipientRecipient?.name : ""}
                               control={control}
                               render={({ field }) => (
                                 <input
@@ -638,7 +666,6 @@ const PropertyValuationForm = (props) => {
                                 />
                               )}
                             />
-
                           </div>
                         </div>
                       </td>
@@ -648,10 +675,12 @@ const PropertyValuationForm = (props) => {
                             <Controller
                               name={`recipientssold[${index}].email`}
                               control={control}
-
-                              defaultValue={(existingRecipientRecipient?.email) ? existingRecipientRecipient?.email : ''}
+                              defaultValue={existingRecipientRecipient?.email ? existingRecipientRecipient?.email : ""}
                               render={({ field }) => (
-                                <input type="text" {...field} className="form-control"
+                                <input
+                                  type="text"
+                                  {...field}
+                                  className="form-control"
                                   onChange={(e) => {
                                     const updatedValue = e.target.value;
                                     updateOldRecipientProperty(index, 2, updatedValue);
@@ -668,15 +697,19 @@ const PropertyValuationForm = (props) => {
                           <div className="form-control-wrap">
                             <Controller
                               name={`recipientssold[${index}].phone`}
-                              defaultValue={(existingRecipientRecipient?.phone) ? existingRecipientRecipient?.phone : ''}
+                              defaultValue={existingRecipientRecipient?.phone ? existingRecipientRecipient?.phone : ""}
                               control={control}
                               render={({ field }) => (
-                                <input type="text" {...field} className="form-control"
+                                <input
+                                  type="text"
+                                  {...field}
+                                  className="form-control"
                                   onChange={(e) => {
                                     const updatedValue = e.target.value;
                                     updateOldRecipientProperty(index, 3, updatedValue);
                                     field.onChange(e);
-                                  }} />
+                                  }}
+                                />
                               )}
                             />
                           </div>
@@ -698,9 +731,7 @@ const PropertyValuationForm = (props) => {
                             name={`recipientss[${index}].name`}
                             // defaultValue={(valauationdetails?.recipientss[index]?.name) ? valauationdetails?.recipientss[index]?.name : ''}
                             control={control}
-                            render={({ field }) => (
-                              <input type="text" {...field} className="form-control" />
-                            )}
+                            render={({ field }) => <input type="text" {...field} className="form-control" />}
                           />
                         </div>
                       </div>
@@ -711,11 +742,8 @@ const PropertyValuationForm = (props) => {
                           <Controller
                             name={`recipientss[${index}].email`}
                             control={control}
-
                             // defaultValue={(valauationdetails?.recipientss[index]?.email) ? valauationdetails?.recipientss[index]?.email : ''}
-                            render={({ field }) => (
-                              <input type="text" {...field} className="form-control" />
-                            )}
+                            render={({ field }) => <input type="text" {...field} className="form-control" />}
                           />
                         </div>
                       </div>
@@ -727,9 +755,7 @@ const PropertyValuationForm = (props) => {
                             name={`recipientss[${index}].phone`}
                             // defaultValue={(valauationdetails?.recipientss[index]?.phone) ? valauationdetails?.recipientss[index]?.phone : ''}
                             control={control}
-                            render={({ field }) => (
-                              <input type="text" {...field} className="form-control" />
-                            )}
+                            render={({ field }) => <input type="text" {...field} className="form-control" />}
                           />
                         </div>
                       </div>
@@ -745,7 +771,6 @@ const PropertyValuationForm = (props) => {
             </table>
           </div>
         </Col>
-
       </Row>
       <Row className="mt-3">
         <Col md="12">
@@ -753,7 +778,14 @@ const PropertyValuationForm = (props) => {
             <label className="form-label">Report Document(Only PDF)</label>
             <div className="form-control-wrap">
               <div className="form-file">
-                <input className="form-control"  {...registerpropertyValuation("reportDocument", { required: true })} type="file" multiple id="customMultipleFiles" onChange={handleImage} />
+                <input
+                  className="form-control"
+                  {...registerpropertyValuation("reportDocument", { required: true })}
+                  type="file"
+                  multiple
+                  id="customMultipleFiles"
+                  onChange={handleImage}
+                />
                 {propertyValuationErrors.file?.message}
                 {propertyValuationErrors.recipient && (
                   <span className="invalid">{propertyValuationErrors.file?.message}</span>
@@ -762,21 +794,20 @@ const PropertyValuationForm = (props) => {
             </div>
           </div>
         </Col>
-
       </Row>
       <Row className="mt-5">
         <Col md="12">
-          {
-            (ccurrentuploadedfile && ccurrentuploadedfile.file_name != '') &&
+          {ccurrentuploadedfile && ccurrentuploadedfile.file_name != "" && (
             <Alert color="primary">
               {/* <a
                 href={`${process.env.REACT_APP_API_BASE_URL}/api/uploader/donwload-cached-image?file=${ccurrentuploadedfile.file_name}`}
               > */}
-              <Button color="primary" onClick={downloadReport} >Preview Uploaded Report Document</Button>
+              <Button color="primary" onClick={downloadReport}>
+                Preview Uploaded Report Document
+              </Button>
               {/* </a> */}
-
             </Alert>
-          }
+          )}
         </Col>
       </Row>
       <Row className="mt-3">
@@ -792,10 +823,11 @@ const PropertyValuationForm = (props) => {
                 className="form-control"
                 {...registerpropertyValuation("marketValue", { required: true })}
                 defaultValue={valauationdetails?.marketValue}
-
               />
               {propertyValuationErrors.marketValue?.message}
-              {propertyValuationErrors.marketValue && <span className="invalid">{propertyValuationErrors.marketValue?.message}</span>}
+              {propertyValuationErrors.marketValue && (
+                <span className="invalid">{propertyValuationErrors.marketValue?.message}</span>
+              )}
             </div>
           </div>
         </Col>
@@ -813,7 +845,9 @@ const PropertyValuationForm = (props) => {
                 defaultValue={valauationdetails?.forcedSaleValue}
               />
               {propertyValuationErrors?.forcedSaleValue?.message}
-              {propertyValuationErrors.forcedSaleValue && <span className="invalid">{propertyValuationErrors.forcedSaleValue?.message}</span>}
+              {propertyValuationErrors.forcedSaleValue && (
+                <span className="invalid">{propertyValuationErrors.forcedSaleValue?.message}</span>
+              )}
             </div>
           </div>
         </Col>
@@ -831,7 +865,9 @@ const PropertyValuationForm = (props) => {
                 defaultValue={valauationdetails?.insurenceValue}
               />
               {propertyValuationErrors?.insurenceValue?.message}
-              {propertyValuationErrors.insurenceValue && <span className="invalid">{propertyValuationErrors.insurenceValue?.message}</span>}
+              {propertyValuationErrors.insurenceValue && (
+                <span className="invalid">{propertyValuationErrors.insurenceValue?.message}</span>
+              )}
             </div>
           </div>
         </Col>
@@ -849,10 +885,11 @@ const PropertyValuationForm = (props) => {
                 className="form-control"
                 {...registerpropertyValuation("annualGRossRentalIncome", { required: true })}
                 defaultValue={valauationdetails?.annualGRossRentalIncome}
-
               />
               {propertyValuationErrors?.annualGRossRentalIncome?.message}
-              {propertyValuationErrors.annualGRossRentalIncome && <span className="invalid">{propertyValuationErrors.annualGRossRentalIncome?.message}</span>}
+              {propertyValuationErrors.annualGRossRentalIncome && (
+                <span className="invalid">{propertyValuationErrors.annualGRossRentalIncome?.message}</span>
+              )}
             </div>
           </div>
         </Col>
@@ -870,10 +907,11 @@ const PropertyValuationForm = (props) => {
                 className="form-control"
                 {...registerpropertyValuation("valuationDate", { required: true })}
                 defaultValue={valauationdetails?.valuationDate}
-
               />
               {propertyValuationErrors.valuationDate?.message}
-              {propertyValuationErrors.valuationDate && <span className="invalid">{propertyValuationErrors.valuationDate?.message}</span>}
+              {propertyValuationErrors.valuationDate && (
+                <span className="invalid">{propertyValuationErrors.valuationDate?.message}</span>
+              )}
             </div>
           </div>
         </Col>
@@ -889,10 +927,11 @@ const PropertyValuationForm = (props) => {
                 className="form-control"
                 {...registerpropertyValuation("InstructionDate", { required: true })}
                 defaultValue={valauationdetails?.InstructionDate}
-
               />
               {propertyValuationErrors.InstructionDate?.message}
-              {propertyValuationErrors.InstructionDate && <span className="invalid">{propertyValuationErrors.InstructionDate?.message}</span>}
+              {propertyValuationErrors.InstructionDate && (
+                <span className="invalid">{propertyValuationErrors.InstructionDate?.message}</span>
+              )}
             </div>
           </div>
         </Col>
@@ -912,7 +951,9 @@ const PropertyValuationForm = (props) => {
                 defaultValue={valauationdetails?.PropertyDescription}
               />
               {propertyValuationErrors.InstructionDate?.message}
-              {propertyValuationErrors.InstructionDate && <span className="invalid">{propertyValuationErrors.InstructionDate?.message}</span>}
+              {propertyValuationErrors.InstructionDate && (
+                <span className="invalid">{propertyValuationErrors.InstructionDate?.message}</span>
+              )}
             </div>
           </div>
         </Col>
@@ -935,49 +976,64 @@ const PropertyValuationForm = (props) => {
   );
 };
 const ValuationSignatures = (props) => {
+  const { data: ccurrentuploadedfile, refetch: refetchUploadedFile } = useGetCurrentUploadedFileQuery();
   const token = useSelector(selectCurrentToken);
   const downloadReport = () => {
     const headers = {
-      'Authorization': `Bearer ${token}`,
-      'Accept': 'application/json',
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
     };
-    axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/uploader/donwload-cached-image?file=${ccurrentuploadedfile?.file_name}`, { headers, responseType: 'blob' })
-      .then(response => {
-        const blob = new Blob([response.data], { type: 'application/pdf' });
+    axios
+      .get(
+        `${process.env.REACT_APP_API_BASE_URL}/api/uploader/donwload-cached-image?file=${ccurrentuploadedfile?.file_name}`,
+        { headers, responseType: "blob" }
+      )
+      .then((response) => {
+        const blob = new Blob([response.data], { type: "application/pdf" });
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
         a.download = ccurrentuploadedfile?.file_name; // Replace with the actual filename
         a.click();
         window.URL.revokeObjectURL(url);
       })
-      .catch(error => {
-        console.error('Error:', error);
+      .catch((error) => {
+        console.error("Error:", error);
       });
-  }
-  const myreportdocdetails = localStorage.getItem('my_reportdocument');
+  };
+  const myreportdocdetails = localStorage.getItem("my_reportdocument");
   console.log("myreportdocdetails", myreportdocdetails);
   const reportsignatories = useSelector(selectCurrentSignatories);
   // console.log(reportsignatories, "reportsignatories");
   const dispatch = useDispatch();
   const signatoriesSchema = Yup.object().shape({
-    repportSinatories: Yup.array().of(Yup.object().shape({
-      id: Yup.string(),
-      value: Yup.string(),
-      label: Yup.string(),
-      email: Yup.string(),
-      phone: Yup.string()
-    })
-    ).min(2, "Signatories are required").max(2, "Only one Property Type is required.")
+    repportSinatories: Yup.array()
+      .of(
+        Yup.object().shape({
+          id: Yup.string(),
+          value: Yup.string(),
+          label: Yup.string(),
+          email: Yup.string(),
+          phone: Yup.string(),
+        })
+      )
+      .min(2, "Signatories are required")
+      .max(2, "Only one Property Type is required."),
   });
-  const { register: registerSignatories, control, setValue: setSignatoriesValues, handleSubmit: handleSignatories, formState: { errors: signatoriesErrors } } = useForm({
+  const {
+    register: registerSignatories,
+    control,
+    setValue: setSignatoriesValues,
+    handleSubmit: handleSignatories,
+    formState: { errors: signatoriesErrors },
+  } = useForm({
     resolver: yupResolver(signatoriesSchema),
   });
   const onSubmitSignatories = async (data) => {
     // console.log(data);
     dispatch(setReportSignatories(data));
     props.next();
-  }
+  };
   //get the registered signatories
   const [signatoriesList, setSignatoriesList] = useState();
   const { data: registeredusers, isLoading: loadingusers } = useGetUsersQuery();
@@ -1000,7 +1056,7 @@ const ValuationSignatures = (props) => {
   //get the registered signnaries
   const animatedComponents = makeAnimated();
   return (
-    <form onSubmit={handleSignatories(onSubmitSignatories)} >
+    <form onSubmit={handleSignatories(onSubmitSignatories)}>
       <Row className="gy-4">
         <Col md="12">
           <div className="form-group">
@@ -1013,7 +1069,14 @@ const ValuationSignatures = (props) => {
                   name="signatories"
                   control={control}
                   render={({ field }) => (
-                    <Select isMulti value={reportsignatories?.signatories} options={signatoriesList} isSearchable={true} isClearable={true} {...field} />
+                    <Select
+                      isMulti
+                      value={reportsignatories?.signatories}
+                      options={signatoriesList}
+                      isSearchable={true}
+                      isClearable={true}
+                      {...field}
+                    />
                   )}
                 />
               )}
@@ -1055,33 +1118,38 @@ const ValuationSummary = (props) => {
   const gpsdetails = useSelector(selectGPSDetails);
   console.log(gpsdetails, "gpsdetails");
   const recipientrecipients = valuationdetails?.recipientss;
-  const reportdocument = localStorage.getItem('my_reportdocument');
+  const reportdocument = localStorage.getItem("my_reportdocument");
   console.log(propertdetails, "propertdetails");
   console.log(locationdetails, "locationdetails");
   console.log(valuationdetails, "valutiondetails");
   console.log(signatories?.signatories, "signatories");
   console.log(recipientrecipients, "recipientrecipient");
-  const [submitvaluationreport, { errors: errorsuploadingreport, isLoading: isSubmittingReport }] = useSubmitValuationReportMutation();
+  const [submitvaluationreport, { errors: errorsuploadingreport, isLoading: isSubmittingReport }] =
+    useSubmitValuationReportMutation();
   const token = useSelector(selectCurrentToken);
   const downloadReport = () => {
     const headers = {
-      'Authorization': `Bearer ${token}`,
-      'Accept': 'application/json',
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
     };
-    axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/uploader/donwload-cached-image?file=${ccurrentuploadedfile?.file_name}`, { headers, responseType: 'blob' })
-      .then(response => {
-        const blob = new Blob([response.data], { type: 'application/pdf' });
+    axios
+      .get(
+        `${process.env.REACT_APP_API_BASE_URL}/api/uploader/donwload-cached-image?file=${ccurrentuploadedfile?.file_name}`,
+        { headers, responseType: "blob" }
+      )
+      .then((response) => {
+        const blob = new Blob([response.data], { type: "application/pdf" });
         const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = url;
         a.download = ccurrentuploadedfile?.file_name; // Replace with the actual filename
         a.click();
         window.URL.revokeObjectURL(url);
       })
-      .catch(error => {
-        console.error('Error:', error);
+      .catch((error) => {
+        console.error("Error:", error);
       });
-  }
+  };
   const handleSubmitValuationReport = async (type) => {
     const formdata = new FormData();
     formdata.append("e_location_name", locationdetails?.locationName);
@@ -1096,7 +1164,6 @@ const ValuationSummary = (props) => {
       formdata.append("a_location_city", gpsdetails?.details.name);
       formdata.append("a_location_town", gpsdetails?.details.name);
       formdata.append("a_location_street", gpsdetails?.details.name);
-
     } else if (gpsdetails.type === "custom") {
       formdata.append("a_location_lat", gpsdetails?.details.lat);
       formdata.append("a_location_long", gpsdetails?.details.long);
@@ -1139,7 +1206,6 @@ const ValuationSummary = (props) => {
     }
     formdata.append("signatories", signs);
 
-
     if (type === "1") {
       formdata.append("signatureNeeded", 1);
     } else {
@@ -1148,12 +1214,11 @@ const ValuationSummary = (props) => {
     // console.log(recnames);
     const submitvaluationreportresutlt = await submitvaluationreport(formdata);
     if ("error" in submitvaluationreportresutlt) {
-
       Swal.fire({
         icon: "error",
         title: "Oops...",
         text: submitvaluationreportresutlt.error.data.message,
-        focusConfirm: false
+        focusConfirm: false,
       });
     } else {
       dispatch(clearValuationReportData());
@@ -1161,204 +1226,236 @@ const ValuationSummary = (props) => {
         icon: "success",
         title: "Upload Of A valuation report",
         text: submitvaluationreportresutlt.data.message,
-        focusConfirm: false
+        focusConfirm: false,
       });
       // toastMessage(result.data.message, "success");
 
       // resetInvestmenrForm();
     }
-  }
+  };
 
   const [isOpen, setIsOpen] = useState("1");
   return (
     <>
       <div className="accordion">
         <div className="accordion-item">
-          <div
-            className="accordion-head"
-            onClick={() => setIsOpen("1")}
-          >
+          <div className="accordion-head" onClick={() => setIsOpen("1")}>
             <h6 className="title">Location Details</h6>
             <span className="accordion-icon"></span>
           </div>
-          <Collapse
-            className="accordion-body"
-            isOpen={isOpen === "1" ? true : false}
-          >
+          <Collapse className="accordion-body" isOpen={isOpen === "1" ? true : false}>
             <div className="accordion-inner">
               <Card className="card-bordered">
                 <div className="card-inner">
                   <div className="rating-card">
-                    <div className="d-flex align-center justify-content-between py-1 " style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                    <div
+                      className="d-flex align-center justify-content-between py-1 "
+                      style={{ borderBottom: "0.5px solid #EAEDED" }}
+                    >
                       <span className="text-muted">Location Name:</span>
                       {locationdetails?.locationName}
                     </div>
-                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                    <div
+                      className="d-flex align-center justify-content-between py-1"
+                      style={{ borderBottom: "0.5px solid #EAEDED" }}
+                    >
                       <span className="text-muted">County</span>
                       {locationdetails?.county}
                     </div>
-                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                    <div
+                      className="d-flex align-center justify-content-between py-1"
+                      style={{ borderBottom: "0.5px solid #EAEDED" }}
+                    >
                       <span className="text-muted">Town</span>
                       {locationdetails?.town}
                     </div>
-                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                    <div
+                      className="d-flex align-center justify-content-between py-1"
+                      style={{ borderBottom: "0.5px solid #EAEDED" }}
+                    >
                       <span className="text-muted">Street</span>
                       {locationdetails?.street}
                     </div>
-                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                    <div
+                      className="d-flex align-center justify-content-between py-1"
+                      style={{ borderBottom: "0.5px solid #EAEDED" }}
+                    >
                       <span className="text-muted">Neighbourhood</span>
                       {locationdetails?.neighbourHood}
                     </div>
-                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                    <div
+                      className="d-flex align-center justify-content-between py-1"
+                      style={{ borderBottom: "0.5px solid #EAEDED" }}
+                    >
                       <span className="text-muted">GPS Location Name</span>
                       {locationdetails?.locationName}
                     </div>
-                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                    <div
+                      className="d-flex align-center justify-content-between py-1"
+                      style={{ borderBottom: "0.5px solid #EAEDED" }}
+                    >
                       <span className="text-muted">GPS Latitude</span>
                       {gpsdetails?.lat}
                     </div>
-                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                    <div
+                      className="d-flex align-center justify-content-between py-1"
+                      style={{ borderBottom: "0.5px solid #EAEDED" }}
+                    >
                       <span className="text-muted">GPS Longitude</span>
                       {locationdetails?.long}
                     </div>
                   </div>
-
                 </div>
               </Card>
             </div>
           </Collapse>
         </div>
         <div className="accordion-item">
-          <div
-            className="accordion-head collapsed"
-            onClick={() => setIsOpen("2")}
-          >
-            <h6 className="title">
-              Property Details
-            </h6>
+          <div className="accordion-head collapsed" onClick={() => setIsOpen("2")}>
+            <h6 className="title">Property Details</h6>
             <span className="accordion-icon"></span>
           </div>
-          <Collapse
-            className="accordion-body"
-            isOpen={isOpen === "2" ? true : false}
-          >
+          <Collapse className="accordion-body" isOpen={isOpen === "2" ? true : false}>
             <div className="accordion-inner">
               <Card className="card-bordered">
                 <div className="card-inner">
                   <div className="rating-card">
-                    <div className="d-flex align-center justify-content-between py-1 " style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                    <div
+                      className="d-flex align-center justify-content-between py-1 "
+                      style={{ borderBottom: "0.5px solid #EAEDED" }}
+                    >
                       <span className="text-muted">Property LR:</span>
                       {propertdetails?.PropertyLR}
                     </div>
-                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                    <div
+                      className="d-flex align-center justify-content-between py-1"
+                      style={{ borderBottom: "0.5px solid #EAEDED" }}
+                    >
                       <span className="text-muted">Property Type:</span>
                       {propertdetails?.PropertyType[0].label}
                     </div>
-                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                    <div
+                      className="d-flex align-center justify-content-between py-1"
+                      style={{ borderBottom: "0.5px solid #EAEDED" }}
+                    >
                       <span className="text-muted">Total Built Up Area:</span>
                       {propertdetails?.totalBuiltUpArea}
                     </div>
-                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                    <div
+                      className="d-flex align-center justify-content-between py-1"
+                      style={{ borderBottom: "0.5px solid #EAEDED" }}
+                    >
                       <span className="text-muted">Land Size:</span>
                       {propertdetails?.landSize}
                     </div>
-                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                    <div
+                      className="d-flex align-center justify-content-between py-1"
+                      style={{ borderBottom: "0.5px solid #EAEDED" }}
+                    >
                       <span className="text-muted">Tenure</span>
                       {propertdetails?.tenure}
                     </div>
-
                   </div>
-
                 </div>
               </Card>
             </div>
           </Collapse>
         </div>
         <div className="accordion-item">
-          <div
-            className="accordion-head collapsed"
-            onClick={() => setIsOpen("3")}
-          >
-            <h6 className="title">
-              Valuation Details
-            </h6>
+          <div className="accordion-head collapsed" onClick={() => setIsOpen("3")}>
+            <h6 className="title">Valuation Details</h6>
             <span className="accordion-icon"></span>
           </div>
-          <Collapse
-            className="accordion-body"
-            isOpen={isOpen === "3" ? true : false}
-          >
+          <Collapse className="accordion-body" isOpen={isOpen === "3" ? true : false}>
             <div className="accordion-inner">
               <Card className="card-bordered">
                 <div className="card-inner">
                   <div className="rating-card">
-                    <div className="d-flex align-center justify-content-between py-1 " style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                    <div
+                      className="d-flex align-center justify-content-between py-1 "
+                      style={{ borderBottom: "0.5px solid #EAEDED" }}
+                    >
                       <span className="text-muted">Recipient:</span>
                       {valuationdetails?.recipient[0]?.label}
                     </div>
-                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                    <div
+                      className="d-flex align-center justify-content-between py-1"
+                      style={{ borderBottom: "0.5px solid #EAEDED" }}
+                    >
                       <span className="text-muted">Market Value:</span>
                       {valuationdetails?.marketValue}
                     </div>
-                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                    <div
+                      className="d-flex align-center justify-content-between py-1"
+                      style={{ borderBottom: "0.5px solid #EAEDED" }}
+                    >
                       <span className="text-muted">Forced Sale Value:</span>
                       {valuationdetails?.forcedSaleValue}
                     </div>
-                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                    <div
+                      className="d-flex align-center justify-content-between py-1"
+                      style={{ borderBottom: "0.5px solid #EAEDED" }}
+                    >
                       <span className="text-muted">Insurence Value:</span>
                       {valuationdetails?.insurenceValue}
                     </div>
-                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                    <div
+                      className="d-flex align-center justify-content-between py-1"
+                      style={{ borderBottom: "0.5px solid #EAEDED" }}
+                    >
                       <span className="text-muted">Annual Grooss Income:</span>
                       {valuationdetails?.annualGRossRentalIncome}
                     </div>
-                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                    <div
+                      className="d-flex align-center justify-content-between py-1"
+                      style={{ borderBottom: "0.5px solid #EAEDED" }}
+                    >
                       <span className="text-muted">Valuation Date:</span>
                       {valuationdetails?.valuationDate}
                     </div>
-                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                    <div
+                      className="d-flex align-center justify-content-between py-1"
+                      style={{ borderBottom: "0.5px solid #EAEDED" }}
+                    >
                       <span className="text-muted">Instruction Date</span>
                       {valuationdetails?.InstructionDate}
                     </div>
-                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                    <div
+                      className="d-flex align-center justify-content-between py-1"
+                      style={{ borderBottom: "0.5px solid #EAEDED" }}
+                    >
                       <span className="text-muted">Property Description:</span>
                       {valuationdetails?.PropertyDescription}
                     </div>
-                    <div className="d-flex align-center justify-content-between py-1" style={{ borderBottom: "0.5px solid #EAEDED" }}>
+                    <div
+                      className="d-flex align-center justify-content-between py-1"
+                      style={{ borderBottom: "0.5px solid #EAEDED" }}
+                    >
                       <span className="text-muted">Report Uploaded:</span>
-                      {
-                        (ccurrentuploadedfile && ccurrentuploadedfile?.file_name != '') &&
+                      {ccurrentuploadedfile && ccurrentuploadedfile?.file_name != "" && (
                         <Alert color="primary">
                           {/* <a
                 href={`${process.env.REACT_APP_API_BASE_URL}/api/uploader/donwload-cached-image?file=${ccurrentuploadedfile.file_name}`}
               > */}
-                          <Button color="primary" onClick={downloadReport} >Preview Uploaded Report Document</Button>
+                          <Button color="primary" onClick={downloadReport}>
+                            Preview Uploaded Report Document
+                          </Button>
                           {/* </a> */}
-
                         </Alert>
-                      }
+                      )}
                     </div>
-
-
                   </div>
-
                 </div>
               </Card>
             </div>
           </Collapse>
         </div>
         <div className="accordion-item">
-          <div
-            className="accordion-head collapsed"
-            onClick={() => setIsOpen("4")}
-          >
+          <div className="accordion-head collapsed" onClick={() => setIsOpen("4")}>
             <h6 className="title">Recipients Within Recipient Organization</h6>
             <span className="accordion-icon"></span>
           </div>
-          <Collapse
-            className="accordion-body"
-            isOpen={isOpen === "4" ? true : false}
-          >
+          <Collapse className="accordion-body" isOpen={isOpen === "4" ? true : false}>
             <div className="accordion-inner">
               <Card className="card-bordered">
                 <div className="card-inner">
@@ -1371,21 +1468,17 @@ const ValuationSummary = (props) => {
                       </tr>
                     </thead>
                     <tbody>
-                      {
-                        (recipientrecipientsList && recipientrecipientsList != null) &&
+                      {recipientrecipientsList &&
+                        recipientrecipientsList != null &&
                         recipientrecipientsList.map((rec, index) => {
                           return (
                             <tr key={index}>
-
                               <td>{rec?.name}</td>
                               <td>{rec?.email}</td>
                               <td>{rec?.phone}</td>
                             </tr>
-
                           );
-                        })
-                      }
-
+                        })}
                     </tbody>
                   </table>
                 </div>
@@ -1394,17 +1487,11 @@ const ValuationSummary = (props) => {
           </Collapse>
         </div>
         <div className="accordion-item">
-          <div
-            className="accordion-head collapsed"
-            onClick={() => setIsOpen("4")}
-          >
+          <div className="accordion-head collapsed" onClick={() => setIsOpen("4")}>
             <h6 className="title">Signatories.</h6>
             <span className="accordion-icon"></span>
           </div>
-          <Collapse
-            className="accordion-body"
-            isOpen={isOpen === "4" ? true : false}
-          >
+          <Collapse className="accordion-body" isOpen={isOpen === "4" ? true : false}>
             <div className="accordion-inner">
               <Card className="card-bordered">
                 <div className="card-inner">
@@ -1417,18 +1504,15 @@ const ValuationSummary = (props) => {
                       </tr>
                     </thead>
                     <tbody>
-                      {
-                        signatories?.signatories.map((rec, index) => {
-                          return (
-                            <tr key={index}>
-                              <td>{rec?.label}</td>
-                              <td>{rec?.email}</td>
-                              <td>{rec?.phone}</td>
-                            </tr>
-
-                          );
-                        })
-                      }
+                      {signatories?.signatories.map((rec, index) => {
+                        return (
+                          <tr key={index}>
+                            <td>{rec?.label}</td>
+                            <td>{rec?.email}</td>
+                            <td>{rec?.phone}</td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
@@ -1436,53 +1520,55 @@ const ValuationSummary = (props) => {
             </div>
           </Collapse>
         </div>
-
       </div>
       <div className="actions clearfix m-20">
         <ul>
           <li>
-            <Button color="primary" type="submit" onClick={() => handleSubmitValuationReport('1')} disabled={isSubmittingReport} >
-              {
-                (!isSubmittingReport) && <span>Submit Report To Lender</span>
-              }
-              {
-                (isSubmittingReport) && <>
+            <Button
+              color="primary"
+              type="submit"
+              onClick={() => handleSubmitValuationReport("1")}
+              disabled={isSubmittingReport}
+            >
+              {!isSubmittingReport && <span>Submit Report To Lender</span>}
+              {isSubmittingReport && (
+                <>
                   <Spinner size="sm" />
                   <span> Submitting to Lender... </span>
                 </>
-              }
+              )}
             </Button>
           </li>
           <li>
-            <Button color="primary" type="submit" onClick={() => handleSubmitValuationReport('0')} disabled={isSubmittingReport}>
-              {
-                (!isSubmittingReport) && <span>Send Report to Signatories</span>
-              }
-              {
-                (isSubmittingReport) && <>
+            <Button
+              color="primary"
+              type="submit"
+              onClick={() => handleSubmitValuationReport("0")}
+              disabled={isSubmittingReport}
+            >
+              {!isSubmittingReport && <span>Send Report to Signatories</span>}
+              {isSubmittingReport && (
+                <>
                   <Spinner size="sm" />
                   <span> Submitting to Signatories... </span>
                 </>
-              }
-
+              )}
             </Button>
           </li>
           <li>
             <Button color="primary" onClick={props.prev} disabled={isSubmittingReport}>
-              {
-                (!isSubmittingReport) && <span>Previous</span>
-              }
-              {
-                (isSubmittingReport) && <>
+              {!isSubmittingReport && <span>Previous</span>}
+              {isSubmittingReport && (
+                <>
                   <Spinner size="sm" />
                   <span> Submitting to Signatories... </span>
                 </>
-              }
+              )}
             </Button>
           </li>
         </ul>
       </div>
-    </ >
+    </>
   );
 };
 const Success = (props) => {
@@ -1501,9 +1587,9 @@ const Header = (props) => {
       <ul>
         <li className={props.current >= 1 ? "first done" : "first"}>
           <a href="#wizard-01-h-0" onClick={(ev) => ev.preventDefault()}>
-            <span className="number">  Step 1</span><h5>Property Location  </h5>
+            <span className="number"> Step 1</span>
+            <h5>Property Location </h5>
           </a>
-
         </li>
         <li className={props.current >= 2 ? "done" : ""}>
           <a href="#wizard-01-h-1" onClick={(ev) => ev.preventDefault()}>
@@ -1524,7 +1610,6 @@ const Header = (props) => {
         </li>
         <li className={props.current >= 5 ? "done" : ""}>
           <a href="#wizard-01-h-2" onClick={(ev) => ev.preventDefault()}>
-
             <span className="number">05</span> <h5>Summary</h5>
           </a>
         </li>
@@ -1543,11 +1628,19 @@ const config = {
 };
 const ReportSubmit = () => {
   return (
-    <div style={{ width: "100%", display: 'flex', justifyContent: 'center' }}>
-      <Card className="card-bordered" style={{ height: '60%', width: '80%', marginTop: '140px', marginBottom: '10%', padding: '3%', overflow: "auto" }} >
-
+    <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+      <Card
+        className="card-bordered"
+        style={{
+          height: "60%",
+          width: "80%",
+          marginTop: "140px",
+          marginBottom: "10%",
+          padding: "3%",
+          overflow: "auto",
+        }}
+      >
         <React.Fragment>
-
           <div className="nk-wizard nk-wizard-simple is-alter wizard clearfix">
             <Steps config={config}>
               <Step component={LocationForm} />

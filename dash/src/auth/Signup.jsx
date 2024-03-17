@@ -9,12 +9,19 @@ import { useRequestUploaderAccessMutation } from "../api/auth/inviteValuerApiSli
 import { Row, Col } from "reactstrap";
 import { useState } from "react";
 
-
-import { Block, BlockContent, BlockDes, BlockHead, BlockTitle, Button, Icon, PreviewCard } from "../components/Component";
+import {
+  Block,
+  BlockContent,
+  BlockDes,
+  BlockHead,
+  BlockTitle,
+  Button,
+  Icon,
+  PreviewCard,
+} from "../components/Component";
 import Head from "../layout/head/Head";
 
 import AuthFooter from "../pages/auth/AuthFooter";
-
 
 const Signin = () => {
   const [backendValErrors, setBackendValErrors] = useState({});
@@ -51,27 +58,19 @@ const Signin = () => {
     formData.append("directors_isk_numer", data.directors_isk_numer);
     formData.append("directors_vrb_numer", data.directors_vrb_numer);
     const result = await requestValuerAccess(formData);
-    if ('error' in result) {
-      if ('backendvalerrors' in result.error.data) {
+    if ("error" in result) {
+      if ("backendvalerrors" in result.error.data) {
         setBackendValErrors(result.error.data.backendvalerrors);
       }
     } else {
       resetRequestForm();
     }
-
   };
 
   return (
     <>
       <Head title="Register" />
       <Block className="nk-block-middle nk-auth-body  wide-xs">
-        <div className="brand-logo pb-4 text-center">
-          <BlockHead>
-            <BlockContent>
-              <BlockTitle tag="h4"> Set Your Account Password</BlockTitle>
-            </BlockContent>
-          </BlockHead>
-        </div>
         <PreviewCard className="card-bordered" bodyClass="card-inner-lg">
           <BlockHead>
             <BlockContent>
@@ -140,7 +139,6 @@ const Signin = () => {
                 )}
               </div>
             </div>
-
 
             <Row>
               <Col>
@@ -235,9 +233,7 @@ const Signin = () => {
               <span>OR</span>
             </h6>
           </div>
-
         </PreviewCard>
-
       </Block>
       <AuthFooter />
     </>

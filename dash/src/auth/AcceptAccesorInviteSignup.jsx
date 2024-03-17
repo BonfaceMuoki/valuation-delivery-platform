@@ -13,7 +13,6 @@ import {
   Button,
   Icon,
   PreviewCard,
-
 } from "../components/Component";
 import { useGetAccesorInviteDetailsQuery } from "../api/auth/inviteAccesorApiSlice";
 import { useRegisterAccesorMutation } from "../api/auth/inviteAccesorApiSlice";
@@ -26,7 +25,6 @@ import { toast } from "react-toastify";
 
 // 👇 Styled React Route Dom Link Component
 const CloseButton = () => {
-
   return (
     <span className="btn-trigger toast-close-button" role="button">
       <Icon name="cross"></Icon>
@@ -152,8 +150,7 @@ function AcceptAccesorInviteSignup() {
 
   if (Object.keys(retrieved).length === 0) {
     return (
-      <Block className="nk-block-middle nk-auth-body  wide-xs"
-      >
+      <Block className="nk-block-middle nk-auth-body  wide-xs">
         {/* <Typography variant="h5" sx={{ mb: 2, fontWeight: "bold" }} align="center">
           {" "}
           Invalid / Expired Invite.
@@ -165,13 +162,6 @@ function AcceptAccesorInviteSignup() {
       <>
         <Head title="Register" />
         <Block className="nk-block-middle nk-auth-body  wide-xs">
-          <div className="brand-logo pb-4 text-center">
-            <BlockHead>
-              <BlockContent>
-                <BlockTitle tag="h4"> Set Your Account Password</BlockTitle>
-              </BlockContent>
-            </BlockHead>
-          </div>
           <PreviewCard className="card-bordered" bodyClass="card-inner-lg">
             <form onSubmit={handleSubmitRegisterValuer(submitRegister)}>
               <div className="form-group">
@@ -277,8 +267,9 @@ function AcceptAccesorInviteSignup() {
                           ev.preventDefault();
                           setPassState(!passState);
                         }}
-                        className={`form-icon lg form-icon-right passcode-switch ${passState ? "is-hidden" : "is-shown"
-                          }`}
+                        className={`form-icon lg form-icon-right passcode-switch ${
+                          passState ? "is-hidden" : "is-shown"
+                        }`}
                       >
                         <Icon name="eye" className="passcode-icon icon-show"></Icon>
                         <Icon name="eye-off" className="passcode-icon icon-hide"></Icon>
@@ -291,28 +282,26 @@ function AcceptAccesorInviteSignup() {
                         placeholder="Enter your passcode"
                         className={`form-control-lg form-control ${passState ? "is-hidden" : "is-shown"}`}
                       />
-                      {acceptInviteerrors.password?.message && <span className="invalid">{acceptInviteerrors.password?.message}</span>}
+                      {acceptInviteerrors.password?.message && (
+                        <span className="invalid">{acceptInviteerrors.password?.message}</span>
+                      )}
                     </div>
                   </div>
                 </Col>
                 <Col>
-
                   <div className="form-group">
                     <div className="form-label-group">
                       <label className="form-label" htmlFor="password">
                         Confirm Passwword
                       </label>
-
                     </div>
                     <div className="form-control-wrap">
                       <a
                         href="#password"
-
-                        className={`form-icon lg form-icon-right passcode-switch ${passState ? "is-hidden" : "is-shown"
-                          }`}
-                      >
-
-                      </a>
+                        className={`form-icon lg form-icon-right passcode-switch ${
+                          passState ? "is-hidden" : "is-shown"
+                        }`}
+                      ></a>
                       <input
                         type={passState ? "text" : "password"}
                         id="password"
@@ -321,7 +310,9 @@ function AcceptAccesorInviteSignup() {
                         placeholder="Confirm Password"
                         className={`form-control-lg form-control ${passState ? "is-hidden" : "is-shown"}`}
                       />
-                      {acceptInviteerrors.confirm_password?.message && <span className="invalid">{acceptInviteerrors.confirm_password?.message}</span>}
+                      {acceptInviteerrors.confirm_password?.message && (
+                        <span className="invalid">{acceptInviteerrors.confirm_password?.message}</span>
+                      )}
                     </div>
                   </div>
                 </Col>

@@ -2,13 +2,22 @@ import React, { useRef, useEffect } from "react";
 
 import { useState } from "react";
 import { Link, Navigate, useNavigate, useLocation } from "react-router-dom";
-import { useDispatch, } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 
 import ReCAPTCHA from "react-google-recaptcha";
-import { Block, BlockContent, BlockDes, BlockHead, BlockTitle, Button, Icon, PreviewCard } from "../components/Component";
+import {
+  Block,
+  BlockContent,
+  BlockDes,
+  BlockHead,
+  BlockTitle,
+  Button,
+  Icon,
+  PreviewCard,
+} from "../components/Component";
 import Head from "../layout/head/Head";
 
 import AuthFooter from "../pages/auth/AuthFooter";
@@ -17,11 +26,9 @@ import { Row, Col } from "reactstrap";
 import { useGetValuerInviteDetailsQuery } from "../api/auth/inviteValuerApiSlice";
 import { useRegisterUploaderMutation } from "../api/auth/inviteValuerApiSlice";
 
-
 const AcceptInviteSignup = () => {
   const [passState, setPassState] = useState(false);
-  const toastMessage = (message, type) => {
-  };
+  const toastMessage = (message, type) => {};
   const SITE_KEY = process.env.REACT_APP_reCAPTCHA_SITE_KEY;
   const SECRET_KEY = process.env.REACT_APP_reCAPTCHA_SECRET_KEY;
   const captchaRef = useRef(null);
@@ -40,16 +47,27 @@ const AcceptInviteSignup = () => {
     vrb_number: yup.string().required("VRB Number is required"),
     isk_number: yup.string().required("ISK Number is required"),
     phone_number: yup.string().required("Phone number is required"),
-    password: yup.string().required("Please provide password").matches(
-      /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@#$%^&+=!])(?!.*\s).{6,}$/,
-      'Password must be at least 8 characters long and contain at least one letter, one number, and one special character'
-    ),
-    confirm_password: yup.string().oneOf([yup.ref("password"), null], "Passwords do not match.").required("Please confirm the password")
-
+    password: yup
+      .string()
+      .required("Please provide password")
+      .matches(
+        /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[@#$%^&+=!])(?!.*\s).{6,}$/,
+        "Password must be at least 8 characters long and contain at least one letter, one number, and one special character"
+      ),
+    confirm_password: yup
+      .string()
+      .oneOf([yup.ref("password"), null], "Passwords do not match.")
+      .required("Please confirm the password"),
   });
 
-  const { register: acceptInviteRegister, handleSubmit: handleSubmitRegisterValuer, setValue: setInviteValue, isLoading: loadingInviteDetails, formState: { errors: acceptInviteerrors } } = useForm({
-    resolver: yupResolver(schema)
+  const {
+    register: acceptInviteRegister,
+    handleSubmit: handleSubmitRegisterValuer,
+    setValue: setInviteValue,
+    isLoading: loadingInviteDetails,
+    formState: { errors: acceptInviteerrors },
+  } = useForm({
+    resolver: yupResolver(schema),
   });
 
   useEffect(() => {
@@ -62,7 +80,7 @@ const AcceptInviteSignup = () => {
       setInviteValue("isk_number", retrieved?.isk_number);
       setInviteValue("phone_number", retrieved?.invite_phone);
     }
-  }, [retrieved, loadingInviteDetails, setInviteValue,]);
+  }, [retrieved, loadingInviteDetails, setInviteValue]);
   const navigate = useNavigate();
   const submitRegister = async (data) => {
     const formdata = new FormData();
@@ -78,36 +96,21 @@ const AcceptInviteSignup = () => {
     formdata.append("register_as", "Report Uploader Admin");
     formdata.append("full_name", data.full_name);
     const result = await registerValuer(formdata);
-    if ('error' in result) {
-
+    if ("error" in result) {
       toastMessage(result.error.data.message, "error");
-      if ('backendvalerrors' in result.error.data) {
-
+      if ("backendvalerrors" in result.error.data) {
         setBackendValErrors(result.error.data.backendvalerrors);
-
       }
-
-
-
     } else {
       toastMessage(result.data.message, "success");
-      navigate('/login');
-
+      navigate("/login");
     }
-
-  }
+  };
 
   return (
     <>
       <Head title="Register" />
       <Block className="nk-block-middle nk-auth-body  wide-xs">
-        <div className="brand-logo pb-4 text-center">
-          <BlockHead>
-            <BlockContent>
-              <BlockTitle tag="h4"> Set Your Account Password</BlockTitle>
-            </BlockContent>
-          </BlockHead>
-        </div>
         <PreviewCard className="card-bordered" bodyClass="card-inner-lg">
           <BlockHead>
             <BlockContent>
@@ -179,7 +182,6 @@ const AcceptInviteSignup = () => {
                 )}
               </div>
             </div>
-
 
             <Row>
               <Col>
@@ -271,43 +273,37 @@ const AcceptInviteSignup = () => {
                         ev.preventDefault();
                         setPassState(!passState);
                       }}
-                      className={`form-icon lg form-icon-right passcode-switch ${passState ? "is-hidden" : "is-shown"
-                        }`}
+                      className={`form-icon lg form-icon-right passcode-switch ${passState ? "is-hidden" : "is-shown"}`}
                     >
                       <Icon name="eye" className="passcode-icon icon-show"></Icon>
                       <Icon name="eye-off" className="passcode-icon icon-hide"></Icon>
                     </a>
                     <input
                       type={passState ? "text" : "password"}
-
                       id="password"
                       {...acceptInviteRegister("password", { required: "This field is required" })}
                       defaultValue=""
                       placeholder="Enter your passcode"
                       className={`form-control-lg form-control ${passState ? "is-hidden" : "is-shown"}`}
                     />
-                    {acceptInviteerrors.password?.message && <span className="invalid">{acceptInviteerrors.password?.message}</span>}
+                    {acceptInviteerrors.password?.message && (
+                      <span className="invalid">{acceptInviteerrors.password?.message}</span>
+                    )}
                   </div>
                 </div>
               </Col>
               <Col>
-
                 <div className="form-group">
                   <div className="form-label-group">
                     <label className="form-label" htmlFor="password">
                       Confirm Passwword
                     </label>
-
                   </div>
                   <div className="form-control-wrap">
                     <a
                       href="#password"
-
-                      className={`form-icon lg form-icon-right passcode-switch ${passState ? "is-hidden" : "is-shown"
-                        }`}
-                    >
-
-                    </a>
+                      className={`form-icon lg form-icon-right passcode-switch ${passState ? "is-hidden" : "is-shown"}`}
+                    ></a>
                     <input
                       type={passState ? "text" : "password"}
                       id="password"
@@ -316,7 +312,9 @@ const AcceptInviteSignup = () => {
                       placeholder="Confirm Password"
                       className={`form-control-lg form-control ${passState ? "is-hidden" : "is-shown"}`}
                     />
-                    {acceptInviteerrors.confirm_password?.message && <span className="invalid">{acceptInviteerrors.confirm_password?.message}</span>}
+                    {acceptInviteerrors.confirm_password?.message && (
+                      <span className="invalid">{acceptInviteerrors.confirm_password?.message}</span>
+                    )}
                   </div>
                 </div>
               </Col>
@@ -345,9 +343,7 @@ const AcceptInviteSignup = () => {
               <span>OR</span>
             </h6>
           </div>
-
         </PreviewCard>
-
       </Block>
       <AuthFooter />
     </>

@@ -28,27 +28,60 @@ import {
   useRequestUploaderRegistrationStatusQuery,
 } from "../../api/auth/inviteValuerApiSlice";
 
-
 import Swal from "sweetalert2";
-import {
-  Button,
-  Modal,
-  ModalHeader,
-  ModalBody,
-  ModalFooter
-} from "reactstrap";
-
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 
 import CompanySummary from "../../components/CompanySummary";
 
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { toast } from "react-toastify";
 
-
+const CloseButton = () => {
+  return (
+    <span className="btn-trigger toast-close-button" role="button">
+      <Icon name="cross"></Icon>
+    </span>
+  );
+};
 const ValuerInvites = () => {
-
-
+  const toastMessage = (message, type) => {
+    if (type == "success") {
+      toast.success(message, {
+        position: "top-right",
+        autoClose: true,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: false,
+        closeButton: <CloseButton />,
+      });
+    } else if (type == "error") {
+      toast.error(message, {
+        position: "top-right",
+        autoClose: true,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: false,
+        closeButton: <CloseButton />,
+      });
+    } else if (type == "warning") {
+      toast.warning(message, {
+        position: "top-right",
+        autoClose: true,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: false,
+        closeButton: <CloseButton />,
+      });
+    }
+  };
 
   const [modalSm, setModalSm] = useState(false);
   const toggleSm = () => setModalSm(!modalSm);
@@ -184,18 +217,21 @@ const ValuerInvites = () => {
   };
   //actions
   const schema = yup.object().shape({
-    reasonForRejection: yup.string().required("Reason is required")
+    reasonForRejection: yup.string().required("Reason is required"),
   });
-  const { register: registerDeclineForm, handleSubmit: handleSubmitDeclineForm, formState: { errors: registerDeclineFormErrorrs } } = useForm({
-    resolver: yupResolver(schema)
-  })
+  const {
+    register: registerDeclineForm,
+    handleSubmit: handleSubmitDeclineForm,
+    formState: { errors: registerDeclineFormErrorrs },
+  } = useForm({
+    resolver: yupResolver(schema),
+  });
 
   if (tableData.length > 0) {
     console.log("Table Data");
     console.log(tableData);
     return (
       <PreviewCard>
-
         {/* open modal decline */}
         <Modal size="sm" isOpen={modalOpenCompanyDetails} toggle={toggleOpenCompanyDetails}>
           <ModalHeader
@@ -269,7 +305,7 @@ const ValuerInvites = () => {
               currentItems != null &&
               currentItems.map((item, index) => {
                 return (
-                  <DataTableItem key={item.id} >
+                  <DataTableItem key={item.id}>
                     <DataTableRow>
                       <Link to={`${process.env.PUBLIC_URL}/user-details-regular/${item.id}`}>
                         <div className="user-card">
@@ -286,12 +322,13 @@ const ValuerInvites = () => {
                             <span className="tb-lead">
                               {item?.valauaion_firm_name}{" "}
                               <span
-                                className={`dot dot-${item.status === "Active"
-                                  ? "success"
-                                  : item?.status === "Pending"
+                                className={`dot dot-${
+                                  item.status === "Active"
+                                    ? "success"
+                                    : item?.status === "Pending"
                                     ? "warning"
                                     : "danger"
-                                  } d-md-none ms-1`}
+                                } d-md-none ms-1`}
                               ></span>
                             </span>
                             <span>{item?.invite_email}</span>
