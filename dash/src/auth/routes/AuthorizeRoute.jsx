@@ -8,14 +8,11 @@ function AuthorizeRoute({ checkpermission }) {
   const roles = useSelector(selectCurrentRoles);
   const permissions = useSelector(selectCurrentPermissions);
   console.log(permissions, "permissionspermissions");
-
   // Check if any permission in checkpermission array exists in user's permissions
   const hasPermission = Array.isArray(checkpermission)
-    ? checkpermission.some(cp => permissions.find(p => p.name === cp))
-    : permissions.find(p => p.name === checkpermission);
-  return (
-    hasPermission ? <Outlet /> : <Navigate to="/unauthorized" state={{ from: location }} replace />
-  );
+    ? checkpermission.some((cp) => permissions.find((p) => p.name === cp))
+    : permissions.find((p) => p.name === checkpermission);
+  return hasPermission ? <Outlet /> : <Navigate to="/unauthorized" state={{ from: location }} replace />;
 }
 
 export default AuthorizeRoute;

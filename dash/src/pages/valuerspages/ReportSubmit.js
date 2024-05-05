@@ -1,7 +1,5 @@
-import React, { useState, useRef, useEffect, useCallback, forwardRef } from "react";
-import Head from "../../layout/head/Head";
-import Content from "../../layout/content/Content";
-import { Block, BlockHead, BlockHeadContent, BlockTitle, PreviewCard } from "../../components/Component";
+import React, { useState, useEffect } from "react";
+import { BlockTitle } from "../../components/Component";
 import makeAnimated from "react-select/animated";
 import { useForm, Controller } from "react-hook-form";
 import { Steps, Step } from "react-step-builder";
@@ -9,7 +7,6 @@ import { Row, Col, Button, Card } from "reactstrap";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { useSelector, useDispatch } from "react-redux";
-import { GoogleMapsProvider, useGoogleMap } from "@ubilabs/google-maps-react-hooks";
 import MapWithAutoSearch from "./MapWithAutoSearch";
 import {
   upDateRecipientRecipientsProperty,
@@ -1031,16 +1028,17 @@ const ValuationSignatures = (props) => {
   });
   const onSubmitSignatories = async (data) => {
     // console.log(data);
+    console.log("submitted signatories", data);
     dispatch(setReportSignatories(data));
     props.next();
   };
   //get the registered signatories
   const [signatoriesList, setSignatoriesList] = useState();
-  const { data: registeredusers, isLoading: loadingusers } = useGetUsersQuery();
-  // console.log(registeredusers, "registeredusers");
+  const { data: registeredusers, isLoading: loadingusers } = useGetUsersQuery({});
+  console.log(registeredusers, "registeredusers");
   useEffect(() => {
     if (registeredusers != undefined) {
-      const restructuredData = registeredusers.map(({ id, full_name, email, phone }) => ({
+      const restructuredData = registeredusers?.data.map(({ id, full_name, email, phone }) => ({
         id: id,
         value: id,
         label: full_name,

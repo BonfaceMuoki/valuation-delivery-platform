@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer("user_id");
             $table->integer("organization_id");
             $table->integer("recipient_id");
-            $table->integer("propertyLR");
+            $table->string("propertyLR");
             $table->string("file_name");
             $table->timestamps();
         });

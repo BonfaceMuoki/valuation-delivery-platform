@@ -162,14 +162,14 @@ class AuthController extends Controller
                 // Proceed with your desired logic
             } else {
                 $statusCode = $response->status();
-                return response()->json(['message' => "Failed. Invalid recaptcha code." . $statusCode], 422);
+                return response()->json(['message' => "Failed. Invalid recaptcha code. 3" . $statusCode,'response'=>$data,'secret'=> $_ENV ], 422);
                 // reCAPTCHA validation failed
                 // Handle the validation failure
             }
         } else {
             // Request to Google reCAPTCHA API failed
             $statusCode = $response->status();
-            return response()->json(['message' => "Failed. Invalid recaptcha code."], 422);
+            return response()->json(['message' => "Failed. Invalid recaptcha code. 2"], 422);
             // Handle the error
         }
 
