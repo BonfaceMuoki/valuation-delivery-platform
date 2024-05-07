@@ -47,7 +47,17 @@ const App = () => {
               <Route path={`${process.env.PUBLIC_URL}`} element={<Layout />}>
                 {/* common routes */}
                 <Route path="/unauthorized" element={<Unauthorized />}></Route>
-                <Route element={<AuthorizeRoute checkpermission={["view super admin dashbaord", "view valuation firm dashboard", "view accesor dashboard"]} />}>
+                <Route
+                  element={
+                    <AuthorizeRoute
+                      checkpermission={[
+                        "view super admin dashbaord",
+                        "view valuation firm dashboard",
+                        "view accesor dashboard",
+                      ]}
+                    />
+                  }
+                >
                   <Route index element={<Homepage />}></Route>
                 </Route>
                 {/* common routes */}

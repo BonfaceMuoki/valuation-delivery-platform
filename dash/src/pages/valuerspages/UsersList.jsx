@@ -1,54 +1,18 @@
 import React, { useState, useEffect } from "react";
-import {
-  BlockHead,
-  BlockHeadContent,
-  PreviewCard,
-  Icon,
-  UserAvatar,
-  PaginationComponent,
-  DataTable,
-  DataTableBody,
-  DataTableHead,
-  DataTableRow,
-  DataTableItem,
-} from "../../components/Component";
-import { DropdownMenu, DropdownToggle, UncontrolledDropdown, DropdownItem } from "reactstrap";
-import { Link } from "react-router-dom";
-
-import Swal from "sweetalert2";
-import {
-  Button,
-  Modal,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Card,
-  CardHeader,
-  CardFooter,
-  CardImg,
-  CardText,
-  CardBody,
-  CardTitle,
-  CardSubtitle,
-  CardLink,
-} from "reactstrap";
-
+import { BlockHead, BlockHeadContent, PreviewCard, Icon, UserAvatar } from "../../components/Component";
+import DataTable from "react-data-table-component";
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Card, CardBody } from "reactstrap";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { toast } from "react-toastify";
-import {
-  useGetPermissionsListQuery,
-  useCreatePermissionMutation,
-  useUpdatePermissionMutation,
-  useDeletePermissionMutation,
-  useGetRolesListQuery,
-} from "../../api/admin/adminActionsApi";
+import { useGetRolesListQuery } from "../../api/admin/adminActionsApi";
 import { Row, Col } from "reactstrap";
 import Select from "react-select";
 import { useGetUsersQuery, useSendValuationFirmUserInviteMutation } from "../../api/commonEndPointsAPI";
 import { findUpper } from "../../utils/Utils";
 
+import { DropdownMenu, DropdownToggle, UncontrolledDropdown, DropdownItem } from "reactstrap";
 const CloseButton = () => {
   return (
     <span className="btn-trigger toast-close-button" role="button">
@@ -97,13 +61,7 @@ const UsersList = () => {
   const [currentItems, setCurrentItems] = useState([]);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [showModalCreatePermission, setShowModalCreatePermission] = useState(false);
-  const closeCreateModal = () => {
-    // resetpermissionForm();
-    // setEditting(false);
-    // setEditRecord(null);
-    // setShowModalCreatePermission(false);
-  };
+
   const [openUserDetailsModal, setOpenUserDetailsModal] = useState(false);
   const handleCloseUserDetailsModal = () => {
     setOpenUserDetailsModal(false);
@@ -218,6 +176,141 @@ const UsersList = () => {
   }, [roles]);
 
   console.log(allRolesList, "rolesrolesroles");
+
+  const [mobileView, setMobileView] = useState();
+
+  const viewChange = () => {
+    if (window.innerWidth < 960) {
+      console.log(window.innerWidth);
+      setMobileView(true);
+    } else {
+      setMobileView(false);
+    }
+  };
+  useEffect(() => {
+    window.addEventListener("load", viewChange);
+    window.addEventListener("resize", viewChange);
+    return () => {
+      window.removeEventListener("resize", viewChange);
+    };
+  }, []);
+
+  const CustomTitle = ({ row }) => (
+    <div className="user-card">
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "flex-start",
+          alignItems: "center",
+          gap: "5px",
+        }}
+      >
+        <UserAvatar
+          theme={row?.avatarBg}
+          text={findUpper(row.full_name != null && row.full_name != undefined ? row.full_name : "")}
+          image=""
+        ></UserAvatar>{" "}
+        <p>{row.full_name}</p>
+      </div>
+    </div>
+  );
+
+  const ManageUsers = ({ row }) => (
+    <div className="user-card">
+      {" "}
+      <ul className="nk-tb-actions gx-1" style={{ display: "flex", justifyContent: "left" }}>
+        <li>
+          <UncontrolledDropdown>
+            <DropdownToggle tag="a" className="dropdown-toggle btn btn-icon btn-trigger">
+              <Icon name="more-h"></Icon>
+            </DropdownToggle>
+            <DropdownMenu end>
+              <ul className="link-list-opt no-bdr">
+                <React.Fragment>
+                  <li className="divider"></li>
+                  <li>
+                    <DropdownItem
+                      tag="a"
+                      href="#suspend"
+                      onClick={(ev) => {
+                        ev.preventDefault();
+                      }}
+                    >
+                      <Icon name="trash"></Icon>
+                      <span>Delete</span>
+                    </DropdownItem>
+                  </li>
+                </React.Fragment>
+              </ul>
+            </DropdownMenu>
+          </UncontrolledDropdown>
+        </li>
+      </ul>
+    </div>
+  );
+
+  const [columns, setColumns] = useState([
+    {
+      name: "Full Name",
+      selector: (row) => row.full_name,
+      sortable: true,
+      cell: (row) => <CustomTitle row={row} />,
+    },
+    {
+      name: "Email",
+      selector: (row) => row.email,
+      sortable: true,
+      hide: 370,
+    },
+    {
+      name: "Phone",
+      selector: (row) => row.phone_number,
+      sortable: true,
+      hide: "sm",
+    },
+    {
+      name: "VRB Number",
+      selector: (row) => row.vrb_number,
+      sortable: true,
+      hide: "sm",
+    },
+    {
+      name: "ISK Number ",
+      selector: (row) => row.isk_number,
+      sortable: true,
+      hide: "md",
+    },
+    {
+      name: "Actions",
+      selector: (row) => row.isk_number,
+      sortable: true,
+      hide: "md",
+      cell: (row) => <ManageUsers row={row} />,
+    },
+  ]);
+
+  const ExpandableRowComponent = ({ data }) => {
+    return (
+      <ul className="dtr-details p-2 border-bottom ms-1">
+        <li className="d-block d-sm-none">
+          <span className="dtr-title">Phone</span> <span className="dtr-data">{data?.forced_market_value}</span>
+        </li>
+        <li className="d-block d-sm-none">
+          <span className="dtr-title ">VRB Number</span> <span className="dtr-data">{data.market_value}</span>
+        </li>
+        <li>
+          <span className="dtr-title">ISK Number</span> <span className="dtr-data">{data.created_at}</span>
+        </li>
+        <li>
+          <span className="dtr-title">DownLoad</span>{" "}
+          <span className="dtr-data">
+            <ManageUsers row={data} />
+          </span>
+        </li>
+      </ul>
+    );
+  };
 
   return (
     <PreviewCard style={{ height: "100%" }}>
@@ -469,162 +562,22 @@ const UsersList = () => {
               </Button>
             </Col>
           </Row>
+          <DataTable
+            data={currentItems}
+            columns={columns}
+            className="nk-tb-list"
+            expandableRowsComponent={ExpandableRowComponent}
+            expandableRows={mobileView}
+            noDataComponent={<div className="p-2">There are no records found</div>}
+            sortIcon={
+              <div>
+                <span>&darr;</span>
+                <span>&uarr;</span>
+              </div>
+            }
+          ></DataTable>
         </CardBody>
       </Card>
-
-      <DataTable
-        className="card-stretch "
-        sortIcon={
-          <div>
-            <span>&darr;</span>
-            <span>&uarr;</span>
-          </div>
-        }
-      >
-        <DataTableBody>
-          <DataTableHead>
-            <DataTableRow size="md">
-              <span
-                className="sub-text"
-                // onClick={() => orderBy("permission_name")}
-                style={{ height: "60px", width: "100%", display: "flex", alignItems: "center", cursor: "pointer" }}
-              >
-                <strong>Full Name</strong> &nbsp;&nbsp;&nbsp;
-                <Icon name="sort-fill" />
-              </span>
-            </DataTableRow>
-            <DataTableRow size="md">
-              <span
-                className="sub-text"
-                style={{ height: "60px", width: "100%", display: "flex", alignItems: "center" }}
-              >
-                {" "}
-                <strong>Email </strong>
-              </span>
-            </DataTableRow>
-            <DataTableRow size="md">
-              <span
-                className="sub-text"
-                style={{ height: "60px", width: "100%", display: "flex", alignItems: "center" }}
-              >
-                {" "}
-                <strong>Phone </strong>
-              </span>
-            </DataTableRow>
-            <DataTableRow size="md">
-              <span
-                className="sub-text"
-                style={{ height: "60px", width: "100%", display: "flex", alignItems: "center" }}
-              >
-                {" "}
-                <strong>VRB Number </strong>
-              </span>
-            </DataTableRow>
-            <DataTableRow size="md">
-              <span
-                className="sub-text"
-                style={{ height: "60px", width: "100%", display: "flex", alignItems: "center" }}
-              >
-                {" "}
-                <strong>ISK Number </strong>
-              </span>
-            </DataTableRow>
-            <DataTableRow size="md" className="nk-tb-col-tools text-end">
-              <span
-                className="sub-text"
-                style={{ height: "60px", width: "100%", display: "flex", alignItems: "center" }}
-              >
-                {" "}
-                <strong>Actions </strong>
-              </span>
-            </DataTableRow>
-          </DataTableHead>
-          {/*Head*/}
-          {currentItems != undefined &&
-            currentItems != null &&
-            currentItems.length > 0 &&
-            currentItems.map((item, index) => {
-              let fullname = item?.full_name?.charAt(0).toUpperCase();
-              return (
-                <DataTableItem key={index}>
-                  <DataTableRow>
-                    <div className="user-card">
-                      <UserAvatar
-                        // theme={item.avatarBg}
-                        text={findUpper(fullname != null && fullname != undefined ? fullname : "Undefined")}
-                        image=""
-                      ></UserAvatar>
-                      <div className="user-info">
-                        <span className="tb-lead">{item?.full_name} </span>
-                      </div>
-                    </div>
-                  </DataTableRow>
-                  <DataTableRow>{item?.email}</DataTableRow>
-                  <DataTableRow>{item?.phone_number}</DataTableRow>
-                  <DataTableRow>{item?.vrb_number}</DataTableRow>
-                  <DataTableRow>{item?.isk_number}</DataTableRow>
-
-                  <DataTableRow className="nk-tb-col-tools">
-                    <ul className="nk-tb-actions gx-1" style={{ display: "flex", justifyContent: "left" }}>
-                      <li>
-                        <UncontrolledDropdown>
-                          <DropdownToggle tag="a" className="dropdown-toggle btn btn-icon btn-trigger">
-                            <Icon name="more-h"></Icon>
-                          </DropdownToggle>
-                          <DropdownMenu end>
-                            <ul className="link-list-opt no-bdr">
-                              <React.Fragment>
-                                {/* <li onClick={() => showEditPermission(item)}>
-                                  <DropdownItem
-                                    tag="a"
-                                    href="#suspend"
-                                    onClick={(ev) => {
-                                      ev.preventDefault();
-                                    }}
-                                  >
-                                    <Icon name="edit"></Icon>
-                                    <span>Edit</span>
-                                  </DropdownItem>
-                                </li> */}
-                                <li className="divider"></li>
-                                <li>
-                                  <DropdownItem
-                                    tag="a"
-                                    href="#suspend"
-                                    onClick={(ev) => {
-                                      ev.preventDefault();
-                                    }}
-                                  >
-                                    <Icon name="trash"></Icon>
-                                    <span>Delete</span>
-                                  </DropdownItem>
-                                </li>
-                              </React.Fragment>
-                            </ul>
-                          </DropdownMenu>
-                        </UncontrolledDropdown>
-                      </li>
-                    </ul>
-                  </DataTableRow>
-                </DataTableItem>
-              );
-            })}
-        </DataTableBody>
-        <div className="card-inner">
-          {currentItems != null && currentItems != undefined ? (
-            <PaginationComponent
-              itemPerPage={rowsPerPage}
-              totalItems={totalRecords}
-              paginate={paginate}
-              currentPage={currentPage}
-            />
-          ) : (
-            <div className="text-center">
-              <span className="text-silent">No data found</span>
-            </div>
-          )}
-        </div>
-      </DataTable>
     </PreviewCard>
   );
 };

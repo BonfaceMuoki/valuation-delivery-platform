@@ -203,6 +203,7 @@ const MyValuersInviteList = () => {
       }
     } else {
       toastMessage(result.data.message, "success");
+      refetchUsers();
       //   setBlocked(false);
     }
   };

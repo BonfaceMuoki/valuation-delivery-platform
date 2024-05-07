@@ -1,43 +1,19 @@
 import React, { useEffect, useState } from "react";
-import Content from "../../layout/content/Content";
-import Head from "../../layout/head/Head"
-import {
-
-  Block,
-  BlockHead,
-  BlockHeadContent,
-  BlockTitle,
-  BlockDes,
-  BackTo,
-  UserAvatar,
-  PreviewCard,
-  Icon,
-  PaginationComponent
-
-} from "../../components/Component";
-import ReportsDataTable from "../../components/table/ReportsDataTable";
-import { DataTableData, dataTableColumns, dataTableColumns2, userData } from "./TableData";
+import { Icon, PaginationComponent } from "../../components/Component";
 import DataTable from "react-data-table-component";
 import exportFromJSON from "export-from-json";
 import CopyToClipboard from "react-copy-to-clipboard";
-import DataTablePagination from "../../components/Component";
 import { useGetValuationReportsQuery } from "../../api/admin/valuationFirmRequestsSlice";
-import {
-  Label,
-  Card,
-  Row, Col, Button, Modal,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  DropdownMenu, DropdownToggle, UncontrolledDropdown, DropdownItem,
-  Nav, NavItem, NavLink, TabContent, TabPane
-} from "reactstrap";
+import { Card, Row, Col, Button, Modal, ModalBody, Nav, NavItem, NavLink, TabContent, TabPane } from "reactstrap";
 import classnames from "classnames";
-import Select from 'react-select'
+import Select from "react-select";
 import DatePicker from "react-datepicker";
-
-import { findUpper } from "../../utils/Utils";
-import { useGetAccesorsListQuery, useGetAllCountiesQuery, useGetPropertyTypeListQuery, useGetUsersQuery } from "../../api/commonEndPointsAPI";
+import {
+  useGetAccesorsListQuery,
+  useGetAllCountiesQuery,
+  useGetPropertyTypeListQuery,
+  useGetUsersQuery,
+} from "../../api/commonEndPointsAPI";
 
 const Export = ({ data }) => {
   const [modal, setModal] = useState(false);
@@ -107,7 +83,10 @@ const ExpandableRowComponent = ({ data }) => {
         <span className="dtr-title">Inspection Nate</span> <span className="dtr-data">{data.created_at}</span>
       </li>
       <li>
-        <span className="dtr-title">DownLoad</span> <span className="dtr-data"><DownLoadReport row={data} /></span>
+        <span className="dtr-title">DownLoad</span>{" "}
+        <span className="dtr-data">
+          <DownLoadReport row={data} />
+        </span>
       </li>
     </ul>
   );
@@ -115,19 +94,11 @@ const ExpandableRowComponent = ({ data }) => {
 
 const CustomCheckbox = React.forwardRef(({ onClick, ...rest }, ref) => (
   <div className="custom-control custom-control-sm custom-checkbox notext">
-    <input
-      id={rest.name}
-      type="checkbox"
-      className="custom-control-input"
-      ref={ref}
-      onClick={onClick}
-      {...rest}
-    />
+    <input id={rest.name} type="checkbox" className="custom-control-input" ref={ref} onClick={onClick} {...rest} />
     <label className="custom-control-label" htmlFor={rest.name} />
   </div>
 ));
 const CustomTitle = ({ row }) => (
-
   // <div className="user-card">
   //   <UserAvatar
   //     theme={row?.avatarBg}
@@ -141,19 +112,16 @@ const CustomTitle = ({ row }) => (
 
   // </div>
   <span>{row?.organization_name}</span>
-
 );
 const DownLoadReport = ({ row }) => (
-
   <div className="user-card">
-    <a
-      href={`${process.env.REACT_APP_API_BASE_URL}/api/commons/download-report?report=${row.id}`}
-    >
-      <Button outline color="primary" className="btn-round" > <Icon name="download"></Icon> Download </Button>
+    <a href={`${process.env.REACT_APP_API_BASE_URL}/api/commons/download-report?report=${row.id}`}>
+      <Button outline color="primary" className="btn-round">
+        {" "}
+        <Icon name="download"></Icon> Download{" "}
+      </Button>
     </a>
-
   </div>
-
 );
 
 const ConvertDate = ({ row }) => {
@@ -161,9 +129,18 @@ const ConvertDate = ({ row }) => {
 
   // Define arrays for month names and day names
   const monthNames = [
-    "January", "February", "March", "April",
-    "May", "June", "July", "August",
-    "September", "October", "November", "December"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
   ];
 
   const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -177,15 +154,17 @@ const ConvertDate = ({ row }) => {
   // Create the wordy date using template literals
   const wordyDate = `${dayNames[dayOfWeek]}, ${monthNames[month]} ${day}, ${year}`;
 
-  return <div className="user-card">
-    <span color="primary" > <Icon name="calender"></Icon> {wordyDate}</span>
-  </div>;
-}
-
-
+  return (
+    <div className="user-card">
+      <span color="primary">
+        {" "}
+        <Icon name="calender"></Icon> {wordyDate}
+      </span>
+    </div>
+  );
+};
 
 const ValuerReports = () => {
-
   const [tableData, setTableData] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [rowsPerPageS, setRowsPerPageS] = useState(5);
@@ -197,7 +176,13 @@ const ValuerReports = () => {
   const [orderColumn, setOrderColumn] = useState("organization_name");
   const [sortOrder, setSortOrder] = useState("ASC");
 
-  const { data: allthereports, isLoading } = useGetValuationReportsQuery({ currentPage, rowsPerPageS, searchText, orderColumn, sortOrder });
+  const { data: allthereports, isLoading } = useGetValuationReportsQuery({
+    currentPage,
+    rowsPerPageS,
+    searchText,
+    orderColumn,
+    sortOrder,
+  });
 
   useEffect(() => {
     if (allthereports != undefined) {
@@ -206,50 +191,50 @@ const ValuerReports = () => {
     }
   }, [allthereports]);
 
-
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
-  }
+  };
 
-  const [columns, setColumns] = useState([{
-    name: "Client Name",
-    selector: (row) => row.organization_name,
-    sortable: true,
-    cell: row => <CustomTitle row={row} />,
-  },
-  {
-    name: "LR Number",
-    selector: (row) => row.property_lr,
-    sortable: true,
-    hide: 370,
-
-  },
-  {
-    name: "FMV",
-    selector: (row) => row.forced_market_value,
-    sortable: true,
-    hide: "sm",
-  },
-  {
-    name: "Market Value",
-    selector: (row) => row.market_value,
-    sortable: true,
-    hide: "sm",
-  },
-  {
-    name: "Inspection Date",
-    selector: (row) => row.created_at,
-    sortable: true,
-    hide: "md",
-    cell: row => <ConvertDate row={row} />
-  },
-  {
-    name: "Report",
-    selector: (row) => row.market_value,
-    sortable: true,
-    hide: "md",
-    cell: row => <DownLoadReport row={row} />,
-  },]);
+  const [columns, setColumns] = useState([
+    {
+      name: "Client Name",
+      selector: (row) => row.organization_name,
+      sortable: true,
+      cell: (row) => <CustomTitle row={row} />,
+    },
+    {
+      name: "LR Number",
+      selector: (row) => row.property_lr,
+      sortable: true,
+      hide: 370,
+    },
+    {
+      name: "FMV",
+      selector: (row) => row.forced_market_value,
+      sortable: true,
+      hide: "sm",
+    },
+    {
+      name: "Market Value",
+      selector: (row) => row.market_value,
+      sortable: true,
+      hide: "sm",
+    },
+    {
+      name: "Inspection Date",
+      selector: (row) => row.created_at,
+      sortable: true,
+      hide: "md",
+      cell: (row) => <ConvertDate row={row} />,
+    },
+    {
+      name: "Report",
+      selector: (row) => row.market_value,
+      sortable: true,
+      hide: "md",
+      cell: (row) => <DownLoadReport row={row} />,
+    },
+  ]);
 
   // useEffect(() => {
   //   let defaultData = tableData;
@@ -281,18 +266,20 @@ const ValuerReports = () => {
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const className = 'nk-tb-list';
+  const className = "nk-tb-list";
 
   const [activeTab, setActivetab] = useState("1");
 
-  const toggle = (tab) => { setActivetab(tab) };
+  const toggle = (tab) => {
+    setActivetab(tab);
+  };
 
   const {
     data: accesorslist,
     isLoading: loadingAccesors,
     isSuccess: accesorsLoaded,
     isError: errorLodingAccesors,
-    error: loadingAccesorError
+    error: loadingAccesorError,
   } = useGetAccesorsListQuery();
   // console.log("Accesors List");
   // console.log(accesorslist);
@@ -302,18 +289,16 @@ const ValuerReports = () => {
       const restructuredData = accesorslist.map(({ id, organization_name }) => ({
         value: id,
         label: organization_name,
-        name: organization_name
+        name: organization_name,
       }));
       setExistingAccessors(restructuredData);
     }
-
   }, [accesorslist]);
 
   const [propertytypesList, setPropertytypesList] = useState();
   const { data: registeredpropertytypes, isLoading: loadingpropertytypes } = useGetPropertyTypeListQuery();
   // console.log(registeredpropertytypes, "registeredpropertytypes");
   useEffect(() => {
-
     if (registeredpropertytypes != undefined) {
       const restructuredData = registeredpropertytypes.map(({ id, type_name }) => ({
         id: id,
@@ -324,13 +309,10 @@ const ValuerReports = () => {
     }
   }, [loadingpropertytypes]);
 
-
-
   const [countiesList, setCountiesList] = useState();
   const { data: counties, isLoading: loadingcounties } = useGetAllCountiesQuery();
   // console.log(registeredpropertytypes, "registeredpropertytypes");
   useEffect(() => {
-
     if (counties != undefined) {
       const restructuredData = counties.map(({ id, name }) => ({
         id: id,
@@ -376,15 +358,17 @@ const ValuerReports = () => {
     setRangeDate({ start: start, end: end });
   };
 
-
-
   return (
-    <div style={{ width: "100%", display: 'flex', justifyContent: 'center' }}>
-      <Card className="card-bordered" style={{ height: '60%', width: '95%', marginTop: '7%', marginBottom: '10%', padding: '3%', }}>
-
+    <div style={{ width: "100%", display: "flex", justifyContent: "center" }}>
+      <Card
+        className="card-bordered"
+        style={{ height: "60%", width: "95%", marginTop: "7%", marginBottom: "10%", padding: "3%" }}
+      >
         <div className={`dataTables_wrapper dt-bootstrap4 no-footer ${className ? className : ""}`}>
-          <Card className="card-bordered" style={{ padding: '15px 35px 25px 35px', borderRadius: "45px", backgroundColor: "#F2F3F5" }}>
-
+          <Card
+            className="card-bordered"
+            style={{ padding: "15px 35px 25px 35px", borderRadius: "45px", backgroundColor: "#F2F3F5" }}
+          >
             <Row>
               <Col>
                 <Nav tabs>
@@ -415,18 +399,14 @@ const ValuerReports = () => {
                       Advanced Search
                     </NavLink>
                   </NavItem>
-                  <NavItem>
-
-                  </NavItem>
-
+                  <NavItem></NavItem>
                 </Nav>
                 <TabContent activeTab={activeTab}>
                   <TabPane tabId="1">
                     <Row className={`justify-between g-2 ${actions ? "with-export" : ""}`}>
                       <Col className="col-12 text-start" sm="12" style={{}}>
-
                         <input
-                          style={{ width: '100%' }}
+                          style={{ width: "100%" }}
                           type="text"
                           className="form-control"
                           placeholder="Organization Name or LR number or Market value or property type "
@@ -435,38 +415,34 @@ const ValuerReports = () => {
                             setCurrentPage(1);
                           }}
                         />
-
                       </Col>
-
-
                     </Row>
-
                   </TabPane>
                   <TabPane tabId="2">
                     <Row className={`justify-between g-2 ${actions ? "with-export" : ""}`}>
                       <Col className="text-start" sm="12" md="3" style={{}}>
                         {existingAccessors && existingAccessors.length > 0 && (
-                          <Select options={existingAccessors} isSearchable={true} placeholder="Organization" />)
-                        }
+                          <Select options={existingAccessors} isSearchable={true} placeholder="Organization" />
+                        )}
                       </Col>
                       <Col className="text-start" sm="12" md="3" style={{}}>
                         {propertytypesList && propertytypesList.length > 0 && (
-                          <Select options={propertytypesList} isSearchable={true} placeholder="Property Type" />)
-                        }
+                          <Select options={propertytypesList} isSearchable={true} placeholder="Property Type" />
+                        )}
                       </Col>
                       <Col className=" text-start" sm="12" md="3" style={{}}>
                         {countiesList && countiesList.length > 0 && (
-                          <Select options={countiesList} isSearchable={true} placeholder="County" />)
-                        }
+                          <Select options={countiesList} isSearchable={true} placeholder="County" />
+                        )}
                       </Col>
                       <Col className="text-start" sm="12" md="3" style={{}}>
                         {signatoriesList && signatoriesList.length > 0 && (
-                          <Select options={signatoriesList} isSearchable={true} placeholder="Valuer" />)
-                        }
+                          <Select options={signatoriesList} isSearchable={true} placeholder="Valuer" />
+                        )}
                       </Col>
                     </Row>
                     <hr></hr>
-                    <Row >
+                    <Row>
                       <Col className="text-start" sm="12" md="4" style={{}}>
                         <div className="form-group">
                           Valuation Date <br></br>
@@ -494,14 +470,13 @@ const ValuerReports = () => {
                               />
                             </div>
                           </div>
-
                         </div>
                       </Col>
                       <Col className="text-start" sm="12" md="6" style={{}}>
-
-                        <span>Search KeyWord</span><br></br>
+                        <span>Search KeyWord</span>
+                        <br></br>
                         <input
-                          style={{ width: '100%' }}
+                          style={{ width: "100%" }}
                           type="text"
                           className="form-control"
                           placeholder="Organization Name or LR number or Market value or property type "
@@ -511,23 +486,23 @@ const ValuerReports = () => {
                           }}
                         />
                       </Col>
-                      <Col className=" text-end" sm="12" md="2" >
-                        <span></span><br></br>
-                        <Button className="btn-round" color="primary" size="md" >
-                          Apply  <Icon name="filter"></Icon>
+                      <Col className=" text-end" sm="12" md="2">
+                        <span></span>
+                        <br></br>
+                        <Button className="btn-round" color="primary" size="md">
+                          Apply <Icon name="filter"></Icon>
                         </Button>
                       </Col>
                     </Row>
                   </TabPane>
-                </TabContent></Col>
+                </TabContent>
+              </Col>
             </Row>
-
           </Card>
           <Row style={{ marginTop: "20px" }}>
             <Col className="text-end" sm="12">
               <div id="DataTables_Table_0_filter" className="dataTables_filter">
                 <label>
-
                   <select
                     name="DataTables_Table_0_length"
                     className="form-control "
@@ -544,13 +519,12 @@ const ValuerReports = () => {
                   </select>{" "}
                 </label>
               </div>
-
             </Col>
           </Row>
           <DataTable
             data={tableData}
             columns={columns}
-            className='nk-tb-list'
+            className="nk-tb-list"
             // selectableRows={selectableRows}
             selectableRowsComponent={CustomCheckbox}
             expandableRowsComponent={ExpandableRowComponent}
@@ -562,9 +536,7 @@ const ValuerReports = () => {
                 <span>&uarr;</span>
               </div>
             }
-          >
-
-          </DataTable>
+          ></DataTable>
           <div className="card-inner">
             {tableData != null && tableData != undefined ? (
               <PaginationComponent
@@ -582,8 +554,6 @@ const ValuerReports = () => {
         </div>
       </Card>
     </div>
-
-
   );
 };
 export default ValuerReports;
