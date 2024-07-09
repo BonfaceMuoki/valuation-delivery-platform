@@ -2,7 +2,7 @@ name: autodeploy
 on:
   push:
     branches:
-      - master
+      - main
       - uat
 
 jobs:
@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment: PROD
-    if: github.ref == 'refs/heads/master'
+    if: github.ref == 'refs/heads/main'
     steps:
     - name: Server Actions
       uses: appleboy/ssh-action@master
