@@ -2,7 +2,7 @@ name: autodeploy
 on:
   push:
     branches:
-      - master
+      - main
       - uat
 
 jobs:
@@ -45,7 +45,7 @@ jobs:
           sudo composer update --ignore-platform-reqs 
 
           cat <<EOF > .env
-          APP_NAME=ElevateClub
+          APP_NAME=VDS
           APP_ENV=true
           APP_DEBUG=false
           APP_KEY=base64:YI0zAJ6HI3Ec+N1yVuS14apUydAoGxgBuCS7LgWS/8M=
@@ -119,7 +119,7 @@ jobs:
           sudo composer update --ignore-platform-reqs 
 
           cat <<EOF > .env
-          APP_NAME=ElevateClub
+          APP_NAME=VDS
           APP_ENV=true
           APP_DEBUG=false
           APP_KEY=base64:YI0zAJ6HI3Ec+N1yVuS14apUydAoGxgBuCS7LgWS/8M=
