@@ -2,7 +2,7 @@ name: autodeploy
 on:
   push:
     branches:
-      - main
+      - master
       - uat
 
 jobs:
