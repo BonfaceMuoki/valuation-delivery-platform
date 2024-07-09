@@ -18,11 +18,6 @@ jobs:
         envkey_DB_DATABASE: ${{ secrets.DB_DATABASE }}
         envkey_DB_USERNAME: ${{ secrets.DB_USERNAME }}
         envkey_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-        envkey_DB_ACTIVE_GROUP: ${{ secrets.DB_ACTIVE_GROUP }}
-        envkey_GOOGLE_SITE_KEY: ${{ secrets.GOOGLE_SITE_KEY }}
-        envkey_GOOGLE_SECRET_KEY: ${{ secrets.GOOGLE_SECRET_KEY }}
-        file_name: .env
-        fail_on_empty: false    
 
   deploy-master:
     name: Deploy to Master
