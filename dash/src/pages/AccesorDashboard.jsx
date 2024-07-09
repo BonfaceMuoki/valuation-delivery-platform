@@ -26,11 +26,11 @@ import {
 } from "../components/Component";
 import { BalanceBarChart, DepositBarChart, WithdrawBarChart } from "../components/partials/charts/invest/InvestChart";
 import ValuerReports from "./valuerspages/ValuerReports";
-import AccesorInvites from "./accesorpages/AccesorRequestInvites";
-import ValuerAccessInvite from "./valuerspages/ValuerAccessInvites";
 import { selectCurrentUser } from "../featuers/authSlice";
 import { useSelector } from "react-redux";
-const ValuerDashboard = () => {
+import AccesorReports from "./valuerspages/AccessorReports";
+
+const AccesorDashboard = () => {
   const [sm, updateSm] = useState(false);
 
   const user = useSelector(selectCurrentUser);
@@ -76,7 +76,7 @@ const ValuerDashboard = () => {
               <PreviewAltCard className="card-full">
                 <div className="card-title-group align-start mb-0">
                   <div className="card-title">
-                    <h6 className="subtitle">Registered Valuers</h6>
+                    <h6 className="subtitle">Panel Valuers</h6>
                   </div>
                   <div className="card-tools">
                     <TooltipComponent
@@ -95,15 +95,15 @@ const ValuerDashboard = () => {
                 <div className="invest-data">
                   <div className="invest-data-amount g-2">
                     <div className="invest-data-history">
-                      <div className="title">This Month</div>
+                      <div className="title">Active</div>
                       <span className="amount">
-                        2 <span className="currency currency-usd"> Users</span>
+                        2 <span className="currency currency-usd"> Valuers</span>
                       </span>
                     </div>
                     <div className="invest-data-history">
-                      <div className="title">This Week</div>
+                      <div className="title">Inactive </div>
                       <span className="amount">
-                        2 <span className="currency currency-usd"> Users</span>
+                        2 <span className="currency currency-usd"> Valuers</span>
                       </span>
                     </div>
                   </div>
@@ -118,7 +118,7 @@ const ValuerDashboard = () => {
               <PreviewAltCard className="card-full">
                 <div className="card-title-group align-start mb-0">
                   <div className="card-title">
-                    <h6 className="subtitle">Registered Accesors</h6>
+                    <h6 className="subtitle">Valuation Reports</h6>
                   </div>
                   <div className="card-tools">
                     <TooltipComponent
@@ -139,15 +139,21 @@ const ValuerDashboard = () => {
                 <div className="invest-data">
                   <div className="invest-data-amount g-2">
                     <div className="invest-data-history">
-                      <div className="title">Lenders</div>
+                      <div className="title">Ongoing Valuations</div>
                       <div className="amount">
-                        3<span className="currency currency-usd">Lenders</span>
+                        3<span className="currency currency-usd"></span>
                       </div>
                     </div>
                     <div className="invest-data-history">
-                      <div className="title">Courts</div>
+                      <div className="title">Submitted</div>
                       <div className="amount">
-                        2<span className="currency currency-usd">Courts</span>
+                        2<span className="currency currency-usd"> Reports</span>
+                      </div>
+                    </div>
+                    <div className="invest-data-history">
+                      <div className="title">Past Due</div>
+                      <div className="amount">
+                        2<span className="currency currency-usd"> Reports</span>
                       </div>
                     </div>
                   </div>
@@ -158,9 +164,9 @@ const ValuerDashboard = () => {
               </PreviewAltCard>
             </Col>
 
-            <Col xl="12" xxl="126">
+            <Col xl="12" xxl="12">
               <Card className="card-bordered card-full">
-                <ValuerReports showsearchbar={false} />
+                <AccesorReports showsearchbar={false} />
               </Card>
             </Col>
           </Row>
@@ -170,4 +176,4 @@ const ValuerDashboard = () => {
   );
 };
 
-export default ValuerDashboard;
+export default AccesorDashboard;

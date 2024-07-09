@@ -104,6 +104,11 @@ Route::group([
     Route::post('/reject-accesor-access-request', [AdminController::class, 'rejectAccesorAccessRequest']);
     Route::post('/archive-accesor-registration-request', [AdminController::class, 'archiveAccesorAccessRequest']);
     Route::get('/get-accesor-request-registration-status', [AdminController::class, 'getAccesorRequestRegistrationStatus']);
+    Route::get('/get-org-users', [AdminController::class, 'getOrgUsers']);
+
+    
+
+
 });
 Route::group([
     'middleware' => 'api',

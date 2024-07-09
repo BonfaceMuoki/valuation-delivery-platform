@@ -1,25 +1,36 @@
+/api/vendor
+/api/public/proofs
+/api/.htaccess
+/api/.env
+/api/composer.lock
+
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
-/.pnp
-.pnp.js
-/.vscode
-/.vscode*
-# testing
-/coverage
+/dash/node_modules
+/dash/.pnp
+/dash/.pnp.js
+/dash/asset-manifest.json
+/dash/index.html
+/dash/manifest.json
+/dash/robots.txt
+/dash/static
+/dash/package-lock.json
 
-# production
-/build
+.vscode
+.vscode*
 
 # misc
-.DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-.eslintcache
+/dash/.htaccess
+/dash/.DS_Store
+/dash/.env.local
+/dash/.env.development.local
+/dash/.env.test.local
+/dash/.env.production.local
+/dash/.eslintcache
 
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+/dash/npm-debug.log*
+/dash/yarn-debug.log*
+/dash/yarn-error.log*
+/dash/.env
+/dash/build

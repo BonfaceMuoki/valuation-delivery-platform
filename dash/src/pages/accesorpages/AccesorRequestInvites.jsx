@@ -26,28 +26,21 @@ import {
 import { useArchiveAccesorRegistrationRequestMutation } from "../../api/auth/inviteAccesorApiSlice";
 
 import Swal from "sweetalert2";
-import {
-  Button,
-  Modal,
-  ModalHeader,
-  ModalBody,
-  ModalFooter
-} from "reactstrap";
+import { Button, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { toast } from "react-toastify";
 import CompanySummary from "../../components/CompanySummary";
 const CloseButton = () => {
-
   return (
     <span className="btn-trigger toast-close-button" role="button">
       <Icon name="cross"></Icon>
     </span>
   );
 };
-const AccesorInvites = () => {
+const AccesorRequestInvites = () => {
   const toastMessage = (message, type) => {
     if (type == "success") {
       toast.success(message, {
@@ -155,7 +148,7 @@ const AccesorInvites = () => {
       confirmButtonText: "Yes, delete it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        setActiveRequest(firm?.id)
+        setActiveRequest(firm?.id);
         setModalSm(true);
         // submitDeclineRequest(firm);
       } else {
@@ -217,28 +210,24 @@ const AccesorInvites = () => {
     const formData = new FormData();
     formData.append("invite", row.id);
     const result = await archiveRequestt(formData);
-    if ('error' in result) {
-
-      if ('backendvalerrors' in result.error.data) {
-
+    if ("error" in result) {
+      if ("backendvalerrors" in result.error.data) {
         // setBackendValErrors(result.error.data.backendvalerrors);
       }
     } else {
       refetchFirmRequests();
     }
-  }
+  };
   const viewCompanyStatus = async (row) => {
     toggleOpenCompanyDetails();
     setActiveRequest(row.id);
     setFullActiveRequest(row);
-  }
+  };
   const viewRegistrationStatus = async (row) => {
     setFullActiveRequest(row);
     setActiveRequest(row.id);
     setModaOpenCompanyDetails(true);
-
-
-  }
+  };
   if (tableData.length > 0) {
     console.log("Table Data");
     console.log(tableData);
@@ -604,12 +593,13 @@ const AccesorInvites = () => {
                             <span className="tb-lead">
                               {item?.institution_name}{" "}
                               <span
-                                className={`dot dot-${item.status === "Active"
-                                  ? "success"
-                                  : item?.status === "Pending"
+                                className={`dot dot-${
+                                  item.status === "Active"
+                                    ? "success"
+                                    : item?.status === "Pending"
                                     ? "warning"
                                     : "danger"
-                                  } d-md-none ms-1`}
+                                } d-md-none ms-1`}
                               ></span>
                             </span>
                             <span>{item?.invite_email}</span>
@@ -744,4 +734,4 @@ const AccesorInvites = () => {
   } else {
   }
 };
-export default AccesorInvites;
+export default AccesorRequestInvites;

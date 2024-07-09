@@ -26,6 +26,12 @@ import ComingSoonPage from "./pages/ComingSoonPage";
 import UsersList from "./pages/valuerspages/UsersList";
 import AcceptValuerUserInviteSignup from "./auth/AcceptValuerUserInviteSignup";
 import MyValuersInviteList from "./pages/valuerspages/MyValuersInviteList";
+import ValuationFirms from "./pages/adminpages/ValuationFirms";
+import AccesorFirms from "./pages/adminpages/AccesorFirms";
+
+import ValuerAccessInvites from "./pages/valuerspages/ValuerAccessInvites";
+import AccesorRequestInvites from "./pages/accesorpages/AccesorRequestInvites";
+import OrgUsersList from "./pages/adminpages/OrgUsersList";
 
 const App = () => {
   return (
@@ -53,7 +59,7 @@ const App = () => {
                       checkpermission={[
                         "view super admin dashbaord",
                         "view valuation firm dashboard",
-                        "view accesor dashboard",
+                        "view accesors dashboard",
                       ]}
                     />
                   }
@@ -62,12 +68,16 @@ const App = () => {
                 </Route>
                 {/* common routes */}
                 {/* accesor dashbooard */}
-                <Route element={<AuthorizeRoute checkpermission={["view accesors dashboard"]} />}>
-                  {/* <Route path="/accesor-dashboard" element={<AccesorDashboard />}></Route> */}
-                </Route>
+                <Route element={<AuthorizeRoute checkpermission={["view accesors dashboard"]} />}></Route>
                 {/* accesor dashboard */}
                 {/* valuer dashbooard */}
                 <Route element={<AuthorizeRoute checkpermission={["view valuer dashboard"]} />}>
+                  <Route path="/valuer-dashboard" element={<ValuerDashboard />}></Route>
+                </Route>
+                <Route element={<AuthorizeRoute checkpermission={["view valuer dashboard"]} />}>
+                  <Route path="/valuer-dashboard" element={<ValuerDashboard />}></Route>
+                </Route>
+                <Route element={<AuthorizeRoute checkpermission={["view Accesor dashboard"]} />}>
                   <Route path="/valuer-dashboard" element={<ValuerDashboard />}></Route>
                 </Route>
                 <Route element={<AuthorizeRoute checkpermission={["upload report"]} />}>
@@ -93,6 +103,12 @@ const App = () => {
                   <Route path="/admin/roles" element={<RoleList />}></Route>
                   <Route path="/admin/permissions" element={<PermissionList />}></Route>
                   <Route path="/admin/role-permissions" element={<UserProfileRegularPage />}></Route>
+                  <Route path="/admin/valuation-firms" element={<ValuationFirms />}></Route>
+                  <Route path="/admin/accesors" element={<AccesorFirms />}></Route>
+
+                  <Route path="/admin/accesor-requests" element={<AccesorRequestInvites />}></Route>
+                  <Route path="/admin/valuation-firm-requests" element={<ValuerAccessInvites />}></Route>
+                  <Route path="/admin/organization-users" element={<OrgUsersList />}></Route>
                 </Route>
                 {/* admin dashboard */}
               </Route>

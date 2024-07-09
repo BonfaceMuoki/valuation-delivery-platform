@@ -1,75 +1,173 @@
-# name: autodeploy
-# on:
-#   push:
-#     branches:
-#       - main
+name: autodeploy
+on:
+  push:
+    branches:
+      - master
+      - uat
 
-# jobs:
-#   build:
-#     name: Build
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v2
-#       - name: Testing-Initiation
-#         run: echo "Testing workflow initiation!"
-#       - name: Copy env.example to .env in api
-#         run: cp api/.env.example api/.env
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Making Env File
+      uses: SpicyPizza/create-envfile@v1.3
+      with:
+        envkey_DB_HOST: ${{ secrets.DB_HOST }}
+        envkey_DB_PORT: ${{ secrets.DB_PORT }}
+        envkey_DB_DATABASE: ${{ secrets.DB_DATABASE }}
+        envkey_DB_USERNAME: ${{ secrets.DB_USERNAME }}
+        envkey_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        envkey_DB_ACTIVE_GROUP: ${{ secrets.DB_ACTIVE_GROUP }}
+        envkey_GOOGLE_SITE_KEY: ${{ secrets.GOOGLE_SITE_KEY }}
+        envkey_GOOGLE_SECRET_KEY: ${{ secrets.GOOGLE_SECRET_KEY }}
+        file_name: .env
+        fail_on_empty: false    
 
-#       - name: Assign value in .env
-#         run: |
-#           sed -i 's/GOOGLE_SITE_KEY=.*/GOOGLE_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}/' api/.env
+  deploy-master:
+    name: Deploy to Master
+    runs-on: ubuntu-latest
+    needs: build
+    environment: PROD
+    if: github.ref == 'refs/heads/master'
+    steps:
+    - name: Server Actions
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        port: ${{ secrets.PORT }}test
+        script: |
+          cd /var/www/html     
+          sudo git pull     
+          cd /var/www/html/api
+          sudo composer update --ignore-platform-reqs 
 
-#       - name: Display  api .env contents
-#         run: cat api/.env
-#       - name: Deploying API
-#         uses: appleboy/ssh-action@master
-#         with:
-#           host: ${{ secrets.SERVER_HOST }}
-#           username: ${{ secrets.SERVER_USERNAME }}
-#           password: ${{ secrets.SERVER_PASSWORD }}
-#           port: ${{ secrets.SERVER_PORT }}
-#           script: |
-#                  cd /var/www/html
-#                  sudo git pull
-#                  cd api
-#                  sudo cp .env.prod .env
-#                  composer install --no-interaction --prefer-dist --optimize-autoloader                
-#                  sed -i 's/APP_NAME=.*/APP_NAME=${{ secrets.APP_NAME }}/' /var/www/html/api/.env
-#                  sed -i 's/APP_ENV=.*/APP_ENV=${{ secrets.APP_ENV_PROD }}/' /var/www/html/api/.env
-#                  sed -i 's/APP_DEBUG=.*/APP_DEBUG=${{ secrets.APP_DEBUG }}/' /var/www/html/api/.env
-#                  sed -i 's/APP_URL=.*/APP_URL=${{ secrets.APP_URL }}/' /var/www/html/api/.env
-#                  sed -i 's/DB_CONNECTION=.*/DB_CONNECTION=${{ secrets.DB_CONNECTION }}/' /var/www/html/api/.env
-#                  sed -i 's/DB_HOST=.*/DB_HOST=${{ secrets.DB_HOST }}/' /var/www/html/api/.env
-#                  sed -i 's/DB_PORT=.*/DB_PORT=${{ secrets.DB_PORT }}/' /var/www/html/api/.env
-#                  sed -i 's/DB_DATABASE=.*/DB_DATABASE=${{ secrets.DB_DATABASE }}/' /var/www/html/api/.env
-#                  sed -i 's/DB_USERNAME=.*/DB_USERNAME=${{ secrets.DB_USERNAME }}/' /var/www/html/api/.env
-#                  sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=${{ secrets.DB_PASSWORD }}/' /var/www/html/api/.env
-#                  sed -i 's/MAIL_MAILER=.*/MAIL_MAILER=${{ secrets.MAIL_MAILER }}/' /var/www/html/api/.env
-#                  sed -i 's/MAIL_HOST=.*/MAIL_HOST=${{ secrets.MAIL_HOST }}/' /var/www/html/api/.env
-#                  sed -i 's/MAIL_PORT=.*/MAIL_PORT=${{ secrets.MAIL_PORT }}/' /var/www/html/api/.env
-#                  sed -i 's/MAIL_USERNAME=.*/MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}/' /var/www/html/api/.env
-#                  sed -i 's/MAIL_PASSWORD=.*/MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}/' /var/www/html/api/.env
-#                  sed -i 's/MAIL_ENCRYPTION=.*/MAIL_ENCRYPTION=${{ secrets.MAIL_ENCRYPTION }}/' /var/www/html/api/.env
-#                  sed -i 's/MAIL_FROM_ADDRESS=.*/MAIL_FROM_ADDRESS=${{ secrets.MAIL_FROM_ADDRESS }}/' /var/www/html/api/.env
-#                  sed -i 's/GOOGLE_SITE_KEY=.*/GOOGLE_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}/' /var/www/html/api/.env
-#                  chmod -R 777 storage
-#                  chmod -R 777 public/reportqr_codes
-#                  chmod -R 777 public/reports               
-#                  php artisan migrate --force
-#                  php artisan jwt:secret --force
-#                  php artisan optimize
-#                  php artisan key:generate
-#                  php artisan config:cache
-#                  php artisan config:clear      
-#       - name: Deploying Dashboard build copy
-#         uses: appleboy/ssh-action@master
-#         with:
-#           host: ${{ secrets.SERVER_HOST }}
-#           username: ${{ secrets.SERVER_USERNAME }}
-#           password: ${{ secrets.SERVER_PASSWORD }}
-#           port: ${{ secrets.SERVER_PORT }}
-#           script: |
-#                 cd /var/www/html/dashboard
-#                 sudo cp -r build/* .  
+          cat <<EOF > .env
+          APP_NAME=ElevateClub
+          APP_ENV=true
+          APP_DEBUG=false
+          APP_KEY=base64:YI0zAJ6HI3Ec+N1yVuS14apUydAoGxgBuCS7LgWS/8M=
+          APP_URL=${{ secrets.REACT_APP_API_BASE_URL }}
+          DB_CONNECTION=${{ secrets.DB_CONNECTION }}
+          DB_HOST=${{ secrets.DB_HOST }}
+          DB_PORT=${{ secrets.DB_PORT }}
+          DB_DATABASE=${{ secrets.DB_DATABASE }}
+          DB_USERNAME=${{ secrets.DB_USERNAME }}
+          DB_PASSWORD='${{ secrets.DB_PASSWORD }}'
+          MAIL_MAILER=${{ secrets.MAIL_MAILER }}
+          MAIL_HOST=${{ secrets.MAIL_HOST }}
+          MAIL_PORT=${{ secrets.MAIL_PORT }}
+          MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
+          MAIL_ENCRYPTION=${{ secrets.MAIL_ENCRYPTION }}
+          MAIL_FROM_ADDRESS=${{ secrets.MAIL_FROM_ADDRESS }}
+          MAIL_FROM_NAME=${{ secrets.MAIL_FROM_NAME }}
+          GOOGLE_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}
+          GOOGLE_SECRET_KEY=${{ secrets.GOOGLE_SECRET_KEY }}
+          EOF
 
+          sudo chmod -R 777 storage
+          sudo mkdir -p /var/www/html/api/public/proofs   
+          sudo chmod -R 777 /var/www/html/api/public/proofs   
+          php artisan migrate --force
+          php artisan db:seed
+          php artisan jwt:secret
+          php artisan key:generate
+          php artisan config:cache
 
+          cd /var/www/html/dash
+          
+          cat <<EOF > .env
+          SKIP_PREFLIGHT_CHECK=${{ secrets.SKIP_PREFLIGHT_CHECK }}
+          DISABLE_ESLINT_PLUGIN=${{ secrets.DISABLE_ESLINT_PLUGIN }}
+          GENERATE_SOURCEMAP=${{ secrets.GENERATE_SOURCEMAP }}
+          REACT_APP_FRONTEND_BASE_URL=${{ secrets.REACT_APP_FRONTEND_BASE_URL }}
+          REACT_APP_FRONT_BASE_URL=${{ secrets.REACT_APP_FRONT_BASE_URL }}
+          REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}
+          REACT_APP_API_IMAGE_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}/storage
+          REACT_APP_reCAPTCHA_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}
+          REACT_APP_reCAPTCHA_SECRET_KEY=${{ secrets.GOOGLE_SECRET_KEY }}
+          EOF
+
+          sudo npm install --force
+          sudo npm run build --force
+          cd build
+          rm -r ../static
+          mv static ../
+          sudo mv * ../
+
+  deploy-uat:
+    name: Deploy to UAT
+    runs-on: ubuntu-latest
+    needs: build
+    environment: UAT
+    if: github.ref == 'refs/heads/uat'
+    steps:
+    - name: Server Actions
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        port: ${{ secrets.PORT }}
+        script: |
+          cd /var/www/html/uat
+          sudo git pull     
+          cd /var/www/html/uat/api
+          sudo composer update --ignore-platform-reqs 
+
+          cat <<EOF > .env
+          APP_NAME=ElevateClub
+          APP_ENV=true
+          APP_DEBUG=false
+          APP_KEY=base64:YI0zAJ6HI3Ec+N1yVuS14apUydAoGxgBuCS7LgWS/8M=
+          APP_URL=${{ secrets.REACT_APP_API_BASE_URL }}
+          DB_CONNECTION=${{ secrets.DB_CONNECTION }}
+          DB_HOST=${{ secrets.DB_HOST }}
+          DB_PORT=${{ secrets.DB_PORT }}
+          DB_DATABASE=${{ secrets.DB_DATABASE }}
+          DB_USERNAME=${{ secrets.DB_USERNAME }}
+          DB_PASSWORD='${{ secrets.DB_PASSWORD }}'
+          MAIL_MAILER=${{ secrets.MAIL_MAILER }}
+          MAIL_HOST=${{ secrets.MAIL_HOST }}
+          MAIL_PORT=${{ secrets.MAIL_PORT }}
+          MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
+          MAIL_ENCRYPTION=${{ secrets.MAIL_ENCRYPTION }}
+          MAIL_FROM_ADDRESS=${{ secrets.MAIL_FROM_ADDRESS }}
+          MAIL_FROM_NAME=${{ secrets.MAIL_FROM_NAME }}
+          GOOGLE_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}
+          GOOGLE_SECRET_KEY=${{ secrets.GOOGLE_SECRET_KEY }}
+          EOF
+
+          sudo chmod -R 777 storage
+          sudo mkdir -p /var/www/html/test/api/public/proofs   
+          sudo chmod -R 777 /var/www/html/test/api/public/proofs   
+          php artisan migrate --force
+          php artisan db:seed
+          php artisan jwt:secret
+          php artisan key:generate
+          php artisan config:cache
+
+          cd /var/www/html/test/dash
+          
+          cat <<EOF > .env
+          SKIP_PREFLIGHT_CHECK=${{ secrets.SKIP_PREFLIGHT_CHECK }}
+          DISABLE_ESLINT_PLUGIN=${{ secrets.DISABLE_ESLINT_PLUGIN }}
+          GENERATE_SOURCEMAP=${{ secrets.GENERATE_SOURCEMAP }}
+          REACT_APP_FRONTEND_BASE_URL=${{ secrets.REACT_APP_FRONTEND_BASE_URL }}
+          REACT_APP_FRONT_BASE_URL=${{ secrets.REACT_APP_FRONT_BASE_URL }}
+          REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}
+          REACT_APP_API_IMAGE_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}/storage
+          REACT_APP_reCAPTCHA_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}
+          REACT_APP_reCAPTCHA_SECRET_KEY=${{ secrets.GOOGLE_SECRET_KEY }}
+          EOF
+
+          sudo npm install --force
+          sudo npm run build --force
+          cd build
+          rm -r ../static
+          mv static ../
+          sudo mv * ../

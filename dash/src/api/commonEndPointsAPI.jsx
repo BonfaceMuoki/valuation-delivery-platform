@@ -18,6 +18,12 @@ export const CommonEnpointsApi = apiSlice.injectEndpoints({
       keepUnusedDataFor: 5,
       refetchOnFocus: true,
     }),
+    getValuersList: builder.query({
+      query: () => `/api/commons/get-uploaders-list`,
+      skipCache: true,
+      keepUnusedDataFor: 5,
+      refetchOnFocus: true,
+    }),
     getPropertyTypeList: builder.query({
       query: () => `/api/commons/get-all-propertytypes`,
       skipCache: true,
@@ -57,6 +63,7 @@ export const {
   useGetAllCountiesQuery,
   useGetUsersQuery,
   useGetAccesorsListQuery,
+  useGetValuersListQuery,
   useGetPropertyTypeListQuery,
   useUploadValuationReportV2Mutation,
   useSendValuationFirmUserInviteMutation,

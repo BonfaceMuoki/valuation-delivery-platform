@@ -45,7 +45,7 @@ const CloseButton = () => {
     </span>
   );
 };
-const ValuerInvites = () => {
+const ValuerAccessInvites = () => {
   const toastMessage = (message, type) => {
     if (type == "success") {
       toast.success(message, {
@@ -472,4 +472,4 @@ const ValuerInvites = () => {
   } else {
   }
 };
-export default ValuerInvites;
+export default ValuerAccessInvites;

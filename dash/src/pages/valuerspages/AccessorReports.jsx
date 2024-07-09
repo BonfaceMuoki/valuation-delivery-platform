@@ -13,6 +13,7 @@ import {
   useGetAllCountiesQuery,
   useGetPropertyTypeListQuery,
   useGetUsersQuery,
+  useGetValuersListQuery,
 } from "../../api/commonEndPointsAPI";
 
 const Export = ({ data }) => {
@@ -164,7 +165,7 @@ const ConvertDate = ({ row }) => {
   );
 };
 
-const ValuerReports = ({ showsearchbar = true }) => {
+const AccesorReports = ({ showsearchbar = true }) => {
   const [tableData, setTableData] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [rowsPerPageS, setRowsPerPageS] = useState(5);
@@ -236,18 +237,6 @@ const ValuerReports = ({ showsearchbar = true }) => {
     },
   ]);
 
-  // useEffect(() => {
-  //   let defaultData = tableData;
-  //   if (searchText !== "") {
-  //     defaultData = data.filter((item) => {
-  //       return item.name.toLowerCase().includes(searchText.toLowerCase());
-  //     });
-  //     setTableData(defaultData);
-  //   } else {
-  //     setTableData(allthereports);
-  //   }
-  // }, [searchText]); // eslint-disable-line react-hooks/exhaustive-deps
-
   // function to change the design view under 1200 px
   const viewChange = () => {
     if (window.innerWidth < 960) {
@@ -280,13 +269,13 @@ const ValuerReports = ({ showsearchbar = true }) => {
     isSuccess: accesorsLoaded,
     isError: errorLodingAccesors,
     error: loadingAccesorError,
-  } = useGetAccesorsListQuery();
+  } = useGetValuersListQuery();
   // console.log("Accesors List");
-  // console.log(accesorslist);
+  console.log(accesorslist, "Acessd ");
   const [existingAccessors, setExistingAccessors] = useState();
   useEffect(() => {
-    if (accesorslist != undefined) {
-      const restructuredData = accesorslist.map(({ id, organization_name }) => ({
+    if (accesorslist?.data != undefined) {
+      const restructuredData = accesorslist?.data.map(({ id, organization_name }) => ({
         value: id,
         label: organization_name,
         name: organization_name,
@@ -558,4 +547,4 @@ const ValuerReports = ({ showsearchbar = true }) => {
     </div>
   );
 };
-export default ValuerReports;
+export default AccesorReports;

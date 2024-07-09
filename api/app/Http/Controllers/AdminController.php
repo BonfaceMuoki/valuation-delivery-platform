@@ -13,6 +13,7 @@ use App\Models\Organization;
 use App\Models\Permission;
 use App\Models\ReportConsumer;
 use App\Models\Role;
+use App\Models\User;
 use App\Models\ValuationFirmInvite;
 use App\Models\ValuationFirmRegistrationRequests;
 use Carbon\Carbon;
@@ -794,6 +795,21 @@ class AdminController extends Controller
         } else {
             return response()->json(['orgdetails' => [], 'message' => 'Not found', 'request' => $request->req, 'requestdetails' => $requestde], 200);
         }
+    }
+
+    public function getOrgUsers(Request $request)
+    {
+        $users = User::query();
+        if($request->filled("type")){
+            if($request->type=="accesor"){
+                $users->join("organization_users","organization_users.user_id","=","users.id");
+            }else if($request->type=="uploader"){
+                $users->join("report_consumer_users","report_consumer_users.user_id","=","users.id");
+            }
+        }
+        $users = $users->paginate();
+        
+        return response()->json($users);
     }
 
     //  close accesor requests

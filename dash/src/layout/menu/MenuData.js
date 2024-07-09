@@ -12,20 +12,20 @@ const menuadmin = [
     active: false,
     subMenu: [
       {
-        text: "User List - Valuers",
-        link: "/admin/my-users",
+        text: "Valuation Firms",
+        link: "/admin/valuation-firms",
       },
       {
-        text: "User List - Lenders & Courts",
-        link: "/admin/my-clients",
+        text: "Accesors",
+        link: "/admin/accesors",
       },
       {
-        text: "Valuers Requests List View",
-        link: "/admin/valuers-requests",
-      },
-      {
-        text: "Lenders & Courts Access Requests",
+        text: "Accesor Requests",
         link: "/admin/accesor-requests",
+      },
+      {
+        text: "Valuation Firms' Requests",
+        link: "/admin/valuation-firm-requests",
       },
     ],
   },
@@ -34,16 +34,9 @@ const menuadmin = [
     text: "Valuations",
     active: false,
     subMenu: [
-
       {
-        text: "Reports - New Report",
-        link: "/upload-new-report",
-      }, {
-        text: "Reports - My Reports",
-        link: "/valuation-firm/my-reports",
-      }, {
-        text: "Reports - Comparables",
-        link: "/valuation-firm/my-comparables",
+        text: "All Reports",
+        link: "admin/reports",
       },
     ],
   },
@@ -53,14 +46,9 @@ const menuadmin = [
     active: false,
     subMenu: [
       {
-        text: "My Credits",
-        link: "valuation-firm/my-credits",
+        text: "Payments",
+        link: "admin/all-payments",
       },
-      {
-        text: "Make Payments",
-        link: "/valuation-firm/make-payment",
-      },
-
     ],
   },
   {
@@ -99,10 +87,6 @@ const menulender = [
         text: "User List - Valuers",
         link: "/valuation-firm/my-users",
       },
-      {
-        text: "User List - Lenders & Courts",
-        link: "/valuation-firm/my-clients",
-      },
     ],
   },
   {
@@ -115,8 +99,8 @@ const menulender = [
         link: "/valuation-firm/my-reports",
       },
       {
-        text: "Reports - New Report",
-        link: "/valuation-firm/submit-report",
+        text: "Reports - Share Instructions",
+        link: "/valuation-firm/share-new-instruction",
       },
     ],
   },
@@ -127,11 +111,11 @@ const menulender = [
     subMenu: [
       {
         text: "My Credits",
-        link: "valuation-firm/my-credits",
+        link: "/my-credits",
       },
       {
         text: "Make Payments",
-        link: "/valuation-firm/make-payment",
+        link: "/make-payment",
       },
     ],
   },
@@ -154,7 +138,7 @@ const menuvaluer = [
       {
         text: "My Valuer Invites",
         link: "/valuation-firm/my-users-invite",
-      }
+      },
     ],
   },
   {
@@ -169,7 +153,8 @@ const menuvaluer = [
       {
         text: "New Report",
         link: "/upload-new-report",
-      }, {
+      },
+      {
         text: "Comparables",
         link: "/valuation-firm/my-comparables",
       },
@@ -191,11 +176,10 @@ const menuvaluer = [
     ],
   },
 ];
-const menu = { 'admin': menuadmin, 'valuer': menuvaluer, 'lender': menulender };
+const menu = { admin: menuadmin, valuer: menuvaluer, lender: menulender };
 // const userrole = currentuser?.role_name;
 // const [menu, setMenu ] = useState([]);
 // setMenu(menuadmin);
-
 
 // useEffect(() => {
 //   if (userrole === "Super Admin") {

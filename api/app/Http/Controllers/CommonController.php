@@ -51,9 +51,9 @@ class CommonController extends Controller
         }
 
     }
-    public function getAccesorsList()
+    public function getAccesorsList(Request $request)
     {
-        $all = ReportConsumer::all();
+        $all = ReportConsumer::paginate(($request->no_records)?$request->no_records:10);
         return response()->json($all, 201);
     }
     public function getAllCounties()
@@ -124,7 +124,7 @@ class CommonController extends Controller
     }
     public function getUploadersList()
     {
-        $all = Organization::all();
+        $all = Organization::paginate(10);
         return response()->json($all, 201);
     }
     public function getUploadersUsersList($uploader)
@@ -148,10 +148,11 @@ class CommonController extends Controller
         }
         $reports_query = ValuationReport::query();
         $reports_query->join("property_types", "property_types.id", "=", "valuation_reports.property_type");
-        $reports_query->join("users", "users.id", "=", "valuation_reports.report_uploading_user");
+      
         $reports = array();
         $url = url("/");
         if ($user->hasPermissionTo(Permission::where("slug", 'view valuation firm reports only')->first())) {
+            $reports_query->join("users", "users.id", "=", "valuation_reports.report_uploading_user");
             $org = $user->UploaderOrganization()->wherePivot("status", 1)->first();
             if ($org == null) {
                 return response()->json(['message' => 'Unauthorized access'], 403);
@@ -174,15 +175,15 @@ class CommonController extends Controller
             }
             $reports_query->select("valuation_reports.*", "report_consumers.organization_name", DB::raw("CONCAT('" . $url . "','/reports/',valuation_reports.upload_link) as report_url"));
             $reports = $reports_query->paginate($request->no_records);
-        } else if ($user->hasPermissionTo((Permission::where("slug", 'view accesors reports only')->first()))) {
+        } else if ($user->hasPermissionTo((Permission::where("slug", 'view accesors reports only')->first()))) {            
             // echo "hallo";
             $org = $user->AccessorOrganization()->wherePivot("status", 1)->first();
             if ($org == null) {
                 return response()->json(['message' => 'Unauthorized access'], 403);
             }
-            $reports_query->join("organizations", "organizations.id", "=", "valuation_reports.report_uploading_from");
-            $reports_query->where("receiving_company_id", $request->no_records);
-            $reports_query->select('valuation_reports.*', 'organizations.organization_name');
+            $reports_query->join("report_consumers", "report_consumers.id", "=", "valuation_reports.receiving_company_id");
+            $reports_query->where("receiving_company_id", $org->id);
+            $reports_query->select('valuation_reports.*', 'report_consumers.organization_name');
             // $reports_query->select("valuation_reports.*", "organizations.organization_name",DB::raw("CONCAT('".$url."','/reports/',valuation_reports.upload_link) as report_url"));
 
             $reports = $reports_query->paginate($request->no_records);
