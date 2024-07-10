@@ -10,8 +10,8 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-    - name: Making Env File
-      uses: SpicyPizza/create-envfile@v1.3
+      - name: Making Env File
+        uses: SpicyPizza/create-envfile@v1.3
 
   deploy-master:
     name: Deploy to Master
@@ -20,72 +20,70 @@ jobs:
     environment: PROD
     if: github.ref == 'refs/heads/main'
     steps:
-    - name: Server Actions
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        password: ${{ secrets.PASSWORD }}
-        port: ${{ secrets.PORT }}
-        script: |
-          cd /var/www/html     
-          sudo git pull     
-          cd /var/www/html/api
-          sudo composer update --ignore-platform-reqs 
+      - name: Server Actions
+        uses: appleboy/ssh-action@v0.1.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /var/www/html     
+            sudo git pull     
+            cd /var/www/html/api
+            sudo composer update --ignore-platform-reqs 
+            cat <<EOF > .env
+            APP_NAME=VDS
+            APP_ENV=true
+            APP_DEBUG=false
+            APP_KEY=base64:YI0zAJ6HI3Ec+N1yVuS14apUydAoGxgBuCS7LgWS/8M=
+            APP_URL=${{ secrets.REACT_APP_API_BASE_URL }}
+            DB_CONNECTION=${{ secrets.DB_CONNECTION }}
+            DB_HOST=${{ secrets.DB_HOST }}
+            DB_PORT=${{ secrets.DB_PORT }}
+            DB_DATABASE=${{ secrets.DB_DATABASE }}
+            DB_USERNAME=${{ secrets.DB_USERNAME }}
+            DB_PASSWORD='${{ secrets.DB_PASSWORD }}'
+            MAIL_MAILER=${{ secrets.MAIL_MAILER }}
+            MAIL_HOST=${{ secrets.MAIL_HOST }}
+            MAIL_PORT=${{ secrets.MAIL_PORT }}
+            MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
+            MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
+            MAIL_ENCRYPTION=${{ secrets.MAIL_ENCRYPTION }}
+            MAIL_FROM_ADDRESS=${{ secrets.MAIL_FROM_ADDRESS }}
+            MAIL_FROM_NAME=${{ secrets.MAIL_FROM_NAME }}
+            GOOGLE_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}
+            GOOGLE_SECRET_KEY=${{ secrets.GOOGLE_SECRET_KEY }}
+            EOF
 
-          cat <<EOF > .env
-          APP_NAME=VDS
-          APP_ENV=true
-          APP_DEBUG=false
-          APP_KEY=base64:YI0zAJ6HI3Ec+N1yVuS14apUydAoGxgBuCS7LgWS/8M=
-          APP_URL=${{ secrets.REACT_APP_API_BASE_URL }}
-          DB_CONNECTION=${{ secrets.DB_CONNECTION }}
-          DB_HOST=${{ secrets.DB_HOST }}
-          DB_PORT=${{ secrets.DB_PORT }}
-          DB_DATABASE=${{ secrets.DB_DATABASE }}
-          DB_USERNAME=${{ secrets.DB_USERNAME }}
-          DB_PASSWORD='${{ secrets.DB_PASSWORD }}'
-          MAIL_MAILER=${{ secrets.MAIL_MAILER }}
-          MAIL_HOST=${{ secrets.MAIL_HOST }}
-          MAIL_PORT=${{ secrets.MAIL_PORT }}
-          MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
-          MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
-          MAIL_ENCRYPTION=${{ secrets.MAIL_ENCRYPTION }}
-          MAIL_FROM_ADDRESS=${{ secrets.MAIL_FROM_ADDRESS }}
-          MAIL_FROM_NAME=${{ secrets.MAIL_FROM_NAME }}
-          GOOGLE_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}
-          GOOGLE_SECRET_KEY=${{ secrets.GOOGLE_SECRET_KEY }}
-          EOF
+            sudo chmod -R 777 storage
+            sudo mkdir -p /var/www/html/api/public/proofs   
+            sudo chmod -R 777 /var/www/html/api/public/proofs   
+            php artisan migrate --force
+            php artisan db:seed
+            php artisan jwt:secret
+            php artisan key:generate
+            php artisan config:cache
 
-          sudo chmod -R 777 storage
-          sudo mkdir -p /var/www/html/api/public/proofs   
-          sudo chmod -R 777 /var/www/html/api/public/proofs   
-          php artisan migrate --force
-          php artisan db:seed
-          php artisan jwt:secret
-          php artisan key:generate
-          php artisan config:cache
+            cd /var/www/html/dash
+            cat <<EOF > .env
+            SKIP_PREFLIGHT_CHECK=${{ secrets.SKIP_PREFLIGHT_CHECK }}
+            DISABLE_ESLINT_PLUGIN=${{ secrets.DISABLE_ESLINT_PLUGIN }}
+            GENERATE_SOURCEMAP=${{ secrets.GENERATE_SOURCEMAP }}
+            REACT_APP_FRONTEND_BASE_URL=${{ secrets.REACT_APP_FRONTEND_BASE_URL }}
+            REACT_APP_FRONT_BASE_URL=${{ secrets.REACT_APP_FRONT_BASE_URL }}
+            REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}
+            REACT_APP_API_IMAGE_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}/storage
+            REACT_APP_reCAPTCHA_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}
+            REACT_APP_reCAPTCHA_SECRET_KEY=${{ secrets.GOOGLE_SECRET_KEY }}
+            EOF
 
-          cd /var/www/html/dash
-          
-          cat <<EOF > .env
-          SKIP_PREFLIGHT_CHECK=${{ secrets.SKIP_PREFLIGHT_CHECK }}
-          DISABLE_ESLINT_PLUGIN=${{ secrets.DISABLE_ESLINT_PLUGIN }}
-          GENERATE_SOURCEMAP=${{ secrets.GENERATE_SOURCEMAP }}
-          REACT_APP_FRONTEND_BASE_URL=${{ secrets.REACT_APP_FRONTEND_BASE_URL }}
-          REACT_APP_FRONT_BASE_URL=${{ secrets.REACT_APP_FRONT_BASE_URL }}
-          REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}
-          REACT_APP_API_IMAGE_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}/storage
-          REACT_APP_reCAPTCHA_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}
-          REACT_APP_reCAPTCHA_SECRET_KEY=${{ secrets.GOOGLE_SECRET_KEY }}
-          EOF
-
-          sudo npm install --force
-          sudo npm run build --force
-          cd build
-          rm -r ../static
-          mv static ../
-          sudo mv * ../
+            sudo npm install --force
+            sudo npm run build --force
+            cd build
+            rm -r ../static
+            mv static ../
+            sudo mv * ../
 
   deploy-uat:
     name: Deploy to UAT
@@ -94,69 +92,67 @@ jobs:
     environment: UAT
     if: github.ref == 'refs/heads/uat'
     steps:
-    - name: Server Actions
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        password: ${{ secrets.PASSWORD }}
-        port: ${{ secrets.PORT }}
-        script: |
-          cd /var/www/html/uat
-          sudo git pull     
-          cd /var/www/html/uat/api
-          sudo composer update --ignore-platform-reqs 
+      - name: Server Actions
+        uses: appleboy/ssh-action@v0.1.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /var/www/html/uat
+            sudo git pull     
+            cd /var/www/html/uat/api
+            sudo composer update --ignore-platform-reqs 
+            cat <<EOF > .env
+            APP_NAME=VDS
+            APP_ENV=true
+            APP_DEBUG=false
+            APP_KEY=base64:YI0zAJ6HI3Ec+N1yVuS14apUydAoGxgBuCS7LgWS/8M=
+            APP_URL=${{ secrets.REACT_APP_API_BASE_URL }}
+            DB_CONNECTION=${{ secrets.DB_CONNECTION }}
+            DB_HOST=${{ secrets.DB_HOST }}
+            DB_PORT=${{ secrets.DB_PORT }}
+            DB_DATABASE=${{ secrets.DB_DATABASE }}
+            DB_USERNAME=${{ secrets.DB_USERNAME }}
+            DB_PASSWORD='${{ secrets.DB_PASSWORD }}'
+            MAIL_MAILER=${{ secrets.MAIL_MAILER }}
+            MAIL_HOST=${{ secrets.MAIL_HOST }}
+            MAIL_PORT=${{ secrets.MAIL_PORT }}
+            MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
+            MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
+            MAIL_ENCRYPTION=${{ secrets.MAIL_ENCRYPTION }}
+            MAIL_FROM_ADDRESS=${{ secrets.MAIL_FROM_ADDRESS }}
+            MAIL_FROM_NAME=${{ secrets.MAIL_FROM_NAME }}
+            GOOGLE_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}
+            GOOGLE_SECRET_KEY=${{ secrets.GOOGLE_SECRET_KEY }}
+            EOF
 
-          cat <<EOF > .env
-          APP_NAME=VDS
-          APP_ENV=true
-          APP_DEBUG=false
-          APP_KEY=base64:YI0zAJ6HI3Ec+N1yVuS14apUydAoGxgBuCS7LgWS/8M=
-          APP_URL=${{ secrets.REACT_APP_API_BASE_URL }}
-          DB_CONNECTION=${{ secrets.DB_CONNECTION }}
-          DB_HOST=${{ secrets.DB_HOST }}
-          DB_PORT=${{ secrets.DB_PORT }}
-          DB_DATABASE=${{ secrets.DB_DATABASE }}
-          DB_USERNAME=${{ secrets.DB_USERNAME }}
-          DB_PASSWORD='${{ secrets.DB_PASSWORD }}'
-          MAIL_MAILER=${{ secrets.MAIL_MAILER }}
-          MAIL_HOST=${{ secrets.MAIL_HOST }}
-          MAIL_PORT=${{ secrets.MAIL_PORT }}
-          MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
-          MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
-          MAIL_ENCRYPTION=${{ secrets.MAIL_ENCRYPTION }}
-          MAIL_FROM_ADDRESS=${{ secrets.MAIL_FROM_ADDRESS }}
-          MAIL_FROM_NAME=${{ secrets.MAIL_FROM_NAME }}
-          GOOGLE_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}
-          GOOGLE_SECRET_KEY=${{ secrets.GOOGLE_SECRET_KEY }}
-          EOF
+            sudo chmod -R 777 storage
+            sudo mkdir -p /var/www/html/uat/api/public/proofs   
+            sudo chmod -R 777 /var/www/html/uat/api/public/proofs   
+            php artisan migrate --force
+            php artisan db:seed
+            php artisan jwt:secret
+            php artisan key:generate
+            php artisan config:cache
 
-          sudo chmod -R 777 storage
-          sudo mkdir -p /var/www/html/uat/api/public/proofs   
-          sudo chmod -R 777 /var/www/html/test/api/public/proofs   
-          php artisan migrate --force
-          php artisan db:seed
-          php artisan jwt:secret
-          php artisan key:generate
-          php artisan config:cache
+            cd /var/www/html/uat/dash
+            cat <<EOF > .env
+            SKIP_PREFLIGHT_CHECK=${{ secrets.SKIP_PREFLIGHT_CHECK }}
+            DISABLE_ESLINT_PLUGIN=${{ secrets.DISABLE_ESLINT_PLUGIN }}
+            GENERATE_SOURCEMAP=${{ secrets.GENERATE_SOURCEMAP }}
+            REACT_APP_FRONTEND_BASE_URL=${{ secrets.REACT_APP_FRONTEND_BASE_URL }}
+            REACT_APP_FRONT_BASE_URL=${{ secrets.REACT_APP_FRONT_BASE_URL }}
+            REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}
+            REACT_APP_API_IMAGE_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}/storage
+            REACT_APP_reCAPTCHA_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}
+            REACT_APP_reCAPTCHA_SECRET_KEY=${{ secrets.GOOGLE_SECRET_KEY }}
+            EOF
 
-          cd /var/www/html/uat/dash
-          
-          cat <<EOF > .env
-          SKIP_PREFLIGHT_CHECK=${{ secrets.SKIP_PREFLIGHT_CHECK }}
-          DISABLE_ESLINT_PLUGIN=${{ secrets.DISABLE_ESLINT_PLUGIN }}
-          GENERATE_SOURCEMAP=${{ secrets.GENERATE_SOURCEMAP }}
-          REACT_APP_FRONTEND_BASE_URL=${{ secrets.REACT_APP_FRONTEND_BASE_URL }}
-          REACT_APP_FRONT_BASE_URL=${{ secrets.REACT_APP_FRONT_BASE_URL }}
-          REACT_APP_API_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}
-          REACT_APP_API_IMAGE_BASE_URL=${{ secrets.REACT_APP_API_BASE_URL }}/storage
-          REACT_APP_reCAPTCHA_SITE_KEY=${{ secrets.GOOGLE_SITE_KEY }}
-          REACT_APP_reCAPTCHA_SECRET_KEY=${{ secrets.GOOGLE_SECRET_KEY }}
-          EOF
-
-          sudo npm install --force
-          sudo npm run build --force
-          cd build
-          rm -r ../static
-          mv static ../
-          sudo mv * ../
+            sudo npm install --force
+            sudo npm run build --force
+            cd build
+            rm -r ../static
+            mv static ../
+            sudo mv * ../
