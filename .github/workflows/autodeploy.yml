@@ -26,7 +26,7 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USERNAME }}
         password: ${{ secrets.PASSWORD }}
-        port: ${{ secrets.PORT }}test
+        port: ${{ secrets.PORT }}
         script: |
           cd /var/www/html     
           sudo git pull     
@@ -132,7 +132,7 @@ jobs:
           EOF
 
           sudo chmod -R 777 storage
-          sudo mkdir -p /var/www/html/test/api/public/proofs   
+          sudo mkdir -p /var/www/html/uat/api/public/proofs   
           sudo chmod -R 777 /var/www/html/test/api/public/proofs   
           php artisan migrate --force
           php artisan db:seed
@@ -140,7 +140,7 @@ jobs:
           php artisan key:generate
           php artisan config:cache
 
-          cd /var/www/html/test/dash
+          cd /var/www/html/uat/dash
           
           cat <<EOF > .env
           SKIP_PREFLIGHT_CHECK=${{ secrets.SKIP_PREFLIGHT_CHECK }}
